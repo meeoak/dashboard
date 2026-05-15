@@ -3640,6 +3640,35 @@ async function loadFromSheet(){
 window.__STATIC_RECORDS = (D.records||[]).slice();
 window.__STATIC_MLABELS = Object.assign({}, D.mlabels||{});
 
+// ── 시트 응답 localStorage 캐시 (재방문 즉시 갱신용) ──────
+const SHEET_CACHE_KEY = 'dashboard.sheet.records.v1';
+const SHEET_CACHE_TIME_KEY = 'dashboard.sheet.savedAt.v1';
+const SHEET_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24h
+function loadSheetCache(){
+  try{
+    const savedAt = parseInt(localStorage.getItem(SHEET_CACHE_TIME_KEY)||'0',10);
+    if(!savedAt || Date.now()-savedAt > SHEET_CACHE_MAX_AGE_MS) return null;
+    const raw = localStorage.getItem(SHEET_CACHE_KEY);
+    if(!raw) return null;
+    const recs = JSON.parse(raw);
+    return Array.isArray(recs) && recs.length ? recs : null;
+  }catch(e){ return null; }
+}
+function saveSheetCache(records){
+  try{
+    localStorage.setItem(SHEET_CACHE_KEY, JSON.stringify(records));
+    localStorage.setItem(SHEET_CACHE_TIME_KEY, String(Date.now()));
+  }catch(e){ /* quota 초과 등 무시 */ }
+}
+function applySheetRecords(liveRecords){
+  const merged = mergeRecords(window.__STATIC_RECORDS, liveRecords);
+  const today = new Date().toISOString().slice(0,10);
+  const mergedD = buildD(merged, today);
+  mergedD.mlabels = Object.assign({}, window.__STATIC_MLABELS, mergedD.mlabels);
+  Object.keys(D).forEach(k=>delete D[k]);
+  Object.assign(D, mergedD);
+}
+
 // 정적 records + 시트 records 머지
 // 각 월별로 더 많은 데이터를 가진 쪽 사용 (파싱 실패로 라이브가 적으면 정적 유지)
 function mergeRecords(staticRecs, liveRecs){
@@ -3677,16 +3706,17 @@ async function boot(){
   initFilters();
   renderAll();
   if(curLang!=='ko')setLang(curLang);
-  // 2) 백그라운드에서 시트 동기화 후 머지·재렌더
+  // 2) localStorage 캐시가 있으면 재방문 즉시 적용 (네트워크 대기 없이)
+  const cachedRecs = loadSheetCache();
+  if(cachedRecs){
+    applySheetRecords(cachedRecs);
+    renderAll();
+  }
+  // 3) 백그라운드에서 시트 동기화 후 머지·재렌더
   const newD=await loadFromSheet();
   if(newD&&newD.records){
-    const merged = mergeRecords(window.__STATIC_RECORDS, newD.records);
-    const today = new Date().toISOString().slice(0,10);
-    const mergedD = buildD(merged, today);
-    // 정적 mlabels 와 머지 (과거 월 라벨 보존)
-    mergedD.mlabels = Object.assign({}, window.__STATIC_MLABELS, mergedD.mlabels);
-    Object.keys(D).forEach(k=>delete D[k]);
-    Object.assign(D, mergedD);
+    saveSheetCache(newD.records);
+    applySheetRecords(newD.records);
     renderAll();
   }
 }
@@ -3695,12 +3725,8 @@ async function boot(){
 window.refreshFromSheet=async function(){
   const newD=await loadFromSheet();
   if(newD&&newD.records){
-    const merged = mergeRecords(window.__STATIC_RECORDS, newD.records);
-    const today = new Date().toISOString().slice(0,10);
-    const mergedD = buildD(merged, today);
-    mergedD.mlabels = Object.assign({}, window.__STATIC_MLABELS, mergedD.mlabels);
-    Object.keys(D).forEach(k=>delete D[k]);
-    Object.assign(D, mergedD);
+    saveSheetCache(newD.records);
+    applySheetRecords(newD.records);
     renderAll();
   }
 };
