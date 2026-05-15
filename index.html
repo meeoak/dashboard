@@ -2530,9 +2530,11 @@ function renderInsight(){
 
 // ── 탭 ──────────────────────────────────────────────────
 function switchTab(tab){
-  ['cal','stats','rank','prov','chan','insight'].forEach(t=>{
-    document.getElementById('tab-'+t).classList.toggle('on', t===tab);
-    document.getElementById('content-'+t).style.display = t===tab?'block':'none';
+  ['cal','stats','rank','insight'].forEach(t=>{
+    const tabEl = document.getElementById('tab-'+t);
+    const contEl = document.getElementById('content-'+t);
+    if(tabEl) tabEl.classList.toggle('on', t===tab);
+    if(contEl) contEl.style.display = t===tab?'block':'none';
   });
   curTab = tab;
   renderTab();
