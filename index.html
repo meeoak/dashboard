@@ -513,6 +513,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 
 /* ─ 인사이트 ─ */
 .insight-grid{padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.ins-team-grid{padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.ins-team-card{background:#fff;border:1px solid #e2e8f0;border-left:5px solid #888;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ins-tc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.ins-tc-name{font-size:18px;font-weight:900;letter-spacing:-.3px}
+.ins-tc-badge{color:white;font-size:12px;font-weight:800;padding:4px 10px;border-radius:6px}
+.ins-tc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 0;border-top:1px solid #f1f5f9;border-bottom:1px solid #f1f5f9;margin-bottom:12px}
+.ins-tc-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ins-tc-lbl{font-size:10.5px;color:#888;font-weight:700}
+.ins-tc-val{font-size:18px;font-weight:900;color:#333}
+.ins-tc-sec{margin-top:10px;font-size:12px}
+.ins-tc-sec b{display:block;margin-bottom:4px;font-size:12.5px}
+.ins-tc-good b{color:#15803d}
+.ins-tc-bad b{color:#b91c1c}
+.ins-tc-tip b{color:#6d28d9}
+.ins-tc-item{padding:4px 8px;background:#fafafa;border-radius:5px;margin-bottom:3px;line-height:1.4;font-weight:600;color:#444}
+.ins-tc-good .ins-tc-item{background:#dcfce7;color:#14532d}
+.ins-tc-bad .ins-tc-item{background:#fef2f2;color:#7f1d1d}
+.ins-tc-tip .ins-tc-item{background:#f5f3ff;color:#4c1d95}
+.ins-ag-wrap{padding:16px 20px}
+.ins-ag-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:16px 20px}
+.ins-ag-col-hd{font-weight:900;font-size:14px;margin-bottom:10px;padding:8px 12px;border-radius:8px}
+.ins-ag-top{background:linear-gradient(90deg,#fef3c7,#fde68a);color:#78350f}
+.ins-ag-bot{background:linear-gradient(90deg,#fee2e2,#fca5a5);color:#7f1d1d}
+.ins-ag-card{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;background:white;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.ins-ag-card:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.ins-ag-card.top{border-left:4px solid #f59e0b;background:linear-gradient(90deg,#fffbeb,#fff)}
+.ins-ag-card.bot{border-left:4px solid #ef4444;background:linear-gradient(90deg,#fef2f2,#fff)}
+.ins-ag-rank{font-size:24px;text-align:center;font-weight:900;color:#888}
+.ins-ag-name{font-size:14px;font-weight:800;color:#1f2937}
+.ins-ag-team{margin-top:3px}
+.ins-ag-stats{display:flex;gap:14px}
+.ins-ag-stat{display:flex;flex-direction:column;align-items:center;font-size:11px}
+.ins-ag-stat b{font-size:15px;font-weight:900}
+.ins-ag-stat small{color:#888;font-weight:700;margin-top:1px}
+.ins-ag-full{padding:0 20px 24px}
+.ins-ag-tbl{width:100%;border-collapse:collapse;font-size:13px;background:white;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+.ins-ag-tbl th{padding:9px 6px;background:#f8fafc;border-bottom:2px solid #e2e8f0;font-size:11.5px;color:#475569;text-align:center;font-weight:800}
+.ins-ag-tbl td{padding:8px 6px;border-bottom:1px solid #f1f5f9;text-align:center;color:#374151}
+.ins-ag-tbl tbody tr:hover{background:#fef3c7}
 .icard{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px}
 .icard.danger{border-color:#fecaca;background:linear-gradient(135deg,#fef2f2,#fff)}
 .icard.warn{border-color:#fde68a;background:linear-gradient(135deg,#fffbeb,#fff)}
@@ -722,9 +761,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
   <button class="tab on"  id="tab-cal"     onclick="switchTab('cal')"     data-t="tab_cal">📅 방문 캘린더</button>
   <button class="tab"     id="tab-stats"   onclick="switchTab('stats')"   data-t="tab_stats">👥 에이전트 현황</button>
   <button class="tab"     id="tab-rank"    onclick="switchTab('rank')"    data-t="tab_rank">🏆 랭킹 & 배틀</button>
-  <button class="tab"     id="tab-prov"    onclick="switchTab('prov')"    data-t="tab_prov">📍 지역별</button>
-  <button class="tab"     id="tab-chan"    onclick="switchTab('chan')"    data-t="tab_chan">📡 채널별</button>
-  <button class="tab"     id="tab-insight" onclick="switchTab('insight')" data-t="tab_insight">🔥 매니저 인사이트</button>
+  <button class="tab"     id="tab-insight" onclick="switchTab('insight')" data-t="tab_insight">🔥 팀·에이전트 인사이트</button>
 </div></div>
 
 <div class="tab-content">
@@ -798,43 +835,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
     </div>
     <div class="rank-wrap" id="rank-wrap"></div>
   </div>
-  <!-- 지역 분석 -->
-  <div id="content-prov" style="display:none">
-    <div class="sec-hd">
-      <div><div class="sec-title">📍 지역(Provinsi)별 영업 현황</div>
-      <div class="sec-sub">DB 많은 지역 + 클로징율 좋은 지역 = 매출 핫스팟</div></div>
-      <div id="prov-lbl" style="font-size:11px;color:#bbb"></div>
-    </div>
-    <div style="overflow-x:auto;padding:0 0 16px"><table class="ana-tbl" id="prov-tbl"></table></div>
-  </div>
-  <!-- 채널 분석 -->
-  <div id="content-chan" style="display:none">
-    <div class="sec-hd">
-      <div><div class="sec-title">📡 채널(Channel Data)별 영업 현황</div>
-      <div class="sec-sub">유입 채널별 효율 비교 - 어디에 마케팅 예산 쓸지</div></div>
-      <div id="chan-lbl" style="font-size:11px;color:#bbb"></div>
-    </div>
-    <div style="overflow-x:auto;padding:0 0 16px"><table class="ana-tbl" id="chan-tbl"></table></div>
-  </div>
-  <!-- 매니저 인사이트 -->
+  <!-- 팀·에이전트 인사이트 -->
   <div id="content-insight" style="display:none">
     <div class="sec-hd">
-      <div><div class="sec-title">📈 일별 활동 추이 (지난 30일)</div>
-      <div class="sec-sub">방문(초록) · 예약(파랑) · 배정(회색) - 모멘텀 확인</div></div>
+      <div><div class="sec-title">🏆 팀별 인사이트</div>
+      <div class="sec-sub">선택한 기간 동안의 팀별 성과 분석 · 강점/약점/권고</div></div>
+      <div id="insight-team-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
-    <div class="trend-wrap">
-      <div class="trend-bars" id="trend-bars"></div>
-      <div class="trend-legend">
-        <div class="tleg"><div class="ldot" style="background:#16a34a"></div>방문 발생</div>
-        <div class="tleg"><div class="ldot" style="background:#2563eb"></div>예약 발생</div>
-        <div class="tleg"><div class="ldot" style="background:#94a3b8"></div>DB 배정</div>
-      </div>
-    </div>
+    <div class="ins-team-grid" id="ins-team-grid"></div>
     <div class="sec-hd" style="border-top:2px solid #f5f5f5">
-      <div><div class="sec-title">🔥 매니저 인사이트</div>
-      <div class="sec-sub">놓치고 있는 것이 있는지 확인하세요</div></div>
+      <div><div class="sec-title">👥 에이전트별 인사이트</div>
+      <div class="sec-sub">TOP / 주의 필요 · 활동 있는 에이전트만 표시</div></div>
+      <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
-    <div class="insight-grid" id="insight-grid"></div>
+    <div class="ins-agent-wrap" id="ins-agent-wrap"></div>
   </div>
 </div>
 </div><!-- /page-main -->
@@ -2527,9 +2541,162 @@ function renderTab(){
   if(curTab==='cal'){ renderCal('sched'); renderCal('done'); }
   else if(curTab==='stats') renderStats();
   else if(curTab==='rank') renderRank();
-  else if(curTab==='prov') renderProvOrChan('prov');
-  else if(curTab==='chan') renderProvOrChan('chan');
-  else if(curTab==='insight') renderInsight();
+  else if(curTab==='insight') renderTeamAgentInsight();
+}
+
+// ===== 팀·에이전트 인사이트 =====
+function renderTeamAgentInsight(){
+  // 팀별 카드
+  const teamGrid = document.getElementById('ins-team-grid');
+  const teamLbl = document.getElementById('insight-team-lbl');
+  if(teamLbl) teamLbl.textContent = rangeLbl() + ' · ' + (curTeam==='ALL'?'전체 통합':curTeam.replace('TIM_',''));
+
+  const teamsToShow = curTeam==='ALL' ? D.teams : [curTeam];
+  let teamHtml = '';
+  teamsToShow.forEach(t=>{
+    const st = statsRange(curFrom, curTo, t, 'ALL');
+    if(!st.db){
+      teamHtml += `<div class="ins-team-card" style="border-left-color:${TC[t]};opacity:.5">
+        <div class="ins-tc-head"><span class="ins-tc-name" style="color:${TC[t]}">${t.replace('TIM_','')}</span>
+        <span class="ins-tc-badge" style="background:#94a3b8">활동 없음</span></div>
+        <div style="color:#999;padding:14px;text-align:center;font-size:13px">기간 내 DB 배정 없음</div>
+      </div>`;
+      return;
+    }
+
+    // 강점/약점 분석
+    const r_ds=st.r_ds||0, r_sv=st.r_sv||0, r_vc=st.r_vc||0, r_dc=st.r_dc||0;
+    const isLidia = t==='TIM_LIDIA';
+    const strengths=[], weaknesses=[], advices=[];
+
+    if(isLidia){
+      // 리디아: 비디오콜 전담
+      if(st.vc >= st.db*0.3) strengths.push(`📹 비디오콜 ${st.vc}건 활발 (${Math.round(st.vc/st.db*100)}%)`);
+      else weaknesses.push(`📹 비디오콜 ${st.vc}건만 (${Math.round(st.vc/st.db*100)}% · 비율 낮음)`);
+      if(r_dc >= TARGETS.dc) strengths.push(`💰 DB→클로 ${r_dc}% (목표 ${TARGETS.dc}% 달성)`);
+      else weaknesses.push(`💰 DB→클로 ${r_dc}% (목표 ${TARGETS.dc}% 미달)`);
+      if(st.cl < 5) advices.push('전화·영상 후속 강화 필요');
+    } else {
+      // GIAR/TINA: 일반 방문 영업
+      if(r_ds >= TARGETS.ds) strengths.push(`📅 예약율 ${r_ds}% (목표 ${TARGETS.ds}% 달성)`);
+      else weaknesses.push(`📅 예약율 ${r_ds}% (목표 ${TARGETS.ds}% 미달 · -${(TARGETS.ds-r_ds).toFixed(1)}%p)`);
+
+      if(r_sv >= TARGETS.sv) strengths.push(`✅ 방문율 ${r_sv}% (목표 ${TARGETS.sv}% 달성)`);
+      else weaknesses.push(`✅ 방문율 ${r_sv}% (목표 ${TARGETS.sv}% 미달 · -${(TARGETS.sv-r_sv).toFixed(1)}%p)`);
+
+      if(r_vc >= TARGETS.vc) strengths.push(`🏆 클로율 ${r_vc}% (목표 ${TARGETS.vc}% 달성)`);
+      else if(st.visit > 0) weaknesses.push(`🏆 클로율 ${r_vc}% (목표 ${TARGETS.vc}% 미달)`);
+
+      if(r_dc >= TARGETS.dc) strengths.push(`💰 DB→클로 ${r_dc}% ⭐ 최종 KPI 달성`);
+      else weaknesses.push(`💰 DB→클로 ${r_dc}% (목표 ${TARGETS.dc}% 미달 · 최종 KPI 미달)`);
+
+      if(r_ds < TARGETS.ds*0.7) advices.push('초기 콜·메시지 후속 강화');
+      if(r_sv < TARGETS.sv*0.7) advices.push('예약 노쇼 줄이기 · 사전 리마인드');
+      if(r_vc < TARGETS.vc*0.7) advices.push('방문 시 클로징 트레이닝');
+      if(st.w > st.db*0.2) advices.push(`⏳ 일정대기 ${st.w}건 누적 - 결단 필요`);
+    }
+
+    const score = st.score||0;
+    const grade = score>=60?'A':score>=40?'B':score>=20?'C':'D';
+    const gradeColor = grade==='A'?'#16a34a':grade==='B'?'#0284c7':grade==='C'?'#d97706':'#dc2626';
+
+    teamHtml += `<div class="ins-team-card" style="border-left-color:${TC[t]}">
+      <div class="ins-tc-head">
+        <span class="ins-tc-name" style="color:${TC[t]}">${TEAM_EMO[t]||''} ${t.replace('TIM_','')}</span>
+        <span class="ins-tc-badge" style="background:${gradeColor}">${grade} · ${score}점</span>
+      </div>
+      <div class="ins-tc-stats">
+        <div class="ins-tc-stat"><span class="ins-tc-lbl">DB</span><span class="ins-tc-val">${st.db}</span></div>
+        <div class="ins-tc-stat"><span class="ins-tc-lbl">방문</span><span class="ins-tc-val" style="color:#16a34a">${st.visit||0}</span></div>
+        <div class="ins-tc-stat"><span class="ins-tc-lbl">클로징</span><span class="ins-tc-val" style="color:#dc2626">${st.cl||0}</span></div>
+        <div class="ins-tc-stat"><span class="ins-tc-lbl">DB→클로</span><span class="ins-tc-val" style="color:#e85d04">${r_dc}%</span></div>
+      </div>
+      ${strengths.length?`<div class="ins-tc-sec ins-tc-good"><b>✅ 강점</b>${strengths.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
+      ${weaknesses.length?`<div class="ins-tc-sec ins-tc-bad"><b>⚠️ 약점</b>${weaknesses.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
+      ${advices.length?`<div class="ins-tc-sec ins-tc-tip"><b>💡 권고</b>${advices.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
+    </div>`;
+  });
+  teamGrid.innerHTML = teamHtml;
+
+  // 에이전트별 카드
+  const agentWrap = document.getElementById('ins-agent-wrap');
+  const agentLbl = document.getElementById('insight-agent-lbl');
+
+  // 활동 있는 에이전트만 추출
+  const agents = curTeam==='ALL' ? Object.keys(D.agent_total) : (D.team_members[curTeam]||[]);
+  const list = agents.map(a=>{
+    const s = statsRange(curFrom, curTo, null, a);
+    return {a, ...s, meta: D.agent_meta[a]||{}};
+  }).filter(x=>(x.db||0)>0).sort((a,b)=>(b.score||0)-(a.score||0));
+
+  if(agentLbl) agentLbl.textContent = `${list.length}명 활동 중`;
+
+  if(list.length===0){
+    agentWrap.innerHTML = '<div style="color:#999;padding:30px;text-align:center">기간 내 활동 에이전트 없음</div>';
+    return;
+  }
+
+  // TOP 3 + Bottom 3 (활동 적은 / 부진한)
+  const top = list.slice(0,3);
+  const bottom = list.slice(-3).reverse();
+
+  let agHtml = `<div class="ins-ag-cols">
+    <div class="ins-ag-col">
+      <div class="ins-ag-col-hd ins-ag-top">🏆 TOP 성과</div>
+      ${top.map((x,i)=>renderAgentCard(x,i+1,true)).join('')}
+    </div>
+    <div class="ins-ag-col">
+      <div class="ins-ag-col-hd ins-ag-bot">⚠️ 주의 필요</div>
+      ${bottom.filter(x=>!top.includes(x)).map(x=>renderAgentCard(x,null,false)).join('')||'<div style="padding:20px;text-align:center;color:#bbb">없음</div>'}
+    </div>
+  </div>`;
+
+  // 전체 에이전트 요약 테이블
+  agHtml += `<div class="ins-ag-full">
+    <div style="font-weight:800;font-size:13px;color:#555;margin:14px 0 8px">📋 전체 에이전트 요약 (점수 순)</div>
+    <table class="ins-ag-tbl">
+      <thead><tr><th>순위</th><th>팀</th><th>에이전트</th><th>DB</th><th>방문</th><th>예약</th><th>대기</th><th>클로</th><th>DB→클로</th><th>점수</th></tr></thead>
+      <tbody>
+        ${list.map((x,i)=>{
+          const tcol = TC[x.meta.team]||'#888';
+          const tlbl = (x.meta.team||'').replace('TIM_','');
+          return `<tr onclick="openMem('${x.a}','db')" style="cursor:pointer">
+            <td><b>${i+1}</b></td>
+            <td><span style="font-size:10px;font-weight:800;color:#fff;background:${tcol};padding:2px 7px;border-radius:4px">${tlbl}</span></td>
+            <td style="text-align:left;font-weight:700">${x.meta.short||x.a}</td>
+            <td>${x.db||0}</td>
+            <td style="color:#16a34a;font-weight:700">${x.visit||0}</td>
+            <td style="color:#2563eb">${(x.s||0)+(x.s_f||0)}</td>
+            <td style="color:#d97706">${x.w||0}</td>
+            <td style="color:#dc2626;font-weight:700">${x.cl||0}</td>
+            <td style="color:#e85d04;font-weight:700">${x.r_dc||0}%</td>
+            <td style="font-weight:900">${x.score||0}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+  agentWrap.innerHTML = agHtml;
+}
+
+function renderAgentCard(x, rank, isTop){
+  const medals=['🥇','🥈','🥉'];
+  const tcol = TC[x.meta.team]||'#888';
+  const tlbl = (x.meta.team||'').replace('TIM_','');
+  const grade = x.score>=60?'A':x.score>=40?'B':x.score>=20?'C':'D';
+  return `<div class="ins-ag-card ${isTop?'top':'bot'}" onclick="openMem('${x.a}','db')">
+    <div class="ins-ag-rank">${rank?(rank<=3?medals[rank-1]:`#${rank}`):'⚠️'}</div>
+    <div class="ins-ag-info">
+      <div class="ins-ag-name">${x.meta.short||x.a}</div>
+      <div class="ins-ag-team"><span style="background:${tcol};color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800">${tlbl}</span></div>
+    </div>
+    <div class="ins-ag-stats">
+      <div class="ins-ag-stat"><b style="color:#16a34a">${x.visit||0}</b><small>방문</small></div>
+      <div class="ins-ag-stat"><b style="color:#dc2626">${x.cl||0}</b><small>클로</small></div>
+      <div class="ins-ag-stat"><b style="color:#e85d04">${x.r_dc||0}%</b><small>DB→클로</small></div>
+      <div class="ins-ag-stat"><b>${x.score||0}</b><small>점수(${grade})</small></div>
+    </div>
+  </div>`;
 }
 function renderAll(){ renderMode(); renderDBSummary(); render3MonthTrend(); renderTargets(); renderGaps(); renderKPI(); renderTab(); if(typeof updateCalControls==='function') updateCalControls(); }
 
