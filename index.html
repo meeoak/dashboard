@@ -119,25 +119,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .gap-title{font-size:14px;font-weight:900}
 .gap-sub{font-size:11px;color:#aaa}
 .gap-grid{display:flex;flex-direction:column;gap:6px}
-.gap-card{background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:22px 26px;border-left-width:8px;border-left-style:solid;display:flex;align-items:center;gap:22px;flex-wrap:wrap;box-shadow:0 3px 12px #0000000c;transition:all .15s}
+.gap-card{background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:18px 20px;border-left-width:8px;border-left-style:solid;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 3px 12px #0000000c;transition:all .15s}
 .gap-card:hover{box-shadow:0 6px 22px #00000018;transform:translateY(-2px)}
 .gap-card.gap-all{background:linear-gradient(135deg,#fff8f4,#fff)}
-.gap-team-header{flex:0 0 220px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.gap-team-name{font-size:24px;font-weight:900;letter-spacing:-.7px;line-height:1}
-.gap-team-db{font-size:14px;font-weight:900;color:#1e293b;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);border-radius:10px;padding:8px 14px;white-space:nowrap;border:1.5px solid #cbd5e1;letter-spacing:-.3px}
-.gap-metrics-h{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;min-width:0}
+.gap-team-header{flex:0 0 195px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gap-team-name{font-size:22px;font-weight:900;letter-spacing:-.7px;line-height:1}
+.gap-team-db{font-size:13px;font-weight:900;color:#1e293b;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);border-radius:10px;padding:6px 12px;white-space:nowrap;border:1.5px solid #cbd5e1;letter-spacing:-.3px}
+.gap-metrics-h{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;min-width:0}
+@media(max-width:1100px){.gap-metrics-h{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.gap-metrics-h{grid-template-columns:repeat(2,1fr)}.gap-team-header{flex:0 0 100%}}
-.gap-metric{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:12px;background:linear-gradient(135deg,#f8fafc,#fff);font-size:14px;min-width:0;border:2px solid #e2e8f0;transition:all .15s;cursor:pointer;box-shadow:0 1px 3px #00000008}
+.gap-metric{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#f8fafc,#fff);font-size:14px;min-width:0;border:2px solid #e2e8f0;transition:all .15s;cursor:pointer;box-shadow:0 1px 3px #00000008}
 .gap-metric:hover{background:linear-gradient(135deg,#fff7ed,#fff);border-color:#fb923c;transform:translateY(-3px);box-shadow:0 4px 14px #e85d0440}
 .gap-metric.final{background:linear-gradient(135deg,#fff3e0,#fffbf5);border-color:#fb923c;font-weight:700;box-shadow:0 2px 8px #e85d0425}
 .gap-metric.final:hover{background:linear-gradient(135deg,#fed7aa,#fff3e0);box-shadow:0 5px 16px #e85d0445}
 @keyframes pulseLidia{0%,100%{box-shadow:0 0 0 0 #dc262640}50%{box-shadow:0 0 0 10px #dc262610}}
-.gap-m-emoji{font-size:22px;flex-shrink:0}
-.gap-m-lbl{font-weight:900;color:#0f172a;font-size:14px;flex-shrink:0;letter-spacing:-.3px}
-.gap-m-vals{font-weight:900;color:#0f172a;font-size:22px;white-space:nowrap;letter-spacing:-.6px;line-height:1}
-.gap-m-vals .vs{color:#cbd5e1;font-weight:700;margin:0 4px;font-size:16px}
-.gap-m-vals .req{color:#64748b;font-size:14px;font-weight:800}
-.gap-m-status{margin-left:auto;font-weight:900;font-size:14px;padding:7px 14px;border-radius:16px;white-space:nowrap;flex-shrink:0;letter-spacing:-.2px;border:2px solid;box-shadow:0 2px 5px #0000000a}
+.gap-m-emoji{font-size:20px;flex-shrink:0}
+.gap-m-lbl{font-weight:900;color:#0f172a;font-size:13px;flex-shrink:0;letter-spacing:-.3px}
+.gap-m-vals{font-weight:900;color:#0f172a;font-size:20px;white-space:nowrap;letter-spacing:-.6px;line-height:1}
+.gap-m-vals .vs{color:#cbd5e1;font-weight:700;margin:0 3px;font-size:15px}
+.gap-m-vals .req{color:#64748b;font-size:13px;font-weight:800}
+.gap-m-status{margin-left:auto;font-weight:900;font-size:12px;padding:5px 10px;border-radius:14px;white-space:nowrap;flex-shrink:0;letter-spacing:-.2px;border:2px solid;box-shadow:0 2px 5px #0000000a}
 .gap-m-status.good{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#14532d;border-color:#22c55e}
 .gap-m-status.bad{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#7f1d1d;border-color:#ef4444}
 .gap-m-status.zero{background:#f1f5f9;color:#475569;border-color:#94a3b8}
