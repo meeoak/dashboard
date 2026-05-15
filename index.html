@@ -335,6 +335,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .kpi-tbl tbody tr.row-all td{background:linear-gradient(90deg,#fff8f4,#fff8f4)}
 .kpi-tbl tbody tr.row-all:hover td{background:linear-gradient(90deg,#fff3e0,#fff8f4)}
 .kpi-tbl .team-cell{text-align:left;padding-left:18px;font-size:14px;font-weight:900;letter-spacing:-.3px;display:flex;align-items:center;gap:7px}
+.kpi-tbl .row-agent td{background:#fafbfc!important;border-bottom:1px dashed #e5e7eb;padding-top:8px;padding-bottom:8px}
+.kpi-tbl .row-agent:hover td{background:#fef3c7!important}
+.kpi-tbl .row-agent .agent-cell{font-style:italic;font-weight:600;font-size:12.5px;display:flex;align-items:center;gap:4px}
+.kpi-tbl .row-agent .num-val{font-size:13px}
 .kpi-tbl .team-emo{font-size:18px}
 .kpi-tbl .num-val{font-size:18px;font-weight:900;line-height:1;cursor:pointer}
 .kpi-tbl .num-val:hover{opacity:.7}
@@ -1949,6 +1953,39 @@ function renderFunnel(){
 }
 
 // ── KPI 테이블 (간결한 5행 표) ─────────────────────────
+function kpiTblRowAgent(agent, teamColor, st, dataTeam){
+  const num = (v, st_, color_) => {
+    if(!v) return `<span class="num-val zero">-</span>`;
+    return `<span class="num-val" style="color:${color_};font-size:13px" onclick="kpiTblClickAgent(event,'${st_}','${agent}')">${f(v)}</span>`;
+  };
+  const sCell = () => {
+    const sf=st.s_f||0, so=st.s_o||0;
+    if(sf===0&&so===0) return `<span class="num-val zero">-</span>`;
+    let html = sf>0
+      ? `<span class="num-val" style="color:#2563eb;font-size:13px" onclick="kpiTblClickAgent(event,'s_f','${agent}')">${f(sf)}</span>`
+      : `<span class="num-val zero">-</span>`;
+    if(so>0) html += `<div style="margin-top:3px"><span class="overdue-tag" style="font-size:9px;padding:1px 5px" onclick="kpiTblClickAgent(event,'s_o','${agent}')" title="방문일 지남 - 클릭시 명단">⚠️ ${f(so)}</span></div>`;
+    return html;
+  };
+  const short = (D.agent_meta[agent]||{}).short || agent;
+  return `<tr class="row-agent" data-team="${dataTeam}" data-agent="${agent}">
+    <td class="team-cell agent-cell" style="padding-left:32px;color:#475569;font-size:12.5px;font-weight:600">
+      <span style="color:${teamColor};margin-right:6px;font-weight:900">└</span>${short}
+    </td>
+    <td>${st.db ? `<span class="num-val col-db" style="font-size:13px" onclick="kpiTblClickAgent(event,'db','${agent}')">${f(st.db)}</span>` : `<span class="num-val zero">-</span>`}</td>
+    <td>${num(st.d,'d','#16a34a')}</td>
+    <td>${num(st.ls,'ls','#ea580c')}</td>
+    <td>${num(st.vc,'vc','#7c3aed')}</td>
+    <td>${sCell()}</td>
+    <td>${num(st.w,'w','#d97706')}</td>
+    <td>${num(st.cl,'cl','#dc2626')}</td>
+  </tr>`;
+}
+function kpiTblClickAgent(event, stype, agent){
+  event.stopPropagation();
+  openMem(agent, stype);
+}
+
 function kpiTblRow(label, emo, color, st, isAll, dataTeam){
   // 팀 행에서는 이모지 제거 (전체 통합만 🌐 유지)
   const showEmo = isAll;
@@ -2009,15 +2046,26 @@ function renderKPI(){
       D.teams.forEach(t=>{
         const st = statsRange(curFrom, curTo, t, 'ALL');
         rows += kpiTblRow(TEAM_NAME[t]||t.replace('TIM_',''), TEAM_EMO[t], TC[t], st, false, t);
+        // 팀 아래 에이전트 세부 행 (활동 있는 에이전트만)
+        const agents = (D.team_members[t]||[]).slice();
+        agents.forEach(a=>{
+          const stAg = statsRange(curFrom, curTo, t, a);
+          if(!stAg.db) return; // 배정 0건 에이전트는 스킵
+          rows += kpiTblRowAgent(a, TC[t], stAg, t);
+        });
       });
     }
   } else {
-    // 특정 팀 - 그 팀만
+    // 특정 팀 - 그 팀만 + 그 팀 에이전트들
     const st = statsRange(curFrom, curTo, curTeam, curAgent);
     rows += kpiTblRow(TEAM_NAME[curTeam]||curTeam.replace('TIM_',''), TEAM_EMO[curTeam], TC[curTeam], st, true, curTeam);
-    if(curAgent!=='ALL'){
-      const stTeam = statsRange(curFrom, curTo, curTeam, 'ALL');
-      rows += kpiTblRow(`${curTeam.replace('TIM_','')} 팀합계`, '📊', '#888', stTeam, false, curTeam);
+    if(curAgent==='ALL'){
+      const agents = (D.team_members[curTeam]||[]).slice();
+      agents.forEach(a=>{
+        const stAg = statsRange(curFrom, curTo, curTeam, a);
+        if(!stAg.db) return;
+        rows += kpiTblRowAgent(a, TC[curTeam], stAg, curTeam);
+      });
     }
   }
 
