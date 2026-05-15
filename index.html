@@ -638,7 +638,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .urgent-banner-alert .ub-title{font-size:20px;font-weight:900;color:#7f1d1d;letter-spacing:-.3px}
 .urgent-banner-alert .ub-sub{font-size:12.5px;color:#991b1b;font-weight:600;margin-top:3px}
 .urgent-banner-alert .ub-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.ub-stat{background:white;border:2px solid;border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 4px rgba(0,0,0,.04)}
+.ub-stat{background:white;border:2px solid;border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 4px rgba(0,0,0,.04);cursor:pointer;transition:transform .12s,box-shadow .12s}
+.ub-stat:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.12)}
+.ub-stat:active{transform:translateY(0)}
 .ub-stat b{font-size:24px;font-weight:900;line-height:1}
 .ub-stat span{font-size:11.5px;font-weight:800;letter-spacing:-.2px}
 .ub-stat-red{border-color:#dc2626}.ub-stat-red b{color:#dc2626}.ub-stat-red span{color:#7f1d1d}
@@ -2847,10 +2849,10 @@ function renderUrgentBanner(){
       </div>
     </div>
     <div class="ub-stats">
-      ${totals.overdue>0?`<div class="ub-stat ub-stat-red"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>`:''}
-      ${totals.idle>0?`<div class="ub-stat ub-stat-red"><b>${totals.idle}</b><span>🚨 미진행 응답없음</span></div>`:''}
-      ${totals.wait>0?`<div class="ub-stat ub-stat-orange"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>`:''}
-      ${totals.soon>0?`<div class="ub-stat ub-stat-blue"><b>${totals.soon}</b><span>📅 방문 임박</span></div>`:''}
+      ${totals.overdue>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('overdue')" title="방문일 지남 회원 목록"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>`:''}
+      ${totals.idle>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('idle')" title="미진행 응답없음 회원 목록"><b>${totals.idle}</b><span>🚨 미진행 응답없음</span></div>`:''}
+      ${totals.wait>0?`<div class="ub-stat ub-stat-orange" onclick="openUrgentByType('wait')" title="일정대기 누적 회원 목록"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>`:''}
+      ${totals.soon>0?`<div class="ub-stat ub-stat-blue" onclick="openUrgentByType('soon')" title="방문 임박 회원 목록"><b>${totals.soon}</b><span>📅 방문 임박</span></div>`:''}
     </div>
     <div class="ub-agents">
       <div class="ub-agents-lbl">긴급 건수 TOP 에이전트:</div>
@@ -2861,6 +2863,40 @@ function renderUrgentBanner(){
       }).join('')}
     </div>
   </div>`;
+}
+
+// ===== 긴급 유형별 회원 목록 (배너 stat 카드 클릭) =====
+function openUrgentByType(kind){
+  const typeMap = {
+    overdue: {icon:'⚠️', label:'방문일 지남', bg:'#fee2e2', color:'#7f1d1d'},
+    idle:    {icon:'🚨', label:'미진행 응답없음', bg:'#fee2e2', color:'#7f1d1d'},
+    wait:    {icon:'⏳', label:'일정대기 누적', bg:'#dbeafe', color:'#1e3a8a'},
+    soon:    {icon:'📅', label:'방문 임박', bg:'#dbeafe', color:'#1e3a8a'},
+  };
+  const info = typeMap[kind] || typeMap.overdue;
+  const todayStr = D.today;
+  const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
+  const recs = [];
+  agents.forEach(a=>{
+    const urgent = findUrgentForAgent(a, todayStr);
+    urgent.forEach(u=>{ if(u.urgentIcon === info.icon) recs.push(u); });
+  });
+  memCache = recs;
+  const teamLabel = curTeam==='ALL' ? '전체' : curTeam.replace('TIM_','');
+  const tcol = curTeam==='ALL' ? '#dc2626' : (TC[curTeam]||'#dc2626');
+  document.getElementById('mem-header').innerHTML = `
+    <div class="mem-av" style="background:${tcol}">🚨</div>
+    <div class="mem-info"><h2>${info.icon} ${info.label}</h2><p>${teamLabel} · 배정 후 2주 이내 · 오늘 기준 ${todayStr}</p>
+      <span class="mem-pill" style="background:${info.bg};color:${info.color}">${info.label} ${recs.length}건</span></div>
+    <div style="margin-left:auto;text-align:right">
+      <div class="mem-count">${recs.length}</div>
+      <div style="font-size:11px;color:#aaa">건</div></div>`;
+  document.getElementById('mem-search').value='';
+  document.getElementById('mem-count-lbl').textContent = `총 ${recs.length}건`;
+  renderMemTable(recs);
+  document.getElementById('page-main').style.display='none';
+  document.getElementById('page-member').style.display='block';
+  window.scrollTo(0,0);
 }
 
 // ===== 에이전트 분석 (팀리더 코칭용) =====
