@@ -2225,7 +2225,14 @@ function rateCell(rate, target){
 
 function renderStats(){
   const agents = curTeam==='ALL' ? Object.keys(D.agent_total) : D.team_members[curTeam];
-  const filtered = curAgent==='ALL' ? agents : [curAgent];
+  let filtered = curAgent==='ALL' ? agents : [curAgent];
+  // 해당 기간에 배정(DB) 0건인 에이전트는 자동 제외 (curAgent 선택시는 제외 안 함)
+  if(curAgent==='ALL'){
+    filtered = filtered.filter(a=>{
+      const t = statsRange(curFrom, curTo, null, a);
+      return (t.db||0) > 0;
+    });
+  }
   // 헤더: 에이전트/팀 + DB + 활동 6개 + 전환율 4개
   let h = `<thead><tr>
     <th class="L">에이전트</th>
@@ -2321,8 +2328,8 @@ function renderRank(){
   const list = agents.map(a=>{
     const s = statsRange(curFrom, curTo, null, a);
     const meta = D.agent_meta[a];
-    return {a, score:s.score||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0, dc:s.r_dc||0, team:meta.team, ini:meta.initials};
-  }).sort((a,b)=>b.score-a.score);
+    return {a, db:s.db||0, score:s.score||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0, dc:s.r_dc||0, team:meta.team, ini:meta.initials};
+  }).filter(x=>x.db>0).sort((a,b)=>b.score-a.score);
   const maxAS = Math.max(1,...list.map(x=>x.score));
   const medals=['🥇','🥈','🥉'];
   let rh='';
