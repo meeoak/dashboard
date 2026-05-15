@@ -1968,7 +1968,8 @@ function kpiTblRowAgent(agent, teamColor, st, dataTeam){
     return html;
   };
   const short = (D.agent_meta[agent]||{}).short || agent;
-  return `<tr class="row-agent" data-team="${dataTeam}" data-agent="${agent}">
+  const hidden = window.__teamCollapsed && window.__teamCollapsed[dataTeam] ? 'style="display:none"' : '';
+  return `<tr class="row-agent" data-team="${dataTeam}" data-agent="${agent}" ${hidden}>
     <td class="team-cell agent-cell" style="padding-left:32px;color:#475569;font-size:12.5px;font-weight:600">
       <span style="color:${teamColor};margin-right:6px;font-weight:900">└</span>${short}
     </td>
@@ -1984,6 +1985,19 @@ function kpiTblRowAgent(agent, teamColor, st, dataTeam){
 function kpiTblClickAgent(event, stype, agent){
   event.stopPropagation();
   openMem(agent, stype);
+}
+
+// 팀별 펼치기/접기 상태
+window.__teamCollapsed = window.__teamCollapsed || {};
+
+function toggleTeamRows(team){
+  window.__teamCollapsed[team] = !window.__teamCollapsed[team];
+  document.querySelectorAll(`tr.row-agent[data-team="${team}"]`).forEach(tr=>{
+    tr.style.display = window.__teamCollapsed[team] ? 'none' : '';
+  });
+  // chevron 토글
+  const chev = document.querySelector(`tr[data-team-row="${team}"] .team-chevron`);
+  if(chev) chev.textContent = window.__teamCollapsed[team] ? '▶' : '▼';
 }
 
 function kpiTblRow(label, emo, color, st, isAll, dataTeam){
@@ -2007,8 +2021,14 @@ function kpiTblRow(label, emo, color, st, isAll, dataTeam){
   };
   const teamBar = isAll ? '' : `<span class="team-bar" style="background:${color}"></span>`;
   const emoSpan = showEmo ? `<span class="team-emo">${emo}</span> ` : '';
-  return `<tr class="${isAll?'row-all':''}" data-team="${dataTeam}">
-    <td class="team-cell" style="color:${color}">${teamBar}${emoSpan}${label}</td>
+  // 팀 행에만 chevron 추가 (전체 통합 / 개별 에이전트 행 제외)
+  const isTeamRow = !isAll && dataTeam.startsWith('TIM_');
+  const chevron = isTeamRow
+    ? `<span class="team-chevron" onclick="event.stopPropagation();toggleTeamRows('${dataTeam}')" title="펼치기/접기" style="cursor:pointer;margin-right:6px;color:${color};font-size:12px;user-select:none">${window.__teamCollapsed[dataTeam]?'▶':'▼'}</span>`
+    : '';
+  const rowAttr = isTeamRow ? `data-team-row="${dataTeam}"` : '';
+  return `<tr class="${isAll?'row-all':''}" data-team="${dataTeam}" ${rowAttr}>
+    <td class="team-cell" style="color:${color}">${teamBar}${chevron}${emoSpan}${label}</td>
     <td>${st.db ? `<span class="num-val col-db" onclick="kpiTblClick(event,'db','${dataTeam}')">${f(st.db)}</span>` : `<span class="num-val zero">-</span>`}</td>
     <td>${num(st.d,'d','#16a34a')}</td>
     <td>${num(st.ls,'ls','#ea580c')}</td>
