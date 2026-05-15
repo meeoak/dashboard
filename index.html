@@ -541,6 +541,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .mem-filter:not([value=""]):not(:invalid){background:#fef3c7;border-color:#f59e0b;color:#78350f}
 .mem-clear{border:1px solid #ef4444;background:white;color:#dc2626;border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s}
 .mem-clear:hover{background:#dc2626;color:white}
+.mem-date-row{background:#f0f9ff;border-color:#bae6fd}
+.mem-date{border:1px solid #cbd5e1;border-radius:7px;padding:6px 10px;font-size:12.5px;font-weight:600;color:#334155;background:white;outline:none;min-width:140px;cursor:pointer}
+.mem-date:focus{border-color:#0284c7;box-shadow:0 0 0 3px rgba(2,132,199,.15)}
+.mem-preset-grp{display:flex;gap:4px;margin-left:8px}
+.mem-preset{padding:6px 11px;border:1px solid #cbd5e1;background:white;color:#475569;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all .12s}
+.mem-preset:hover{background:#0284c7;color:white;border-color:#0284c7}
+.mem-preset.on{background:#0c4a6e;color:white;border-color:#0c4a6e}
 .mem-tbl-wrap{background:#fff;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;overflow-x:auto}
 .mem-tbl{width:100%;border-collapse:collapse;min-width:1400px}
 .mem-tbl td.memo-cell{font-size:11px;color:#444;max-width:320px;white-space:pre-wrap;line-height:1.45}
@@ -869,6 +876,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
     </select>
     <button class="mem-clear" onclick="clearMemFilters()" title="필터 초기화">🔄 초기화</button>
     <div style="margin-left:auto;font-size:13px;color:#666;font-weight:600" id="mem-count-lbl"></div>
+  </div>
+  <!-- 날짜 기간 필터 (2번째 줄) -->
+  <div class="mem-filters mem-date-row">
+    <select class="mem-filter" id="mem-f-date-type" onchange="filterMem()" title="날짜 기준">
+      <option value="ad">📅 배정일 기준</option>
+      <option value="vd">🚶 방문일 기준</option>
+    </select>
+    <input class="mem-date" type="date" id="mem-f-from" onchange="filterMem()" title="시작일">
+    <span style="color:#999;font-weight:700">~</span>
+    <input class="mem-date" type="date" id="mem-f-to" onchange="filterMem()" title="종료일">
+    <div class="mem-preset-grp">
+      <button class="mem-preset" onclick="setMemDatePreset('today')">오늘</button>
+      <button class="mem-preset" onclick="setMemDatePreset('d7')">7일</button>
+      <button class="mem-preset" onclick="setMemDatePreset('d30')">30일</button>
+      <button class="mem-preset" onclick="setMemDatePreset('thismonth')">이번달</button>
+      <button class="mem-preset" onclick="setMemDatePreset('lastmonth')">지난달</button>
+      <button class="mem-preset" onclick="setMemDatePreset('all')">전체</button>
+    </div>
   </div>
   <div class="mem-tbl-wrap"><table class="mem-tbl">
     <thead><tr><th>#</th><th>팀</th><th>에이전트</th><th>학생</th><th>학부모</th><th>지역</th><th>채널</th><th>방문일</th><th>배정일</th><th>상태</th><th>클로징</th><th style="min-width:280px">상담내용</th></tr></thead>
@@ -2678,6 +2703,9 @@ function filterMem(){
   const dk=document.getElementById('mem-f-dk').value;
   const st=document.getElementById('mem-f-st').value;
   const cl=document.getElementById('mem-f-cl').value;
+  const dateType=(document.getElementById('mem-f-date-type')||{}).value||'ad';
+  const dFrom=(document.getElementById('mem-f-from')||{}).value||'';
+  const dTo=(document.getElementById('mem-f-to')||{}).value||'';
   const filtered=memCache.filter(r=>{
     if(q&&!(r.nm||'').toLowerCase().includes(q)&&!(r.pa||'').toLowerCase().includes(q))return false;
     if(team&&r.t!==team)return false;
@@ -2687,16 +2715,43 @@ function filterMem(){
     if(dk&&r.dk!==dk)return false;
     if(st&&r.st!==st)return false;
     if(cl!==''&&String(r.cl||0)!==cl)return false;
+    // 날짜 기간 필터
+    if(dFrom||dTo){
+      const dval=(dateType==='vd'?r.vd:r.ad)||'';
+      if(!dval)return false; // 해당 날짜 없으면 제외
+      if(dFrom&&dval<dFrom)return false;
+      if(dTo&&dval>dTo)return false;
+    }
     return true;
   });
   document.getElementById('mem-count-lbl').textContent=`${filtered.length}건 / 전체 ${memCache.length}건`;
   renderMemTable(filtered);
 }
+function setMemDatePreset(p){
+  const today=new Date();
+  const yyyy=today.getFullYear(), mm=today.getMonth(), dd=today.getDate();
+  const toISO=d=>d.toISOString().slice(0,10);
+  let from='',to='';
+  if(p==='today'){from=to=toISO(today);}
+  else if(p==='d7'){const d=new Date(today);d.setDate(dd-6);from=toISO(d);to=toISO(today);}
+  else if(p==='d30'){const d=new Date(today);d.setDate(dd-29);from=toISO(d);to=toISO(today);}
+  else if(p==='thismonth'){from=toISO(new Date(yyyy,mm,1));to=toISO(new Date(yyyy,mm+1,0));}
+  else if(p==='lastmonth'){from=toISO(new Date(yyyy,mm-1,1));to=toISO(new Date(yyyy,mm,0));}
+  else if(p==='all'){from='';to='';}
+  document.getElementById('mem-f-from').value=from;
+  document.getElementById('mem-f-to').value=to;
+  // 활성화 표시
+  document.querySelectorAll('.mem-preset').forEach(b=>b.classList.remove('on'));
+  if(p!=='all'){const btn=document.querySelector(`.mem-preset[onclick="setMemDatePreset('${p}')"]`);if(btn)btn.classList.add('on');}
+  filterMem();
+}
 function clearMemFilters(){
   document.getElementById('mem-search').value='';
-  ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
+  ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl','mem-f-from','mem-f-to'].forEach(id=>{
     const el=document.getElementById(id); if(el)el.value='';
   });
+  const dt=document.getElementById('mem-f-date-type'); if(dt)dt.value='ad';
+  document.querySelectorAll('.mem-preset').forEach(b=>b.classList.remove('on'));
   filterMem();
 }
 function goBack(){
