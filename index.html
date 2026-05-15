@@ -2785,8 +2785,13 @@ function buildD(records,today){
   D.cal_recs=[];
   for(const r of records){
     if(!['d','ls','vc','s','w'].includes(r.st))continue;
-    if(!r.vd)continue;
-    const c={a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''};
+    // vd 없으면 vc/ls 같은 비디오콜·랑숭은 ad(배정일)을 fallback으로 사용
+    let vd=r.vd;
+    if(!vd){
+      if(r.st==='vc'||r.st==='ls')vd=r.ad;
+      else continue; // s/d/w 는 방문일 없으면 캘린더 제외
+    }
+    const c={a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''};
     D.cal_recs.push(c);
   }
   D.cal_summary={};const calMonths=new Set(D.months);
@@ -2830,10 +2835,36 @@ function buildD(records,today){
   const staleThreshold=(()=>{const t=new Date(today);t.setDate(t.getDate()-7);return t.toISOString().slice(0,10);})();
   D.stale_list=records.filter(r=>r.ad<staleThreshold&&(r.st==='none'||r.st==='w')).slice(0,100);
   D.stale_by_agent={};for(const r of D.stale_list)D.stale_by_agent[r.a]=(D.stale_by_agent[r.a]||0)+1;
+  // ===== agent_daily: 일별 집계 (배정일 기준) =====
   D.agent_daily={};D.agent_daily_dk={};D.agent_insights={};
   for(const a of Object.keys(D.agent_meta)){
-    D.agent_daily[a]={};D.agent_daily_dk[a]={};
+    D.agent_daily[a]={};
+    D.agent_daily_dk[a]={OFF:{},MKT:{}};
     D.agent_insights[a]={positives:[],negatives:[],suggestions:[]};
+  }
+  for(const r of records){
+    if(!r.ad||!r.a)continue;
+    const a=r.a, day=r.ad, dk=r.dk||'MKT';
+    if(!D.agent_daily[a]) D.agent_daily[a]={};
+    if(!D.agent_daily[a][day]) D.agent_daily[a][day]=emptyStat();
+    const ds=D.agent_daily[a][day];
+    ds.db++;ds[r.st]=(ds[r.st]||0)+1;ds.s_f+=r._sf||0;ds.s_o+=r._so||0;ds.cl+=r.cl;
+    // dk 별로도 집계
+    if(!D.agent_daily_dk[a]) D.agent_daily_dk[a]={OFF:{},MKT:{}};
+    if(!D.agent_daily_dk[a][dk]) D.agent_daily_dk[a][dk]={};
+    if(!D.agent_daily_dk[a][dk][day]) D.agent_daily_dk[a][dk][day]=emptyStat();
+    const dks=D.agent_daily_dk[a][dk][day];
+    dks.db++;dks[r.st]=(dks[r.st]||0)+1;dks.s_f+=r._sf||0;dks.s_o+=r._so||0;dks.cl+=r.cl;
+  }
+  // 일별 derived 필드 계산
+  for(const a of Object.keys(D.agent_daily)){
+    for(const day of Object.keys(D.agent_daily[a])) computeDerived(D.agent_daily[a][day]);
+  }
+  for(const a of Object.keys(D.agent_daily_dk)){
+    for(const dk of ['OFF','MKT']){
+      if(!D.agent_daily_dk[a][dk])continue;
+      for(const day of Object.keys(D.agent_daily_dk[a][dk])) computeDerived(D.agent_daily_dk[a][dk][day]);
+    }
   }
   D.trend_data=[];
   const ads=records.map(r=>r.ad).filter(Boolean).sort();
