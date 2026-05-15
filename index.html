@@ -593,8 +593,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .ins-ag-d-name{font-size:24px;font-weight:900;color:#0f172a;margin-bottom:8px;letter-spacing:-.5px;line-height:1.1}
 .ins-ag-d-sub{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .ins-ag-d-sub span{font-size:13px;padding:4px 12px!important;border-radius:6px!important;font-weight:800!important}
+.ins-ag-d-btns{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
 .ins-ag-d-btn{background:linear-gradient(135deg,#0284c7,#0369a1);color:white;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;cursor:pointer;transition:all .15s;flex-shrink:0;box-shadow:0 2px 6px rgba(2,132,199,.25)}
 .ins-ag-d-btn:hover{background:linear-gradient(135deg,#0369a1,#075985);transform:translateY(-2px);box-shadow:0 4px 14px rgba(2,132,199,.4)}
+.ins-ag-d-btn-pdf{background:linear-gradient(135deg,#1e3a8a,#2563eb);box-shadow:0 2px 6px rgba(30,58,138,.25)}
+.ins-ag-d-btn-pdf:hover{background:linear-gradient(135deg,#1e40af,#1d4ed8);box-shadow:0 4px 14px rgba(30,58,138,.4)}
 /* 펀널 시각화 - 강화 */
 .ins-funnel{display:flex;align-items:stretch;gap:0;background:linear-gradient(90deg,#f8fafc 0%,#fff 50%,#f8fafc 100%);border:2px solid #cbd5e1;border-radius:14px;padding:20px 14px;margin-bottom:18px;box-shadow:inset 0 1px 4px rgba(0,0,0,.04)}
 .ins-f-stage{flex:1;text-align:center;padding:10px 8px;border-radius:10px;transition:all .15s}
@@ -973,7 +976,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
     <div class="sec-hd" style="border-top:6px solid #f5f5f5;background:linear-gradient(180deg,#fef3c7 0%,#fff 100%)">
       <div><div class="sec-title">👥 에이전트별 상세 분석</div>
       <div class="sec-sub">📊 펀널 + ✅ 강점 + ⚠️ 약점/병목 + 💡 팀리더 코칭 액션 (활동 있는 에이전트만)</div></div>
-      <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+        <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
+        <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport()" title="현재 팀의 활동 중인 모든 에이전트 보고서를 한 PDF로" style="padding:8px 14px;font-size:12px">📄 전체 일괄 PDF</button>
+      </div>
     </div>
     <div class="ins-agent-wrap" id="ins-agent-wrap"></div>
   </div>
@@ -3064,6 +3070,271 @@ ${agentUrgent.map(({agent, short, team, urgent})=>{
   w.document.close();
 }
 
+// ===== 에이전트 개인 보고서 PDF =====
+function _agentReportCSS(){
+  return `
+@page { size: A4; margin: 12mm 10mm; }
+*{box-sizing:border-box}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',sans-serif;margin:0;color:#0f172a;font-size:11.5px;line-height:1.45;padding:18px 22px;background:#f8fafc}
+.rpt-print-btn{position:fixed;top:14px;right:14px;background:#1e3a8a;color:#fff;border:none;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.18);z-index:9999;letter-spacing:-.3px}
+.rpt-print-btn:hover{background:#1d4ed8;transform:translateY(-1px);box-shadow:0 5px 14px rgba(0,0,0,.25)}
+.ag-rpt{background:#fff;border-radius:12px;padding:0;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.04);overflow:hidden;page-break-after:always}
+.ag-rpt:last-child{page-break-after:auto}
+.ag-rpt-hd{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:18px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ag-rpt-rank{font-size:34px;width:48px;text-align:center;line-height:1;flex-shrink:0}
+.ag-rpt-info{flex:1;min-width:0}
+.ag-rpt-name{font-size:22px;font-weight:900;letter-spacing:-.4px;margin-bottom:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ag-rpt-sub{font-size:12px;opacity:.92;font-weight:600}
+.ag-rpt-pill{display:inline-block;background:rgba(255,255,255,.2);padding:3px 11px;border-radius:6px;font-size:12px;font-weight:800}
+.ag-rpt-grade{padding:3px 12px;border-radius:6px;font-size:13px;font-weight:900;color:#fff}
+.ag-rpt-body{padding:18px 22px}
+.ag-rpt-section{margin-bottom:18px;page-break-inside:avoid}
+.ag-rpt-section:last-child{margin-bottom:0}
+.ag-rpt-h{font-size:14px;font-weight:900;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #cbd5e1;color:#0f172a;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+/* 펀널 */
+.ag-funnel{display:flex;align-items:center;gap:4px;background:linear-gradient(180deg,#f1f5f9,#fff);border-radius:10px;padding:14px;border:1.5px solid #cbd5e1}
+.f-stage{flex:1;text-align:center}
+.f-num{font-size:24px;font-weight:900;line-height:1;letter-spacing:-.5px}
+.f-lbl{font-size:11px;font-weight:700;color:#475569;margin-top:4px}
+.f-arrow{flex:0 0 80px;text-align:center}
+.f-rate{display:inline-block;padding:5px 9px;border-radius:7px;font-size:12px;font-weight:900;color:#fff}
+.f-rate.good{background:#16a34a}
+.f-rate.bad{background:#dc2626}
+.f-rate small{display:block;font-size:9px;opacity:.92;font-weight:700;margin-top:2px}
+/* 관리율 표 */
+.rate-tbl{width:100%;border-collapse:collapse;font-size:12px;border:1.5px solid #cbd5e1;border-radius:8px;overflow:hidden}
+.rate-tbl th{background:#f1f5f9;padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:#475569;border-bottom:1.5px solid #cbd5e1}
+.rate-tbl td{padding:9px 10px;border-bottom:1px solid #f1f5f9;font-weight:700}
+.rate-tbl tr:last-child td{border-bottom:none}
+.rate-tbl tr.row-final td{background:linear-gradient(135deg,#fefce8,#fffbeb)}
+.rate-tbl tr.row-final td:first-child{font-weight:900}
+.rate-tbl .val{font-weight:900;font-size:14px;letter-spacing:-.3px}
+.rate-tbl .pill{display:inline-block;padding:3px 10px;border-radius:7px;font-weight:900;font-size:11px;color:#fff;letter-spacing:-.2px}
+.rate-tbl .pill.good{background:#16a34a}
+.rate-tbl .pill.bad{background:#dc2626}
+/* 긴급 관리 */
+.urg-tbl{width:100%;border-collapse:collapse;font-size:11px;border:1.5px solid #fca5a5;border-radius:8px;overflow:hidden}
+.urg-tbl th{background:#fef2f2;padding:7px 9px;text-align:left;font-size:10.5px;font-weight:800;color:#7f1d1d;border-bottom:1.5px solid #fca5a5;white-space:nowrap}
+.urg-tbl td{padding:7px 9px;border-bottom:1px solid #fee2e2;vertical-align:top;font-weight:600}
+.urg-tbl tr:last-child td{border-bottom:none}
+.urg-tbl tr.sev-3{background:#fef2f2}.urg-tbl tr.sev-2{background:#eff6ff}.urg-tbl tr.sev-1{background:#fffbeb}
+.dday{display:inline-block;font-weight:900;padding:2px 7px;border-radius:5px;color:#fff;font-size:10.5px;min-width:42px;text-align:center}
+.dday-3{background:#dc2626}.dday-2{background:#1d4ed8}.dday-1{background:#d97706}
+.urg-empty{padding:14px;background:#f0fdf4;border:1.5px solid #22c55e;border-radius:8px;color:#14532d;font-weight:800;text-align:center}
+/* 인사이트 (강점/약점/코칭) */
+.ins-cols{display:grid;grid-template-columns:1fr 1.2fr 1.4fr;gap:10px}
+.ins-col{border-radius:9px;padding:11px 14px;border:1.5px solid}
+.ins-col.good{background:linear-gradient(135deg,#dcfce7,#f0fdf4);border-color:#22c55e}
+.ins-col.bad{background:linear-gradient(135deg,#fee2e2,#fef2f2);border-color:#ef4444}
+.ins-col.tip{background:linear-gradient(135deg,#ede9fe,#f5f3ff);border-color:#8b5cf6}
+.ins-col-h{font-weight:900;font-size:13px;margin-bottom:8px;padding-bottom:5px;border-bottom:1.5px dashed currentColor;letter-spacing:-.2px}
+.ins-col.good .ins-col-h{color:#14532d}
+.ins-col.bad .ins-col-h{color:#7f1d1d}
+.ins-col.tip .ins-col-h{color:#4c1d95}
+.ins-col-item{font-size:11.5px;line-height:1.5;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,.08);font-weight:700}
+.ins-col-item:last-child{border-bottom:none}
+.ins-col-detail{font-size:10.5px;color:#475569;font-weight:600;margin-top:2px}
+.ins-empty{font-size:11px;color:#94a3b8;font-style:italic;text-align:center;padding:6px}
+/* 푸터 */
+.rpt-footer{margin-top:14px;padding-top:12px;border-top:1.5px dashed #cbd5e1;font-size:10px;color:#64748b;line-height:1.6}
+@media print{
+  .rpt-print-btn{display:none}
+  body{padding:0;background:#fff;font-size:10.5px}
+  .ag-rpt,.ag-rpt-hd,.f-rate,.rate-tbl tr.row-final,.rate-tbl .pill,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+`;
+}
+
+function _buildAgentReportSection(agent, rank){
+  const s = statsRange(curFrom, curTo, null, agent);
+  const meta = D.agent_meta[agent] || {};
+  const x = {a: agent, ...s, meta};
+  const tcol = TC[meta.team] || '#888';
+  const tlbl = (meta.team||'').replace('TIM_','');
+  const grade = (x.score||0)>=60?'A':(x.score||0)>=40?'B':(x.score||0)>=20?'C':'D';
+  const gradeColor = grade==='A'?'#16a34a':grade==='B'?'#0284c7':grade==='C'?'#d97706':'#dc2626';
+  const medals=['🥇','🥈','🥉'];
+  const rankIcon = rank!=null && rank<3 ? medals[rank] : (rank!=null?`#${rank+1}`:'');
+  const analysis = analyzeAgent(x);
+  const urgent = findUrgentForAgent(agent, D.today);
+
+  const sched = x.sched||0, visit = x.visit||0, db = x.db||0, cl = x.cl||0;
+  const r_ds = x.r_ds||0, r_sv = x.r_sv||0, r_vc = x.r_vc||0, r_dc = x.r_dc||0;
+  const r_ds_ok = r_ds >= TARGETS.ds, r_sv_ok = r_sv >= TARGETS.sv, r_vc_ok = r_vc >= TARGETS.vc, r_dc_ok = r_dc >= TARGETS.dc;
+  const fmt = (v, tgt)=>{
+    const ok = v >= tgt;
+    const diff = (v - tgt).toFixed(1);
+    return `<span class="pill ${ok?'good':'bad'}">${ok?'달성':'미달'} ${diff>=0?'+':''}${diff}%p</span>`;
+  };
+  const esc = (s)=>(s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const typeLabel = (icon)=>({'⚠️':'방문일 지남','🚨':'미진행 응답없음','⏳':'일정대기 누적','📅':'방문 임박'})[icon] || '';
+
+  return `<div class="ag-rpt">
+  <div class="ag-rpt-hd">
+    <div class="ag-rpt-rank">${rankIcon}</div>
+    <div class="ag-rpt-info">
+      <div class="ag-rpt-name">
+        ${esc(meta.short||agent)}
+        <span class="ag-rpt-pill" style="background:${tcol}">${esc(tlbl)}</span>
+        <span class="ag-rpt-grade" style="background:${gradeColor}">${grade} · ${x.score||0}점</span>
+        <span class="ag-rpt-pill">DB ${db}건</span>
+      </div>
+      <div class="ag-rpt-sub">${esc(D.today)} 기준 · 데이터 범위: ${esc(curFrom)} ~ ${esc(curTo)}</div>
+    </div>
+  </div>
+  <div class="ag-rpt-body">
+    <!-- 펀널 -->
+    <div class="ag-rpt-section">
+      <div class="ag-rpt-h">📊 관리 펀널</div>
+      <div class="ag-funnel">
+        <div class="f-stage"><div class="f-num" style="color:#475569">${db}</div><div class="f-lbl">📋 DB</div></div>
+        <div class="f-arrow"><div class="f-rate ${r_ds_ok?'good':'bad'}">${r_ds}%<small>예약율</small></div></div>
+        <div class="f-stage"><div class="f-num" style="color:#2563eb">${sched}</div><div class="f-lbl">📅 예약</div></div>
+        <div class="f-arrow"><div class="f-rate ${r_sv_ok?'good':'bad'}">${r_sv}%<small>방문율</small></div></div>
+        <div class="f-stage"><div class="f-num" style="color:#16a34a">${visit}</div><div class="f-lbl">✅ 방문</div></div>
+        <div class="f-arrow"><div class="f-rate ${r_vc_ok?'good':'bad'}">${r_vc}%<small>클로율</small></div></div>
+        <div class="f-stage"><div class="f-num" style="color:#dc2626">${cl}</div><div class="f-lbl">🏆 클로</div></div>
+      </div>
+    </div>
+    <!-- 관리율 -->
+    <div class="ag-rpt-section">
+      <div class="ag-rpt-h">📈 관리율 상세</div>
+      <table class="rate-tbl">
+        <thead><tr><th>지표</th><th style="width:80px">실적</th><th style="width:80px">목표</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>📅 예약율 (DB → 예약)</td><td class="val">${r_ds}%</td><td>${TARGETS.ds}%</td><td>${fmt(r_ds, TARGETS.ds)}</td></tr>
+          <tr><td>✅ 방문율 (예약 → 방문)</td><td class="val">${r_sv}%</td><td>${TARGETS.sv}%</td><td>${fmt(r_sv, TARGETS.sv)}</td></tr>
+          <tr><td>🏆 클로율 (방문 → 클로)</td><td class="val">${r_vc}%</td><td>${TARGETS.vc}%</td><td>${fmt(r_vc, TARGETS.vc)}</td></tr>
+          <tr class="row-final"><td>💰 DB → 클로 <small>(최종 KPI)</small></td><td class="val">${r_dc}%</td><td>${TARGETS.dc}%</td><td>${fmt(r_dc, TARGETS.dc)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- 긴급 관리 -->
+    <div class="ag-rpt-section">
+      <div class="ag-rpt-h">🚨 긴급 관리 필요 ${urgent.length>0?`<span style="background:#dc2626;color:#fff;font-size:11px;padding:2px 9px;border-radius:5px;margin-left:6px">${urgent.length}건</span>`:''}</div>
+      ${urgent.length === 0 ? `<div class="urg-empty">✅ 긴급 관리 대상 없음 (이관 위험 0건)</div>` : `
+      <table class="urg-tbl">
+        <thead><tr>
+          <th style="width:55px">D-day</th>
+          <th style="width:24px"></th>
+          <th>회원명 (후원자)</th>
+          <th style="width:110px">유형</th>
+          <th>사유</th>
+          <th style="width:88px">배정일</th>
+          <th style="width:100px">연락처</th>
+          <th style="width:65px">채널</th>
+        </tr></thead>
+        <tbody>
+          ${urgent.map(u=>`
+            <tr class="sev-${u.severity}">
+              <td><span class="dday dday-${u.severity}">D-${u.daysLeft}</span></td>
+              <td style="font-size:14px;text-align:center">${u.urgentIcon}</td>
+              <td><b>${esc(u.nm||'-')}</b>${u.pa?`<div style="color:#64748b;font-size:10.5px;font-weight:600">(${esc(u.pa)})</div>`:''}</td>
+              <td>${esc(typeLabel(u.urgentIcon))}</td>
+              <td>${esc(u.reason)}</td>
+              <td>${esc(u.ad||'-')}</td>
+              <td style="font-family:'Courier New',monospace;font-size:10.5px;font-weight:700">${esc(u.ph||'-')}</td>
+              <td>${u.ch?`<span style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;color:#475569;border:1px solid #cbd5e1">${esc(u.ch)}</span>`:'-'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`}
+    </div>
+    <!-- 인사이트 (강점/약점/코칭) -->
+    <div class="ag-rpt-section">
+      <div class="ag-rpt-h">💡 인사이트 분석</div>
+      <div class="ins-cols">
+        <div class="ins-col good">
+          <div class="ins-col-h">✅ 강점</div>
+          ${analysis.strengths.length ? analysis.strengths.map(s=>`<div class="ins-col-item">${esc(s)}</div>`).join('') : '<div class="ins-empty">강점 미확인 - 지표 미달 영역 우선 개선 필요</div>'}
+        </div>
+        <div class="ins-col bad">
+          <div class="ins-col-h">⚠️ 약점 / 병목</div>
+          ${analysis.weaknesses.length ? analysis.weaknesses.map(w=>`<div class="ins-col-item"><b>${w.icon} ${esc(w.text)}</b><div class="ins-col-detail">${esc(w.detail)}</div></div>`).join('') : '<div class="ins-empty">약점 없음 - 모든 지표 양호</div>'}
+        </div>
+        <div class="ins-col tip">
+          <div class="ins-col-h">💡 코칭 액션</div>
+          ${analysis.advices.length ? analysis.advices.map((a,j)=>`<div class="ins-col-item"><b>${j+1}. ${a.icon}</b> ${esc(a.text)}</div>`).join('') : '<div class="ins-empty">현재 코칭 권고사항 없음</div>'}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+function openAgentReport(agent){
+  const meta = D.agent_meta[agent] || {};
+  const reportHtml = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>${(meta.short||agent)} 일일 보고서 - ${D.today}</title>
+<style>${_agentReportCSS()}</style>
+</head>
+<body>
+<button class="rpt-print-btn" onclick="window.print()">📄 PDF로 저장 · 인쇄</button>
+${_buildAgentReportSection(agent, null)}
+<div class="rpt-footer">
+  · 생성 시각: ${new Date().toLocaleString('ko-KR')}<br>
+  · 인쇄 대화상자에서 "대상 → PDF로 저장"을 선택하면 PDF 파일로 저장됩니다
+</div>
+</body>
+</html>`;
+  const w = window.open('', '_blank');
+  if(!w){ alert('팝업이 차단되었습니다. 브라우저에서 팝업을 허용한 뒤 다시 시도하세요.'); return; }
+  w.document.open();
+  w.document.write(reportHtml);
+  w.document.close();
+}
+
+function openAllAgentsReport(){
+  const teamLabel = curTeam==='ALL' ? '전체 팀' : curTeam.replace('TIM_','');
+  const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
+  const list = agents.map(a=>{
+    const s = statsRange(curFrom, curTo, null, a);
+    return {a, ...s};
+  }).filter(x=>(x.db||0)>0).sort((a,b)=>(b.score||0)-(a.score||0));
+  if(list.length === 0){ alert('활동 중인 에이전트가 없습니다.'); return; }
+
+  const sections = list.map((x,i)=>_buildAgentReportSection(x.a, i)).join('');
+  const reportHtml = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>${teamLabel} 에이전트 일일 보고서 - ${D.today}</title>
+<style>${_agentReportCSS()}
+.cover{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:40px 30px;border-radius:14px;margin-bottom:18px;text-align:center;page-break-after:always}
+.cover h1{font-size:32px;font-weight:900;margin:0 0 10px;letter-spacing:-1px}
+.cover .sub{font-size:15px;opacity:.92;margin-bottom:18px}
+.cover .stats{display:inline-flex;gap:14px;background:rgba(255,255,255,.12);padding:14px 22px;border-radius:10px;font-size:13px;font-weight:700}
+.cover .stats b{font-size:22px;font-weight:900;letter-spacing:-.5px}
+</style>
+</head>
+<body>
+<button class="rpt-print-btn" onclick="window.print()">📄 PDF로 저장 · 인쇄</button>
+<div class="cover">
+  <h1>📊 ${teamLabel} 에이전트 일일 보고서</h1>
+  <div class="sub">${D.today} 기준 · 매니저 코칭 자료 · 활동 중인 ${list.length}명</div>
+  <div class="stats">
+    <div><b>${list.length}</b>명 활동</div>
+    <div><b>${list.reduce((s,x)=>s+(x.db||0),0)}</b> DB</div>
+    <div><b>${list.reduce((s,x)=>s+(x.cl||0),0)}</b> 클로</div>
+  </div>
+</div>
+${sections}
+<div class="rpt-footer">
+  · 보고서 순서: 점수 높은 에이전트부터<br>
+  · 생성 시각: ${new Date().toLocaleString('ko-KR')}<br>
+  · 인쇄 대화상자에서 "대상 → PDF로 저장"을 선택하면 PDF 파일로 저장됩니다
+</div>
+</body>
+</html>`;
+  const w = window.open('', '_blank');
+  if(!w){ alert('팝업이 차단되었습니다. 브라우저에서 팝업을 허용한 뒤 다시 시도하세요.'); return; }
+  w.document.open();
+  w.document.write(reportHtml);
+  w.document.close();
+}
+
 // ===== 에이전트 분석 (팀리더 코칭용) =====
 function analyzeAgent(s){
   const db=s.db||0, visit=s.visit||0, sched=s.sched||0, cl=s.cl||0;
@@ -3238,7 +3509,10 @@ function renderTeamAgentInsight(){
             <span style="color:#666;font-size:12px;font-weight:700">DB ${x.db}건</span>
           </div>
         </div>
-        <button class="ins-ag-d-btn" onclick="openMem('${x.a}','db')" title="회원 목록 보기">📋 회원 목록</button>
+        <div class="ins-ag-d-btns">
+          <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}')" title="이 에이전트의 일일 보고서 PDF 출력">📄 PDF 보고서</button>
+          <button class="ins-ag-d-btn" onclick="openMem('${x.a}','db')" title="회원 목록 보기">📋 회원 목록</button>
+        </div>
       </div>
 
       <!-- 펀널 시각화 -->
