@@ -165,10 +165,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .gap-agent-m-status.good{background:#dcfce7;color:#14532d;border-color:#22c55e}
 .gap-agent-m-status.bad{background:#fee2e2;color:#7f1d1d;border-color:#ef4444}
 .gap-agent-m-status.zero{background:#dbeafe;color:#1e3a8a;border-color:#60a5fa}
-.gap-agent-toggle{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd;color:#1e3a8a;font-size:11.5px;font-weight:900;padding:5px 12px;border-radius:9px;cursor:pointer;transition:all .12s;white-space:nowrap;letter-spacing:-.2px;box-shadow:0 1px 3px #1e3a8a14}
-.gap-agent-toggle:hover{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-color:#1e3a8a;transform:translateY(-1px);box-shadow:0 3px 8px #1e3a8a25}
-.gap-agent-toggle.collapsed{background:linear-gradient(135deg,#fef9c3,#fef3c7);border-color:#fcd34d;color:#854d0e}
-.gap-agent-toggle.collapsed:hover{background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:#ca8a04;color:#713f12}
+.gap-agent-toggle{display:inline-flex;align-items:center;gap:4px;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s;letter-spacing:-.2px;white-space:nowrap}
+.gap-agent-toggle:hover{transform:scale(1.05);box-shadow:0 3px 8px rgba(0,0,0,0.25);filter:brightness(1.1)}
+.gap-agent-toggle:active{transform:scale(0.97)}
 .gap-agents-empty{padding:10px 18px;font-size:12px;color:#94a3b8;text-align:center}
 
 /* 정의 박스 */
@@ -1705,7 +1704,7 @@ function renderGaps(){
     });
     const isCollapsedNow = !!(window.__gapAgentsCollapsed && window.__gapAgentsCollapsed[team]);
     const agentToggleHtml = activeAgents.length
-      ? `<button class="gap-agent-toggle${isCollapsedNow ? ' collapsed' : ''}" data-team="${team}" data-count="${activeAgents.length}" onclick="event.stopPropagation();toggleGapAgents('${team}')">${isCollapsedNow ? `▶ 펼치기 · ${activeAgents.length}명` : `▼ 접기 · ${activeAgents.length}명`}</button>`
+      ? `<button class="gap-agent-toggle" data-team="${team}" data-count="${activeAgents.length}" onclick="event.stopPropagation();toggleGapAgents('${team}')" title="${isCollapsedNow?'펼치기':'접기'}" style="background:${color}">${isCollapsedNow ? `▶ 펼치기 · ${activeAgents.length}명` : `▼ 접기 · ${activeAgents.length}명`}</button>`
       : '';
     if(team === 'TIM_LIDIA'){
       // LIDIA: 비디오콜 전담팀
@@ -1786,7 +1785,7 @@ function toggleGapAgents(team){
   if(btn){
     const count = btn.dataset.count || '0';
     btn.textContent = isCollapsed ? `▶ 펼치기 · ${count}명` : `▼ 접기 · ${count}명`;
-    btn.classList.toggle('collapsed', isCollapsed);
+    btn.title = isCollapsed ? '펼치기' : '접기';
   }
 }
 
