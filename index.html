@@ -524,7 +524,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .irow-v{font-weight:700}
 
 /* ─ 회원 페이지 ─ */
-.mem-wrap{max-width:840px;margin:0 auto;padding:20px 16px 80px}
+.mem-wrap{max-width:1600px;margin:0 auto;padding:20px 16px 80px}
 .back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;font-size:13px;font-weight:700;color:#e85d04;cursor:pointer;padding:8px 0;margin-bottom:14px}
 .mem-header{background:#fff;border:1px solid #eee;border-radius:14px;padding:18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .mem-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
@@ -534,7 +534,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .mem-count{margin-left:auto;font-size:22px;font-weight:900}
 .mem-search{border:1px solid #ddd;border-radius:8px;padding:7px 12px;font-size:13px;width:100%;max-width:260px;outline:none;margin-bottom:10px}
 .mem-tbl-wrap{background:#fff;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;overflow-x:auto}
-.mem-tbl{width:100%;border-collapse:collapse;min-width:920px}
+.mem-tbl{width:100%;border-collapse:collapse;min-width:1400px}
+.mem-tbl td.memo-cell{font-size:11px;color:#444;max-width:320px;white-space:pre-wrap;line-height:1.45}
+.mem-tbl td.memo-cell .memo-orig{color:#999;font-size:10px;margin-top:3px;display:block;font-style:italic}
 .mem-tbl thead th{font-size:10.5px;font-weight:700;color:#aaa;padding:9px 12px;background:#fafafa;border-bottom:1px solid #eee;text-align:left;white-space:nowrap}
 .mem-tbl thead th:first-child{width:32px;text-align:center}
 .mem-tbl tbody td{padding:10px 12px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
@@ -705,25 +707,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 </div></div>
 
 <div class="tab-content">
+  <!-- 모든 탭에서 공유되는 빠른 컨트롤바: 월이동 / 팀 / 에이전트 -->
+  <div class="cal-controls">
+    <div class="cal-month-nav">
+      <button class="cal-nav-btn" onclick="calPrevMonth()" title="이전 월">◀</button>
+      <span class="cal-month-label" id="cal-month-label">5월</span>
+      <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월">▶</button>
+    </div>
+    <div class="cal-team-tabs">
+      <button class="cal-tt-btn on" data-team="ALL" onclick="setCalTeamQuick('ALL')">🌐 전체</button>
+      <button class="cal-tt-btn" data-team="TIM_GIAR" onclick="setCalTeamQuick('TIM_GIAR')"><span class="cal-tt-dot" style="background:#1a73e8"></span>GIAR</button>
+      <button class="cal-tt-btn" data-team="TIM_TINA" onclick="setCalTeamQuick('TIM_TINA')"><span class="cal-tt-dot" style="background:#16a34a"></span>TINA</button>
+      <button class="cal-tt-btn" data-team="TIM_LIDIA" onclick="setCalTeamQuick('TIM_LIDIA')"><span class="cal-tt-dot" style="background:#ea4335"></span>LIDIA</button>
+    </div>
+    <select class="cal-agent-sel" id="cal-agent-sel" onchange="setCalAgentQuick(this.value)">
+      <option value="ALL">👥 전체 에이전트</option>
+    </select>
+  </div>
   <!-- 캘린더 (예정 위 + 완료 아래) -->
   <div id="content-cal">
-    <!-- 캘린더 전용 컨트롤바: 월이동 / 팀 / 에이전트 -->
-    <div class="cal-controls">
-      <div class="cal-month-nav">
-        <button class="cal-nav-btn" onclick="calPrevMonth()" title="이전 월">◀</button>
-        <span class="cal-month-label" id="cal-month-label">5월</span>
-        <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월">▶</button>
-      </div>
-      <div class="cal-team-tabs">
-        <button class="cal-tt-btn on" data-team="ALL" onclick="setCalTeamQuick('ALL')">🌐 전체</button>
-        <button class="cal-tt-btn" data-team="TIM_GIAR" onclick="setCalTeamQuick('TIM_GIAR')"><span class="cal-tt-dot" style="background:#1a73e8"></span>GIAR</button>
-        <button class="cal-tt-btn" data-team="TIM_TINA" onclick="setCalTeamQuick('TIM_TINA')"><span class="cal-tt-dot" style="background:#16a34a"></span>TINA</button>
-        <button class="cal-tt-btn" data-team="TIM_LIDIA" onclick="setCalTeamQuick('TIM_LIDIA')"><span class="cal-tt-dot" style="background:#ea4335"></span>LIDIA</button>
-      </div>
-      <select class="cal-agent-sel" id="cal-agent-sel" onchange="setCalAgentQuick(this.value)">
-        <option value="ALL">👥 전체 에이전트</option>
-      </select>
-    </div>
     <!-- 방문예약 (앞으로 다가올 일정) -->
     <div class="cal-wrap" style="border-bottom:6px solid #f5f5f5">
       <div class="cal-nav">
@@ -825,7 +827,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
     <div style="font-size:12px;color:#bbb" id="mem-count-lbl"></div>
   </div>
   <div class="mem-tbl-wrap"><table class="mem-tbl">
-    <thead><tr><th>#</th><th>팀</th><th>에이전트</th><th>학생</th><th>학부모</th><th>지역</th><th>채널</th><th>방문일</th><th>배정일</th><th>상태</th><th>클로징</th></tr></thead>
+    <thead><tr><th>#</th><th>팀</th><th>에이전트</th><th>학생</th><th>학부모</th><th>지역</th><th>채널</th><th>방문일</th><th>배정일</th><th>상태</th><th>클로징</th><th style="min-width:280px">상담내용</th></tr></thead>
     <tbody id="mem-tbody"></tbody>
   </table></div>
 </div></div>
@@ -2445,6 +2447,121 @@ function showMem(recs, agent, stype, month, date){
   document.getElementById('page-member').style.display='block';
   window.scrollTo(0,0);
 }
+// ===== 인도네시아어 → 한국어 간단 번역 =====
+const ID_KO_PHRASES = [
+  // 긴 구문 먼저 (matching priority)
+  [/\bchat dan call (belum|blm) (di)?respon/gi, '채팅·전화 응답 없음'],
+  [/\bchat dan tlp via WA (belum|blm) di respon/gi, '채팅·전화(WA) 응답 없음'],
+  [/\bcall (dan|and) chat (belum|blm|no answer|no respon|no response)/gi, '전화·채팅 응답 없음'],
+  [/\bwa (dan|&|and) (call|chat) (belum|blm|no answer|no respon|no response)/gi, 'WA·전화 응답 없음'],
+  [/\bcall (dan|and) WA no answer/gi, '전화·WA 응답 없음'],
+  [/\bChat (dan|and) Call No Respon/gi, '채팅·전화 응답 없음'],
+  [/\bcall belum direspon/gi, '전화 응답 없음'],
+  [/\bchat (belum|blm) (di)?respon/gi, '채팅 답변 없음'],
+  [/\bcall (belum|blm) (di)?respon/gi, '전화 응답 없음'],
+  [/\btelepon (tidak|tdk) (di)?angkat/gi, '전화 안 받음'],
+  [/\btelepon (tidak|tdk) (di)?respon/gi, '전화 응답 없음'],
+  [/\btelepon memanggil/gi, '전화 신호음만 감'],
+  [/\btidak ada (wa|whatsapp)/gi, 'WA 없음'],
+  [/\b(no|tidak ada) respon(se)?\b/gi, '응답 없음'],
+  [/\b(no|tidak ada) answer\b/gi, '응답 없음'],
+  [/\b(no|tidak ada) response\b/gi, '응답 없음'],
+  [/\bsend wa\b/gi, 'WA 전송'],
+  [/\bbersedia (di)?visit/gi, '방문 가능'],
+  [/\bok (untuk )?(di)?visit/gi, '방문 OK'],
+  [/\bvisit done\b/gi, '방문 완료'],
+  [/\bvisit selesai/gi, '방문 완료'],
+  [/\bclosing on (the )?spot/gi, '현장 클로징'],
+  [/\bclosing on visit/gi, '방문 직가입'],
+  [/\bclosing after visit/gi, '방문 체험 후 가입'],
+  [/\bberlangganan/gi, '구독 가입'],
+  [/\bnomor (telepon )?(salah|invalid)/gi, '잘못된 번호'],
+  [/\bin ?valid (number|no)?/gi, '잘못된 번호'],
+  [/\bpenolakan janji temu/gi, '방문 예약 거절'],
+  [/\bpenolakan langsung/gi, '바로 거절'],
+  [/\bpembatalan janji temu/gi, '방문 예약 취소'],
+  [/\brescheduling visit batal/gi, '방문 취소 후 재예약'],
+  [/\bperlu pengecekan ulang/gi, '재확인 필요'],
+  [/\bmenunggu (jadwal|kabar)/gi, '일정 대기'],
+  [/\bdiskusi (dengan )?suami/gi, '남편과 상의'],
+  [/\bdiskusi (dengan )?istri/gi, '아내와 상의'],
+  [/\bsedang berdiskusi/gi, '상의 중'],
+  [/\bsedang sibuk/gi, '바쁨'],
+  [/\bsedang uji coba/gi, '체험 중'],
+  [/\bnone trial/gi, '체험 없음'],
+  [/\buji coba batal/gi, '체험 취소'],
+  [/\bcicilan (\d+) tahun/gi, '$1년 분납'],
+  [/\bcicilan (\d+) bulan/gi, '$1개월 분납'],
+  [/\bfull payment (\d+) tahun/gi, '$1년 일시납'],
+  [/\bok di visit (hari )?(senin|selasa|rabu|kamis|jumat|sabtu|minggu)/gi, '$2 방문 OK'],
+  [/\bok di visit (besok|hari ini)/gi, '$1 방문 OK'],
+  [/\bbesok jam (\d+)/gi, '내일 $1시'],
+  [/\bhari ini jam (\d+)/gi, '오늘 $1시'],
+  [/\b(akan|nanti) di?kabari/gi, '추후 알려준다고 함'],
+  [/\bnanti saja\b/gi, '나중에'],
+  [/\bbelum dulu\b/gi, '아직 안 함'],
+  [/\btidak jadi\b/gi, '하지 않기로'],
+  [/\btidak berminat\b/gi, '관심 없음'],
+  [/\bmenolak/gi, '거절'],
+  [/\bditolak/gi, '거절됨'],
+  [/\bappointment\b/gi, '약속'],
+  [/\breminding\b/gi, '리마인드'],
+  [/\breschedule/gi, '일정 변경'],
+  [/\breschadule/gi, '일정 변경'],
+  [/\bsedang (di)?proses/gi, '진행 중'],
+  [/\bsedang fokus/gi, '집중 중'],
+  [/\bbelum bisa/gi, '아직 불가'],
+  [/\bbelum perlu/gi, '아직 필요 없음'],
+  [/\bsudah closing/gi, '가입 완료'],
+  [/\btidak closing/gi, '가입 안 함'],
+  [/\bsudah payment/gi, '결제 완료'],
+  // 일반 단어 (마지막)
+  [/\bok\b/gi, 'OK'],
+  [/\bchat\b/gi, '채팅'],
+  [/\bcall\b/gi, '전화'],
+  [/\bvisit\b/gi, '방문'],
+  [/\btelepon\b/gi, '전화'],
+  [/\btlp\b/gi, '전화'],
+  [/\bbelum\b/gi, '아직'],
+  [/\bblm\b/gi, '아직'],
+  [/\btidak\b/gi, '안 함'],
+  [/\btdk\b/gi, '안 함'],
+  [/\bsudah\b/gi, '이미'],
+  [/\bsdh\b/gi, '이미'],
+  [/\bmau\b/gi, '원함'],
+  [/\bnanti\b/gi, '나중에'],
+  [/\bbesok\b/gi, '내일'],
+  [/\bhari ini\b/gi, '오늘'],
+  [/\bjadwal\b/gi, '일정'],
+  [/\bbunda\b/gi, '어머니'],
+  [/\bibu\b/gi, '어머니'],
+  [/\bmama\b/gi, '어머니'],
+  [/\bayah\b/gi, '아버지'],
+  [/\bbapak\b/gi, '아버지'],
+  [/\bpapa\b/gi, '아버지'],
+  [/\bsuami\b/gi, '남편'],
+  [/\bistri\b/gi, '아내'],
+  [/\banak\b/gi, '아이'],
+  [/\bparent(s)?\b/gi, '부모님'],
+  [/\bcust(omer)?\b/gi, '고객'],
+  [/\bdouble data\b/gi, '중복 데이터'],
+  [/\bdrop\b/gi, '드롭'],
+  [/\bfollow ?up\b/gi, '팔로업'],
+  [/\bcancelled\b/gi, '취소됨'],
+  [/\bbatal\b/gi, '취소'],
+  [/\bdone\b/gi, '완료'],
+  [/\bsudah info(rmasi)?\b/gi, '안내 완료'],
+  [/\bsudah/gi, '이미'],
+];
+function translateMemo(text){
+  if(!text)return '';
+  let out=text;
+  for(const [pat,rep] of ID_KO_PHRASES){
+    out = out.replace(pat,rep);
+  }
+  return out;
+}
+
 function renderMemTable(recs){
   let h='';
   recs.forEach((r,i)=>{
@@ -2458,6 +2575,15 @@ function renderMemTable(recs){
     // ⚠️ 확인필요 (방문예약 중 방문일 지난 것)
     const overdueBadge = r.od ? `<span class="overdue-tag" style="margin-left:4px" title="방문일 지났는데 방문완료 처리 안 됨">⚠️확인필요</span>` : '';
     const rowStyle = r.od ? 'background:#fffbeb' : '';
+    // 상담내용 - 한국어 번역 + 원본 표시
+    const memoRaw = (r.memo||'').trim();
+    let memoCell = '<span style="color:#ddd">-</span>';
+    if(memoRaw){
+      const memoKo = translateMemo(memoRaw);
+      const safeRaw = memoRaw.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const safeKo = memoKo.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      memoCell = `<div>${safeKo}</div><span class="memo-orig" title="원문">📝 ${safeRaw}</span>`;
+    }
     h+=`<tr style="${rowStyle}"><td>${i+1}</td>
       <td><span style="font-size:10px;font-weight:800;color:#fff;background:${tcol};padding:2px 7px;border-radius:4px">${TEAM_EMO[r.t]||''} ${tm}</span></td>
       <td style="font-size:12px;font-weight:600" title="${r.a||''}">${shortName(r.a||'')||'-'}</td>
@@ -2468,9 +2594,10 @@ function renderMemTable(recs){
       <td style="font-size:12px">${r.vd||'<span style="color:#ddd">미기재</span>'}</td>
       <td style="font-size:12px">${r.ad||'-'}</td>
       <td><span class="mst mst-${r.st}">${stLbl}</span>${overdueBadge}</td>
-      <td>${clLbl}</td></tr>`;
+      <td>${clLbl}</td>
+      <td class="memo-cell">${memoCell}</td></tr>`;
   });
-  document.getElementById('mem-tbody').innerHTML = h || '<tr><td colspan="11" style="text-align:center;padding:24px;color:#bbb">데이터 없음</td></tr>';
+  document.getElementById('mem-tbody').innerHTML = h || '<tr><td colspan="12" style="text-align:center;padding:24px;color:#bbb">데이터 없음</td></tr>';
 }
 function filterMem(){
   const q = document.getElementById('mem-search').value.toLowerCase();
@@ -2520,6 +2647,23 @@ function parseSheetDate(s){
   return '';
 }
 
+// 메모 컬럼 자동 탐지 (한 번만 실행, 첫 번째 행 기준)
+let MEMO_COL_IDX = 16; // 기본값
+let MEMO_COL_DETECTED = false;
+function detectMemoColumn(headerRow){
+  if(MEMO_COL_DETECTED||!headerRow)return;
+  // 헤더에서 "Isi Konsultasi" 또는 "상담" 키워드를 찾아 정확한 컬럼 위치 파악
+  for(let i=0;i<headerRow.length;i++){
+    const h=(headerRow[i]||'').toLowerCase();
+    if(h.includes('konsultasi')||h.includes('상담')||h.includes('memo')||h.includes('note')){
+      MEMO_COL_IDX=i;
+      console.log(`📝 메모 컬럼 감지: 인덱스 ${i} ("${headerRow[i]}")`);
+      break;
+    }
+  }
+  MEMO_COL_DETECTED=true;
+}
+
 function rowToRecord(row,today){
   if(!row||row.length<13)return null;
   const ad=parseSheetDate(row[1]);
@@ -2535,6 +2679,7 @@ function rowToRecord(row,today){
   const statusA=(row[17]||'').trim();
   const statusB=(row[18]||'').trim();
   const clType=(row[20]||'').trim();
+  const memo=(row[MEMO_COL_IDX]||'').trim();
   let team='';
   for(let i=24;i<Math.min(row.length,28);i++){
     const v=(row[i]||'').trim();
@@ -2554,7 +2699,7 @@ function rowToRecord(row,today){
   let dk='MKT';
   if(channel.startsWith('OFF_')||channel.startsWith('On_')||channel.startsWith('DGI_')||channel.startsWith('REFERRAL')||channel.startsWith('Teacher Center'))dk='OFF';
   const cl=clType?1:0;
-  return{a:agent,t:team,m:ad.slice(0,7),st,cl,cl_type:clType,nm:childName,pa:parentName,ph:phone,pv:province,ch:channel,vd:visitDate,ad,od:0,dk,cancel:'',_sf:s_f,_so:s_o};
+  return{a:agent,t:team,m:ad.slice(0,7),st,cl,cl_type:clType,nm:childName,pa:parentName,ph:phone,pv:province,ch:channel,vd:visitDate,ad,od:0,dk,cancel:'',memo,_sf:s_f,_so:s_o};
 }
 
 function emptyStat(){return{db:0,d:0,ls:0,vc:0,s:0,s_f:0,s_o:0,w:0,x:0,none:0,cl:0,visit:0,sched:0,active:0,score:0,r_ds:0,r_sv:0,r_vc:0,r_dc:0};}
@@ -2641,7 +2786,7 @@ function buildD(records,today){
   for(const r of records){
     if(!['d','ls','vc','s','w'].includes(r.st))continue;
     if(!r.vd)continue;
-    const c={a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel};
+    const c={a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''};
     D.cal_recs.push(c);
   }
   D.cal_summary={};const calMonths=new Set(D.months);
@@ -2658,7 +2803,7 @@ function buildD(records,today){
     }
     D.cal_summary[month]={days,days_in:lastDay};
   }
-  D.records=records.map(r=>({a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel}));
+  D.records=records.map(r=>({a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''}));
   const chanMap={};
   for(const r of records){
     if(!r.ch)continue;
@@ -2720,14 +2865,25 @@ async function loadFromSheet(){
     const today=new Date().toISOString().slice(0,10);
     const records=rows.slice(1).map(r=>rowToRecord(r,today)).filter(Boolean);
     if(records.length===0)throw new Error('유효 데이터 0건');
+    // 디버그용: 첫 행의 컬럼 구조 확인
+    const memoCount=records.filter(r=>r.memo&&r.memo.length>0).length;
+    console.log('🔍 시트 동기화 결과:',{
+      총행수:rows.length,
+      유효레코드:records.length,
+      메모있음:memoCount,
+      첫번째행:rows[1],
+      첫번째레코드:records[0]
+    });
     const newD=buildD(records,today);
-    showSheetStatus(`✅ 실시간 동기화 완료 (${records.length}건) · ${new Date().toLocaleTimeString('ko-KR')}`,'#16a34a');
-    setTimeout(hideSheetStatus,3000);
+    window.dataSource='sheet';
+    showSheetStatus(`✅ 실시간 동기화 완료 (${records.length}건, 메모 ${memoCount}건) · ${new Date().toLocaleTimeString('ko-KR')}`,'#16a34a');
+    setTimeout(hideSheetStatus,5000);
     return newD;
   }catch(e){
     console.error('Sheet load error:',e);
-    showSheetStatus('⚠️ 시트 불러오기 실패: '+e.message+' (정적 데이터 표시 중) · 새로고침 시도하세요','#dc2626');
-    setTimeout(hideSheetStatus,8000);
+    window.dataSource='static';
+    showSheetStatus('⚠️ 시트 불러오기 실패: '+e.message+' (정적 데이터 표시 중 · 메모 없음) · 라이브 사이트에서 확인 필요','#dc2626');
+    setTimeout(hideSheetStatus,15000);
     return null;
   }
 }
