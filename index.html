@@ -142,6 +142,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .gap-m-status.good{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#14532d;border-color:#22c55e}
 .gap-m-status.bad{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#7f1d1d;border-color:#ef4444}
 .gap-m-status.zero{background:#f1f5f9;color:#475569;border-color:#94a3b8}
+/* 팀 격차 카드 하위 에이전트 행 */
+.gap-agents-wrap{margin:-4px 0 6px;background:linear-gradient(180deg,#fafbfc,#fff);border:1.5px solid #e2e8f0;border-top:none;border-radius:0 0 14px 14px;overflow:hidden}
+.gap-agents-wrap.collapsed{display:none}
+.gap-agent-row{display:flex;align-items:center;gap:10px;padding:8px 18px 8px 30px;border-top:1px solid #f1f5f9;transition:background .12s;cursor:pointer}
+.gap-agent-row:first-child{border-top:none}
+.gap-agent-row:hover{background:#fefce8}
+.gap-agent-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px #fff,0 0 0 3px currentColor}
+.gap-agent-name{font-weight:800;color:#0f172a;font-size:13px;flex:0 0 140px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gap-agent-db{font-size:11px;color:#475569;font-weight:800;background:#f1f5f9;padding:2px 9px;border-radius:8px;flex-shrink:0;border:1px solid #cbd5e1;letter-spacing:-.2px}
+.gap-agent-metrics{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;min-width:0}
+@media(max-width:1100px){.gap-agent-metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.gap-agent-name{flex:0 0 100px}}
+.gap-agent-metric{display:flex;flex-wrap:wrap;align-items:center;gap:3px 6px;padding:5px 8px;border-radius:8px;background:#fff;border:1.5px solid #e5e7eb;font-size:11px;min-width:0}
+.gap-agent-metric.final{background:linear-gradient(135deg,#fefce8,#fffbeb);border-color:#fcd34d}
+.gap-agent-metric.muted{background:#f8fafc;opacity:.55;border-style:dashed}
+.gap-agent-m-emo{font-size:13px;flex-shrink:0}
+.gap-agent-m-vals{font-weight:900;font-size:13px;color:#0f172a;letter-spacing:-.3px;white-space:nowrap}
+.gap-agent-m-vals .vs{color:#cbd5e1;font-weight:700;margin:0 2px;font-size:11px}
+.gap-agent-m-vals .req{color:#64748b;font-size:11px;font-weight:800}
+.gap-agent-m-status{margin-left:auto;font-weight:800;font-size:10px;padding:2px 7px;border-radius:7px;white-space:nowrap;flex-shrink:0;border:1.5px solid;letter-spacing:-.1px}
+.gap-agent-m-status.good{background:#dcfce7;color:#14532d;border-color:#22c55e}
+.gap-agent-m-status.bad{background:#fee2e2;color:#7f1d1d;border-color:#ef4444}
+.gap-agent-m-status.zero{background:#f1f5f9;color:#475569;border-color:#94a3b8}
+.gap-agent-toggle{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1.5px solid #cbd5e1;color:#1e293b;font-size:11px;font-weight:800;padding:5px 11px;border-radius:9px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.gap-agent-toggle:hover{background:#eff6ff;border-color:#1e3a8a;color:#1e3a8a}
+.gap-agent-toggle.collapsed{background:#f1f5f9;color:#475569}
+.gap-agents-empty{padding:10px 18px;font-size:12px;color:#94a3b8;text-align:center}
 
 /* 정의 박스 */
 .def-box-wrap{max-width:1180px;margin:0 auto;padding:0 20px 14px}
@@ -1667,13 +1694,28 @@ function renderGaps(){
     const st = statsRange(curFrom, curTo, team, curAgent);
     const g = computeGap(st);
 
+    // 팀 카드용 에이전트 토글 버튼 (펼치기/접기) — 활동 있는 에이전트만 카운트
+    const agentList = (D.team_members[team]||[]);
+    const activeAgents = [];
+    agentList.forEach(agent => {
+      const agSt = statsRange(curFrom, curTo, team, agent);
+      const hasActivity = (agSt.db||0)>0 || (agSt.cl||0)>0 || (agSt.vc||0)>0 || (agSt.visit||0)>0 || (agSt.sched||0)>0;
+      if(hasActivity) activeAgents.push({agent, st: agSt});
+    });
+    const isCollapsedNow = !!(window.__gapAgentsCollapsed && window.__gapAgentsCollapsed[team]);
+    const agentToggleHtml = activeAgents.length
+      ? `<button class="gap-agent-toggle${isCollapsedNow ? ' collapsed' : ''}" data-team="${team}" onclick="event.stopPropagation();toggleGapAgents('${team}')">${isCollapsedNow ? '▶' : '▼'} ${activeAgents.length}명</button>`
+      : '';
     if(team === 'TIM_LIDIA'){
       // LIDIA: 비디오콜 전담팀
       const overTxt = g.cl_db.gap>=0 ? `✅+${f(g.cl_db.gap)}${T('gap_over_short')}` : `🔻+${f(Math.abs(g.cl_db.gap))}${T('gap_need_short')}`;
       h += `<div class="gap-card" style="border-left-color:${color};background:linear-gradient(90deg,#fef2f2,#fff);border:2px dashed #fca5a5;border-left:5px solid ${color}">
         <div class="gap-team-header">
           <span class="gap-team-name" style="color:${color}">${name}</span>
-          <span class="gap-team-db" style="background:#dc2626;color:#fff;font-size:11px;font-weight:900;padding:3px 10px;animation:pulseLidia 2s ease-in-out infinite">${T('lidia_video_team')}</span>
+          <div class="gap-team-meta" style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+            <span class="gap-team-db" style="background:#dc2626;color:#fff;font-size:11px;font-weight:900;padding:3px 10px;animation:pulseLidia 2s ease-in-out infinite">${T('lidia_video_team')}</span>
+            ${agentToggleHtml}
+          </div>
         </div>
         <div class="gap-metrics-h">
           <div class="gap-metric" onclick="openMemTeam('${team}','vc','📹 ${T('s_vc')}')" style="cursor:pointer;background:#ede9fe;border-color:#c4b5fd">
@@ -1705,7 +1747,10 @@ function renderGaps(){
       h += `<div class="gap-card" style="border-left-color:${color}">
         <div class="gap-team-header">
           <span class="gap-team-name" style="color:${color}">${name}</span>
-          <span class="gap-team-db">${T('gap_db')} ${f(st.db||0)}${T('gap_unit')}</span>
+          <div class="gap-team-meta" style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+            <span class="gap-team-db">${T('gap_db')} ${f(st.db||0)}${T('gap_unit')}</span>
+            ${agentToggleHtml}
+          </div>
         </div>
         <div class="gap-metrics-h">
           ${gapMetric('📅', T('gap_book'), g.sched, TARGETS.ds, false, `onclick="openMemTeam('${team}','s,d,vc,ls,cl','📅 ${T('gap_book')}')"`)}
@@ -1715,10 +1760,77 @@ function renderGaps(){
         </div>
       </div>`;
     }
+
+    // 팀 카드 다음에 에이전트 행 추가
+    if(activeAgents.length){
+      let agentRows = '';
+      activeAgents.forEach(({agent, st: agSt}) => {
+        agentRows += renderAgentGapRow(team, agent, agSt, computeGap(agSt));
+      });
+      h += `<div class="gap-agents-wrap${isCollapsedNow?' collapsed':''}" id="gap-agents-${team}">${agentRows}</div>`;
+    }
   });
 
   document.getElementById('gap-grid').innerHTML = h;
   document.getElementById('gap-context').textContent = rangeLbl();
+}
+
+function toggleGapAgents(team){
+  const wrap = document.getElementById('gap-agents-'+team);
+  if(!wrap) return;
+  const isCollapsed = wrap.classList.toggle('collapsed');
+  window.__gapAgentsCollapsed = window.__gapAgentsCollapsed || {};
+  window.__gapAgentsCollapsed[team] = isCollapsed;
+  const btn = document.querySelector(`.gap-agent-toggle[data-team="${team}"]`);
+  if(btn){
+    const count = btn.textContent.replace(/[^\d]/g,'') || '0';
+    btn.textContent = `${isCollapsed?'▶':'▼'} ${count}명`;
+    btn.classList.toggle('collapsed', isCollapsed);
+  }
+}
+
+function renderAgentGapRow(team, agent, st, g){
+  const color = TC[team] || '#888';
+  const meta = (D.agent_meta && D.agent_meta[agent]) || {};
+  const short = meta.short || agent;
+  const safeAgent = agent.replace(/'/g,"\\'");
+  if(team === 'TIM_LIDIA'){
+    const overTxt = g.cl_db.gap>=0 ? `+${f(g.cl_db.gap)}${T('gap_over_short')}` : `+${f(Math.abs(g.cl_db.gap))}${T('gap_need_short')}`;
+    return `<div class="gap-agent-row" onclick="setCalAgentQuick('${safeAgent}')" title="${short} 상세 보기">
+      <span class="gap-agent-dot" style="background:${color};color:${color}"></span>
+      <span class="gap-agent-name">${short}</span>
+      <span class="gap-agent-db" style="background:#fee2e2;color:#7f1d1d;border-color:#fca5a5">${T('gap_db')} ${f(st.db||0)}</span>
+      <div class="gap-agent-metrics">
+        <div class="gap-agent-metric"><span class="gap-agent-m-emo">📹</span><span class="gap-agent-m-vals" style="color:#6d28d9">${f(st.vc||0)}${T('gap_unit')}</span></div>
+        <div class="gap-agent-metric"><span class="gap-agent-m-emo">🏆</span><span class="gap-agent-m-vals" style="color:#dc2626">${f(st.cl||0)}${T('gap_unit')}</span></div>
+        <div class="gap-agent-metric muted"><span class="gap-agent-m-emo">🚫</span><span class="gap-agent-m-vals" style="font-size:10px;color:#94a3b8">${T('lidia_no_target')}</span></div>
+        ${agentMetricCompact('💰', g.cl_db, true)}
+      </div>
+    </div>`;
+  }
+  return `<div class="gap-agent-row" onclick="setCalAgentQuick('${safeAgent}')" title="${short} 상세 보기">
+    <span class="gap-agent-dot" style="background:${color};color:${color}"></span>
+    <span class="gap-agent-name">${short}</span>
+    <span class="gap-agent-db">${T('gap_db')} ${f(st.db||0)}</span>
+    <div class="gap-agent-metrics">
+      ${agentMetricCompact('📅', g.sched, false)}
+      ${agentMetricCompact('✅', g.visit, false)}
+      ${agentMetricCompact('🏆', g.cl_visit, false)}
+      ${agentMetricCompact('💰', g.cl_db, true)}
+    </div>
+  </div>`;
+}
+
+function agentMetricCompact(emo, g, isFinal){
+  let cls, txt;
+  if(g.gap > 0){ cls='good'; txt=`+${f(g.gap)}${T('gap_over_short')}`; }
+  else if(g.gap === 0){ cls='zero'; txt=T('achieved'); }
+  else { cls='bad'; txt=`+${f(Math.abs(g.gap))}${T('gap_need_short')}`; }
+  return `<div class="gap-agent-metric${isFinal?' final':''}">
+    <span class="gap-agent-m-emo">${emo}</span>
+    <span class="gap-agent-m-vals">${f(g.actual)}<span class="vs">/</span><span class="req">${f(g.required)}</span></span>
+    <span class="gap-agent-m-status ${cls}">${txt}</span>
+  </div>`;
 }
 
 // ── 📈 최근 3개월 트렌드 ───────────────────────────────
