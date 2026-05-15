@@ -597,6 +597,52 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .ins-ag-d-item b{font-weight:900;display:block;margin-bottom:3px;font-size:14px}
 .ins-ag-d-detail{font-size:12.5px;color:#9f1239;font-weight:700;margin-top:4px;font-style:italic;line-height:1.4}
 .ins-ag-d-empty{color:#cbd5e1;padding:14px;text-align:center;font-size:13px;font-weight:600;background:#fafafa;border-radius:8px;border:1.5px dashed #e2e8f0}
+/* 🚨 긴급 관리 배너 (인사이트 탭 상단) */
+#urgent-banner{padding:16px 20px 4px}
+.urgent-banner-ok{background:linear-gradient(135deg,#dcfce7,#f0fdf4);border:2px solid #22c55e;border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:18px;box-shadow:0 2px 8px rgba(34,197,94,.15)}
+.urgent-banner-ok .ub-icon{font-size:36px}
+.urgent-banner-ok .ub-title{font-size:18px;font-weight:900;color:#14532d;margin-bottom:3px}
+.urgent-banner-ok .ub-sub{font-size:13px;color:#15803d;font-weight:600}
+.urgent-banner-alert{background:linear-gradient(135deg,#fef2f2,#fee2e2);border:3px solid #dc2626;border-radius:14px;padding:18px 22px;box-shadow:0 4px 14px rgba(220,38,38,.18);animation:urgPulse 3s ease-in-out infinite}
+@keyframes urgPulse{0%,100%{box-shadow:0 4px 14px rgba(220,38,38,.18)}50%{box-shadow:0 4px 18px rgba(220,38,38,.32)}}
+.urgent-banner-alert .ub-hd{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.urgent-banner-alert .ub-flame{font-size:38px}
+.urgent-banner-alert .ub-title{font-size:20px;font-weight:900;color:#7f1d1d;letter-spacing:-.3px}
+.urgent-banner-alert .ub-sub{font-size:12.5px;color:#991b1b;font-weight:600;margin-top:3px}
+.urgent-banner-alert .ub-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.ub-stat{background:white;border:2px solid;border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 4px rgba(0,0,0,.04)}
+.ub-stat b{font-size:24px;font-weight:900;line-height:1}
+.ub-stat span{font-size:11.5px;font-weight:800;letter-spacing:-.2px}
+.ub-stat-red{border-color:#dc2626}.ub-stat-red b{color:#dc2626}.ub-stat-red span{color:#7f1d1d}
+.ub-stat-orange{border-color:#ea580c}.ub-stat-orange b{color:#ea580c}.ub-stat-orange span{color:#7c2d12}
+.ub-stat-blue{border-color:#2563eb}.ub-stat-blue b{color:#2563eb}.ub-stat-blue span{color:#1e3a8a}
+.ub-agents{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1.5px dashed #fca5a5}
+.ub-agents-lbl{font-size:12px;font-weight:800;color:#7f1d1d;margin-right:4px}
+.ub-ag-chip{background:white;border:2px solid;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;color:#1f2937;cursor:pointer;transition:all .12s}
+.ub-ag-chip:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.ub-ag-chip b{font-weight:900;color:#dc2626;margin-right:4px}
+/* 에이전트 카드 내 긴급 관리 섹션 */
+.ins-urgent{margin-bottom:16px;border-radius:11px;padding:12px 16px;border:2px solid}
+.ins-urgent.ok{background:#f0fdf4;border-color:#86efac}
+.ins-urgent.ok .ins-urgent-hd{color:#15803d}
+.ins-urgent.ok .ins-urgent-empty{color:#16a34a;font-weight:700;text-align:center;padding:6px}
+.ins-urgent.danger{background:linear-gradient(180deg,#fef2f2,#fff);border-color:#dc2626;box-shadow:0 2px 6px rgba(220,38,38,.12)}
+.ins-urgent-hd{font-weight:900;font-size:14px;color:#7f1d1d;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ins-urgent-hd .urg-count{background:#dc2626;color:white;font-size:12px;padding:2px 10px;border-radius:12px;font-weight:900}
+.ins-urgent-hd small{color:#991b1b;font-size:11.5px;font-weight:600;letter-spacing:-.2px}
+.ins-urgent-item{display:grid;grid-template-columns:60px 28px 1fr auto auto auto;gap:10px;align-items:center;padding:8px 11px;margin-bottom:5px;background:white;border-radius:8px;border-left:4px solid;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .12s}
+.ins-urgent-item:hover{transform:translateX(3px);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.ins-urgent-item.sev-3{border-left-color:#dc2626}
+.ins-urgent-item.sev-2{border-left-color:#ea580c}
+.ins-urgent-item.sev-1{border-left-color:#d97706}
+.urg-dday{color:white;font-weight:900;font-size:13px;padding:3px 8px;border-radius:6px;text-align:center;line-height:1.2}
+.urg-icon{font-size:18px;text-align:center}
+.urg-name{font-weight:900;color:#0f172a;font-size:13.5px}
+.urg-pa{color:#64748b;font-size:11.5px;font-weight:600}
+.urg-reason{color:#991b1b;font-size:12px;font-weight:700}
+.urg-ad{color:#94a3b8;font-size:10.5px;font-weight:600}
+.urg-more{text-align:center;padding:8px;font-size:12px;font-weight:800;color:#0284c7;cursor:pointer;background:white;border-radius:6px;margin-top:4px}
+.urg-more:hover{background:#e0f2fe}
 .icard{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px}
 .icard.danger{border-color:#fecaca;background:linear-gradient(135deg,#fef2f2,#fff)}
 .icard.warn{border-color:#fde68a;background:linear-gradient(135deg,#fffbeb,#fff)}
@@ -882,6 +928,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
   </div>
   <!-- 팀·에이전트 인사이트 -->
   <div id="content-insight" style="display:none">
+    <!-- 🚨 전체 긴급 관리 배너 (배정 후 2주 이내) -->
+    <div id="urgent-banner"></div>
     <div class="sec-hd">
       <div><div class="sec-title">🏆 팀별 인사이트</div>
       <div class="sec-sub">선택한 기간 동안의 팀별 성과 분석 · 강점/약점/권고</div></div>
@@ -2592,6 +2640,109 @@ function renderTab(){
 }
 
 // ===== 팀·에이전트 인사이트 =====
+// ===== 배정 후 2주 이내 긴급 관리 대상 찾기 (에이전트별 회원) =====
+function findUrgentForAgent(agentName, todayStr){
+  const todayDate = new Date(todayStr);
+  const twoWeeksAgo = new Date(todayDate);
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+  const twoWeeksAgoStr = twoWeeksAgo.toISOString().slice(0,10);
+
+  const recent = (D.records||[]).filter(r=>{
+    if(r.a!==agentName) return false;
+    if(!r.ad||r.ad<twoWeeksAgoStr) return false;
+    return true;
+  });
+
+  const urgent=[];
+  recent.forEach(r=>{
+    const adDate = new Date(r.ad);
+    const daysSince = Math.floor((todayDate-adDate)/(1000*60*60*24));
+    const daysLeft = 14-daysSince; // 이관 D-day
+    let reason=null, severity=0, icon='';
+
+    if(r.st==='s'&&r.vd&&r.vd<todayStr){
+      const visitDate = new Date(r.vd);
+      const daysOverdue = Math.floor((todayDate-visitDate)/(1000*60*60*24));
+      reason = `방문일 ${daysOverdue}일 지남 - 즉시 확인`;
+      severity=3; icon='⚠️';
+    } else if(r.st==='w'){
+      reason = `일정대기 ${daysSince}일 누적`;
+      severity = daysLeft<=3?3:daysLeft<=7?2:1; icon='⏳';
+    } else if(r.st==='none'&&daysSince>=3){
+      reason = `미진행 ${daysSince}일 (응답 없음)`;
+      severity = daysLeft<=3?3:daysLeft<=7?2:1; icon='🚨';
+    } else if(r.st==='s'&&r.vd&&r.vd>=todayStr){
+      const visitDate = new Date(r.vd);
+      const daysUntil = Math.floor((visitDate-todayDate)/(1000*60*60*24));
+      if(daysUntil<=2){
+        reason = `방문 D-${daysUntil} - 사전 리마인드 필요`;
+        severity=1; icon='📅';
+      }
+    }
+    if(reason) urgent.push({...r, daysSince, daysLeft, reason, severity, urgentIcon:icon});
+  });
+
+  urgent.sort((a,b)=>b.severity-a.severity||a.daysLeft-b.daysLeft);
+  return urgent;
+}
+
+// ===== 전체 긴급 배너 (인사이트 탭 상단) =====
+function renderUrgentBanner(){
+  const banner = document.getElementById('urgent-banner');
+  if(!banner)return;
+  const todayStr = D.today;
+  const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
+  // 모든 활동 에이전트의 긴급 건수 집계
+  const totals = {overdue:0, wait:0, idle:0, soon:0, byAgent:{}, total:0};
+  agents.forEach(a=>{
+    const urgent = findUrgentForAgent(a, todayStr);
+    if(urgent.length===0)return;
+    totals.byAgent[a] = urgent.length;
+    totals.total += urgent.length;
+    urgent.forEach(u=>{
+      if(u.urgentIcon==='⚠️')totals.overdue++;
+      else if(u.urgentIcon==='⏳')totals.wait++;
+      else if(u.urgentIcon==='🚨')totals.idle++;
+      else if(u.urgentIcon==='📅')totals.soon++;
+    });
+  });
+
+  if(totals.total===0){
+    banner.innerHTML = `<div class="urgent-banner-ok">
+      <div class="ub-icon">✅</div>
+      <div class="ub-content"><div class="ub-title">긴급 관리 대상 없음</div><div class="ub-sub">배정 후 2주 이내 회원 중 즉시 액션 필요한 건 없습니다</div></div>
+    </div>`;
+    return;
+  }
+
+  // 에이전트별 긴급 건수 (TOP 5)
+  const topAgents = Object.entries(totals.byAgent).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+  banner.innerHTML = `<div class="urgent-banner-alert">
+    <div class="ub-hd">
+      <span class="ub-flame">🚨</span>
+      <div class="ub-hd-text">
+        <div class="ub-title">긴급 관리 필요 ${totals.total}건</div>
+        <div class="ub-sub">배정 후 2주 이내 · 이관 임박 · 매일 자동 업데이트 (오늘 ${todayStr})</div>
+      </div>
+    </div>
+    <div class="ub-stats">
+      ${totals.overdue>0?`<div class="ub-stat ub-stat-red"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>`:''}
+      ${totals.idle>0?`<div class="ub-stat ub-stat-red"><b>${totals.idle}</b><span>🚨 미진행 응답없음</span></div>`:''}
+      ${totals.wait>0?`<div class="ub-stat ub-stat-orange"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>`:''}
+      ${totals.soon>0?`<div class="ub-stat ub-stat-blue"><b>${totals.soon}</b><span>📅 방문 임박</span></div>`:''}
+    </div>
+    <div class="ub-agents">
+      <div class="ub-agents-lbl">긴급 건수 TOP 에이전트:</div>
+      ${topAgents.map(([a,n])=>{
+        const meta = D.agent_meta[a]||{};
+        const tcol = TC[meta.team]||'#888';
+        return `<span class="ub-ag-chip" style="border-color:${tcol}" onclick="openMem('${a}','db')"><b>${n}</b> ${meta.short||a}</span>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
 // ===== 에이전트 분석 (팀리더 코칭용) =====
 function analyzeAgent(s){
   const db=s.db||0, visit=s.visit||0, sched=s.sched||0, cl=s.cl||0;
@@ -2655,6 +2806,8 @@ function analyzeAgent(s){
 }
 
 function renderTeamAgentInsight(){
+  // 🚨 전체 긴급 관리 배너 (배정 후 2주 이내)
+  renderUrgentBanner();
   // 팀별 카드
   const teamGrid = document.getElementById('ins-team-grid');
   const teamLbl = document.getElementById('insight-team-lbl');
@@ -2777,6 +2930,30 @@ function renderTeamAgentInsight(){
         <div class="ins-f-arrow"><div class="ins-f-rate ${r_vc_ok?'good':'bad'}">${x.r_vc||0}%<small>클로율</small></div></div>
         <div class="ins-f-stage"><div class="ins-f-num" style="color:#dc2626">${x.cl||0}</div><div class="ins-f-lbl">🏆 클로</div></div>
       </div>
+
+      <!-- 🚨 긴급 관리 (배정 후 2주 이내) -->
+      ${(()=>{
+        const urgent = findUrgentForAgent(x.a, D.today);
+        if(urgent.length===0){
+          return `<div class="ins-urgent ok"><div class="ins-urgent-hd">🚨 긴급 관리 (배정 후 2주 이내)</div><div class="ins-urgent-empty">✅ 긴급 관리 대상 없음 (이관 위험 0건)</div></div>`;
+        }
+        const sevColor = ['#94a3b8','#d97706','#ea580c','#dc2626'];
+        const urgItems = urgent.slice(0,5).map(u=>`
+          <div class="ins-urgent-item sev-${u.severity}" onclick="openMem('${u.a}','${u.st}')">
+            <span class="urg-dday" style="background:${sevColor[u.severity]}">D-${u.daysLeft}</span>
+            <span class="urg-icon">${u.urgentIcon}</span>
+            <span class="urg-name">${u.nm||'-'}</span>
+            <span class="urg-pa">(${u.pa||'-'})</span>
+            <span class="urg-reason">${u.reason}</span>
+            <span class="urg-ad">${u.ad}</span>
+          </div>
+        `).join('');
+        return `<div class="ins-urgent danger">
+          <div class="ins-urgent-hd">🚨 긴급 관리 필요 <span class="urg-count">${urgent.length}건</span> <small>(배정 후 2주 이내 · 이관 임박)</small></div>
+          ${urgItems}
+          ${urgent.length>5?`<div class="urg-more" onclick="openMem('${x.a}','db')">+${urgent.length-5}건 더 보기 →</div>`:''}
+        </div>`;
+      })()}
 
       <!-- 분석 (강점/약점/코칭) 3열 -->
       <div class="ins-ag-d-analysis">
