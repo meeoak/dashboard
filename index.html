@@ -387,6 +387,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 /* ─ 캘린더 ─ */
 .cal-wrap{padding:16px 20px 24px}
 .cal-nav{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.cal-controls{display:flex;align-items:center;gap:16px;padding:14px 18px;background:linear-gradient(180deg,#f0f9ff 0%,#e0f2fe 100%);border-bottom:2px solid #bae6fd;flex-wrap:wrap;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(2,132,199,0.12)}
+.cal-month-nav{display:flex;align-items:center;gap:8px}
+.cal-nav-btn{width:34px;height:34px;border:2px solid #0284c7;background:white;border-radius:8px;cursor:pointer;font-size:15px;font-weight:800;color:#0369a1;transition:all .15s}
+.cal-nav-btn:hover{background:#0284c7;color:white;transform:scale(1.05)}
+.cal-nav-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.cal-month-label{font-size:18px;font-weight:900;min-width:90px;text-align:center;color:#0c4a6e;letter-spacing:-0.3px}
+.cal-team-tabs{display:flex;gap:6px;align-items:center}
+.cal-tt-btn{padding:7px 16px;border:2px solid #cbd5e1;background:white;border-radius:999px;cursor:pointer;font-size:13px;font-weight:700;color:#475569;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.cal-tt-btn:hover:not(.on){background:#f1f5f9;border-color:#94a3b8}
+.cal-tt-btn.on{background:#1e293b;color:white;border-color:#1e293b;box-shadow:0 2px 6px rgba(30,41,59,.25)}
+.cal-tt-btn.on[data-team="TIM_GIAR"]{background:#1a73e8;border-color:#1a73e8}
+.cal-tt-btn.on[data-team="TIM_TINA"]{background:#16a34a;border-color:#16a34a}
+.cal-tt-btn.on[data-team="TIM_LIDIA"]{background:#ea4335;border-color:#ea4335}
+.cal-tt-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cal-agent-sel{padding:8px 14px;border:2px solid #cbd5e1;border-radius:8px;background:white;font-size:13px;font-weight:600;color:#334155;cursor:pointer;min-width:160px}
+.cal-agent-sel:hover{border-color:#94a3b8}
+.cal-agent-sel:focus{outline:none;border-color:#0284c7;box-shadow:0 0 0 3px rgba(2,132,199,.15)}
 .cal-title{font-size:17px;font-weight:900}
 .cal-sub{font-size:11px;color:#aaa;margin-left:6px}
 .cal-legend{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
@@ -690,6 +707,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 <div class="tab-content">
   <!-- 캘린더 (예정 위 + 완료 아래) -->
   <div id="content-cal">
+    <!-- 캘린더 전용 컨트롤바: 월이동 / 팀 / 에이전트 -->
+    <div class="cal-controls">
+      <div class="cal-month-nav">
+        <button class="cal-nav-btn" onclick="calPrevMonth()" title="이전 월">◀</button>
+        <span class="cal-month-label" id="cal-month-label">5월</span>
+        <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월">▶</button>
+      </div>
+      <div class="cal-team-tabs">
+        <button class="cal-tt-btn on" data-team="ALL" onclick="setCalTeamQuick('ALL')">🌐 전체</button>
+        <button class="cal-tt-btn" data-team="TIM_GIAR" onclick="setCalTeamQuick('TIM_GIAR')"><span class="cal-tt-dot" style="background:#1a73e8"></span>GIAR</button>
+        <button class="cal-tt-btn" data-team="TIM_TINA" onclick="setCalTeamQuick('TIM_TINA')"><span class="cal-tt-dot" style="background:#16a34a"></span>TINA</button>
+        <button class="cal-tt-btn" data-team="TIM_LIDIA" onclick="setCalTeamQuick('TIM_LIDIA')"><span class="cal-tt-dot" style="background:#ea4335"></span>LIDIA</button>
+      </div>
+      <select class="cal-agent-sel" id="cal-agent-sel" onchange="setCalAgentQuick(this.value)">
+        <option value="ALL">👥 전체 에이전트</option>
+      </select>
+    </div>
     <!-- 방문예약 (앞으로 다가올 일정) -->
     <div class="cal-wrap" style="border-bottom:6px solid #f5f5f5">
       <div class="cal-nav">
@@ -1145,6 +1179,84 @@ function setPreset(p){
   else { document.getElementById('fsel-month').value=''; }
   renderAll();
 }
+// ===== 캘린더 전용 빠른 컨트롤 =====
+function calPrevMonth(){
+  const months = D.cal_months || D.months || [];
+  let cur = curMonth==='ALL' ? months[months.length-1] : curMonth;
+  const idx = months.indexOf(cur);
+  if(idx > 0){
+    curMonth = months[idx-1];
+    const monthSel = document.getElementById('fsel-month');
+    if(monthSel) monthSel.value = curMonth;
+    onMonthChange();
+  }
+}
+function calNextMonth(){
+  const months = D.cal_months || D.months || [];
+  let cur = curMonth==='ALL' ? months[0] : curMonth;
+  const idx = months.indexOf(cur);
+  if(idx >= 0 && idx < months.length-1){
+    curMonth = months[idx+1];
+    const monthSel = document.getElementById('fsel-month');
+    if(monthSel) monthSel.value = curMonth;
+    onMonthChange();
+  }
+}
+function setCalTeamQuick(team){
+  // 기존 selectScope 로직 활용 (OFF/MKT 스코프는 유지)
+  curTeam = team;
+  curAgent = 'ALL';
+  document.querySelectorAll('.scope-btn[data-scope]').forEach(b=>{
+    if(b.dataset.scope.startsWith('TIM_') || b.dataset.scope==='ALL'){
+      const isTeamScope = b.dataset.scope===team || (team==='ALL' && b.dataset.scope==='ALL' && curDbKind==='ALL');
+      if(team==='ALL' && curDbKind==='ALL'){
+        b.classList.toggle('on', b.dataset.scope==='ALL');
+      } else if(b.dataset.scope.startsWith('TIM_')){
+        b.classList.toggle('on', b.dataset.scope===team);
+      } else if(b.dataset.scope==='ALL' && team!=='ALL'){
+        b.classList.remove('on');
+      }
+    }
+  });
+  buildAgentSelect();
+  updateCalControls();
+  renderAll();
+}
+function setCalAgentQuick(agent){
+  curAgent = agent;
+  const sel = document.getElementById('fsel-agent');
+  if(sel) sel.value = agent;
+  renderAll();
+}
+function updateCalControls(){
+  // 월 레이블
+  const lbl = document.getElementById('cal-month-label');
+  const months = D.cal_months || D.months || [];
+  let cur = curMonth==='ALL' ? months[months.length-1] : curMonth;
+  if(lbl){
+    if(curMonth==='ALL') lbl.textContent='전체';
+    else lbl.textContent = (D.mlabels && D.mlabels[cur]) || cur;
+  }
+  // prev/next 버튼 활성화
+  const idx = months.indexOf(cur);
+  const prevBtn = document.querySelector('.cal-nav-btn[onclick="calPrevMonth()"]');
+  const nextBtn = document.querySelector('.cal-nav-btn[onclick="calNextMonth()"]');
+  if(prevBtn) prevBtn.disabled = (idx<=0);
+  if(nextBtn) nextBtn.disabled = (idx>=months.length-1);
+  // 팀 탭 활성화
+  document.querySelectorAll('.cal-tt-btn').forEach(b=>{
+    b.classList.toggle('on', b.dataset.team===curTeam);
+  });
+  // 에이전트 셀렉트
+  const aSel = document.getElementById('cal-agent-sel');
+  if(aSel){
+    const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
+    aSel.innerHTML = '<option value="ALL">👥 전체 에이전트</option>' +
+      agents.map(a=>`<option value="${a}">${(D.agent_meta[a]||{}).short || a}</option>`).join('');
+    aSel.value = curAgent || 'ALL';
+  }
+}
+
 function selectScope(scope){
   // scope: 'ALL' | 'TIM_GIAR' | 'TIM_TINA' | 'TIM_LIDIA' | 'OFF' | 'MKT'
   if(scope === 'OFF' || scope === 'MKT'){
@@ -2266,7 +2378,7 @@ function renderTab(){
   else if(curTab==='chan') renderProvOrChan('chan');
   else if(curTab==='insight') renderInsight();
 }
-function renderAll(){ renderMode(); renderDBSummary(); render3MonthTrend(); renderTargets(); renderGaps(); renderKPI(); renderTab(); }
+function renderAll(){ renderMode(); renderDBSummary(); render3MonthTrend(); renderTargets(); renderGaps(); renderKPI(); renderTab(); if(typeof updateCalControls==='function') updateCalControls(); }
 
 // ── 회원 ────────────────────────────────────────────────
 function openMem(agent, stype, month){
