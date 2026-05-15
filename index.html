@@ -556,43 +556,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .ins-ag-tbl td{padding:8px 6px;border-bottom:1px solid #f1f5f9;text-align:center;color:#374151}
 .ins-ag-tbl tbody tr:hover{background:#fef3c7}
 /* 에이전트 상세 분석 카드 (팀리더 코칭용) */
-.ins-ag-detail-list{padding:16px 20px;display:flex;flex-direction:column;gap:16px}
-.ins-ag-detail{background:white;border:1px solid #e2e8f0;border-radius:14px;padding:18px 22px;box-shadow:0 1px 4px rgba(0,0,0,.04);transition:all .15s}
-.ins-ag-detail:hover{border-color:#cbd5e1;box-shadow:0 4px 14px rgba(0,0,0,.08)}
-.ins-ag-d-head{display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1.5px dashed #e2e8f0;margin-bottom:14px}
-.ins-ag-d-rank{font-size:32px;width:50px;text-align:center;font-weight:900;flex-shrink:0}
+.ins-ag-detail-list{padding:16px 20px;display:flex;flex-direction:column;gap:20px}
+.ins-ag-detail{background:white;border:2px solid #e2e8f0;border-radius:16px;padding:22px 26px;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:all .15s}
+.ins-ag-detail:hover{border-color:#cbd5e1;box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px)}
+.ins-ag-d-head{display:flex;align-items:center;gap:18px;padding-bottom:18px;border-bottom:2px dashed #e2e8f0;margin-bottom:18px}
+.ins-ag-d-rank{font-size:40px;width:60px;text-align:center;font-weight:900;flex-shrink:0;line-height:1}
 .ins-ag-d-info{flex:1;min-width:0}
-.ins-ag-d-name{font-size:18px;font-weight:900;color:#0f172a;margin-bottom:6px;letter-spacing:-.3px}
+.ins-ag-d-name{font-size:24px;font-weight:900;color:#0f172a;margin-bottom:8px;letter-spacing:-.5px;line-height:1.1}
 .ins-ag-d-sub{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.ins-ag-d-btn{background:#0284c7;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:800;cursor:pointer;transition:all .15s;flex-shrink:0}
-.ins-ag-d-btn:hover{background:#0369a1;transform:translateY(-1px);box-shadow:0 3px 8px rgba(2,132,199,.3)}
-/* 펀널 시각화 */
-.ins-funnel{display:flex;align-items:stretch;gap:0;background:linear-gradient(90deg,#f8fafc,#fff,#f8fafc);border:1.5px solid #e2e8f0;border-radius:10px;padding:14px 10px;margin-bottom:14px}
-.ins-f-stage{flex:1;text-align:center;padding:6px 8px}
-.ins-f-num{font-size:28px;font-weight:900;letter-spacing:-1px;line-height:1.1}
-.ins-f-lbl{font-size:11px;font-weight:800;color:#64748b;margin-top:4px;letter-spacing:-.2px}
-.ins-f-arrow{flex:0 0 80px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 4px}
-.ins-f-rate{font-size:14px;font-weight:900;padding:5px 10px;border-radius:14px;display:flex;flex-direction:column;align-items:center;line-height:1.1;letter-spacing:-.3px;border:1.5px solid}
-.ins-f-rate.good{background:#dcfce7;color:#15803d;border-color:#86efac}
-.ins-f-rate.bad{background:#fef2f2;color:#b91c1c;border-color:#fca5a5}
-.ins-f-rate small{font-size:9px;color:inherit;font-weight:700;margin-top:1px;opacity:.85}
-/* 분석 3열 */
-.ins-ag-d-analysis{display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:14px}
+.ins-ag-d-sub span{font-size:13px;padding:4px 12px!important;border-radius:6px!important;font-weight:800!important}
+.ins-ag-d-btn{background:linear-gradient(135deg,#0284c7,#0369a1);color:white;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;cursor:pointer;transition:all .15s;flex-shrink:0;box-shadow:0 2px 6px rgba(2,132,199,.25)}
+.ins-ag-d-btn:hover{background:linear-gradient(135deg,#0369a1,#075985);transform:translateY(-2px);box-shadow:0 4px 14px rgba(2,132,199,.4)}
+/* 펀널 시각화 - 강화 */
+.ins-funnel{display:flex;align-items:stretch;gap:0;background:linear-gradient(90deg,#f8fafc 0%,#fff 50%,#f8fafc 100%);border:2px solid #cbd5e1;border-radius:14px;padding:20px 14px;margin-bottom:18px;box-shadow:inset 0 1px 4px rgba(0,0,0,.04)}
+.ins-f-stage{flex:1;text-align:center;padding:10px 8px;border-radius:10px;transition:all .15s}
+.ins-f-stage:hover{background:rgba(255,255,255,.6)}
+.ins-f-num{font-size:42px;font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:6px}
+.ins-f-lbl{font-size:13px;font-weight:800;color:#475569;letter-spacing:-.2px;display:flex;align-items:center;justify-content:center;gap:3px}
+.ins-f-arrow{flex:0 0 90px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 6px;position:relative}
+.ins-f-arrow::before{content:'→';position:absolute;top:50%;left:50%;transform:translate(-50%,-130%);font-size:24px;color:#cbd5e1;font-weight:900}
+.ins-f-rate{font-size:18px;font-weight:900;padding:8px 14px;border-radius:18px;display:flex;flex-direction:column;align-items:center;line-height:1.1;letter-spacing:-.3px;border:2px solid;min-width:75px;box-shadow:0 2px 6px rgba(0,0,0,.08);position:relative;z-index:1}
+.ins-f-rate.good{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#15803d;border-color:#22c55e}
+.ins-f-rate.bad{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#b91c1c;border-color:#ef4444}
+.ins-f-rate small{font-size:10px;color:inherit;font-weight:800;margin-top:2px;opacity:.9}
+/* 분석 3열 - 강화 */
+.ins-ag-d-analysis{display:grid;grid-template-columns:1fr 1.2fr 1.5fr;gap:16px}
 @media(max-width:900px){.ins-ag-d-analysis{grid-template-columns:1fr}}
-.ins-ag-d-col{display:flex;flex-direction:column;gap:6px}
-.ins-ag-d-h{font-weight:900;font-size:13px;padding:7px 10px;border-radius:7px;margin-bottom:2px}
-.ins-ag-d-h.good{background:#dcfce7;color:#15803d}
-.ins-ag-d-h.bad{background:#fee2e2;color:#b91c1c}
-.ins-ag-d-h.tip{background:#ede9fe;color:#5b21b6}
-.ins-ag-d-item{padding:8px 12px;border-radius:7px;font-size:12.5px;line-height:1.5;font-weight:600;border-left:3px solid}
+.ins-ag-d-col{display:flex;flex-direction:column;gap:8px}
+.ins-ag-d-h{font-weight:900;font-size:15px;padding:10px 14px;border-radius:9px;margin-bottom:4px;letter-spacing:-.3px;display:flex;align-items:center;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.ins-ag-d-h.good{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#14532d;border:1.5px solid #22c55e}
+.ins-ag-d-h.bad{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#7f1d1d;border:1.5px solid #ef4444}
+.ins-ag-d-h.tip{background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:#4c1d95;border:1.5px solid #8b5cf6}
+.ins-ag-d-item{padding:11px 14px;border-radius:8px;font-size:13.5px;line-height:1.55;font-weight:700;border-left:4px solid;transition:all .12s}
+.ins-ag-d-item:hover{transform:translateX(3px)}
 .ins-ag-d-item.good{background:#f0fdf4;color:#14532d;border-left-color:#16a34a}
 .ins-ag-d-item.bad{background:#fef2f2;color:#7f1d1d;border-left-color:#dc2626}
-.ins-ag-d-item.bad.sev-high{border-left-width:4px;border-left-color:#b91c1c;background:#fee2e2;animation:pulseWeakness 3s ease-in-out infinite}
+.ins-ag-d-item.bad.sev-high{border-left-width:6px;border-left-color:#b91c1c;background:linear-gradient(90deg,#fee2e2,#fef2f2);animation:pulseWeakness 3s ease-in-out infinite;font-weight:800}
 @keyframes pulseWeakness{0%,100%{box-shadow:inset 0 0 0 0 #fca5a510}50%{box-shadow:inset 0 0 0 8px #fca5a525}}
 .ins-ag-d-item.tip{background:#f5f3ff;color:#4c1d95;border-left-color:#8b5cf6}
-.ins-ag-d-item b{font-weight:900;display:block;margin-bottom:2px}
-.ins-ag-d-detail{font-size:11.5px;color:#9f1239;font-weight:600;margin-top:3px;font-style:italic}
-.ins-ag-d-empty{color:#cbd5e1;padding:10px;text-align:center;font-size:12px}
+.ins-ag-d-item b{font-weight:900;display:block;margin-bottom:3px;font-size:14px}
+.ins-ag-d-detail{font-size:12.5px;color:#9f1239;font-weight:700;margin-top:4px;font-style:italic;line-height:1.4}
+.ins-ag-d-empty{color:#cbd5e1;padding:14px;text-align:center;font-size:13px;font-weight:600;background:#fafafa;border-radius:8px;border:1.5px dashed #e2e8f0}
 .icard{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px}
 .icard.danger{border-color:#fecaca;background:linear-gradient(135deg,#fef2f2,#fff)}
 .icard.warn{border-color:#fde68a;background:linear-gradient(135deg,#fffbeb,#fff)}
