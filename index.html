@@ -1460,7 +1460,14 @@ function selectScope(scope){
 }
 
 // 날짜 범위로 일별 집계 합산
+// statsRange 결과 캐시 — renderAll 시작 시 invalidateStatsCache()로 무효화
+let _statsCache = new Map();
+function invalidateStatsCache(){ _statsCache.clear(); }
+
 function statsRange(from, to, team, agent){
+  const cacheKey = from+'|'+to+'|'+team+'|'+agent+'|'+curDbKind;
+  const hit = _statsCache.get(cacheKey);
+  if(hit) return hit;
   const agents = agent && agent!=='ALL' ? [agent]
     : (team && team!=='ALL' ? D.team_members[team] : Object.keys(D.agent_total));
   const s = {db:0,d:0,ls:0,vc:0,s:0,s_f:0,s_o:0,w:0,x:0,none:0,cl:0,visit:0,sched:0,active:0,score:0};
@@ -1479,35 +1486,33 @@ function statsRange(from, to, team, agent){
       }
     }
   });
-  // 방문예약(s_f) = 날짜 무관 ALL 미래 (5월 예약 등 모두)
-  // 확인필요(s_o) = 날짜 범위 적용 (해당 기간의 미완료만)
-  D.records.forEach(r=>{
-    if(r.st !== 's') return;
-    if(team && team!=='ALL' && r.t!==team) return;
-    if(agent && agent!=='ALL' && r.a!==agent) return;
-    if(useKind && r.dk !== curDbKind) return;
-    if(r.od){
-      if(r.ad >= from && r.ad <= to) s.s_o++;
-    } else {
-      s.s_f++;
-    }
-  });
-  // 🆕 상담예약(sched)에 비짓랑숭(ls) 추가 (랑숭=즉시 방문도 상담예약으로 간주)
-  // 정확한 재계산: records에서 OR 마스크로 직접 카운트
+  // 단일 패스로 s_f / s_o / sched 동시 카운트 (이전엔 records 를 2번 순회)
+  const teamFilter = team && team!=='ALL';
+  const agentFilter = agent && agent!=='ALL';
   let schedNew = 0;
-  D.records.forEach(r=>{
-    if(r.ad < from || r.ad > to) return;
-    if(team && team!=='ALL' && r.t!==team) return;
-    if(agent && agent!=='ALL' && r.a!==agent) return;
-    if(useKind && r.dk !== curDbKind) return;
-    // 상담예약 = 방문예약(s) OR 방문완료(d) OR 비디오콜(vc) OR 비짓랑숭(ls) OR 클로징(cl=1)
-    if(['s','d','vc','ls'].includes(r.st) || r.cl === 1) schedNew++;
-  });
+  const recs = D.records || [];
+  for(let i=0;i<recs.length;i++){
+    const r = recs[i];
+    if(teamFilter && r.t!==team) continue;
+    if(agentFilter && r.a!==agent) continue;
+    if(useKind && r.dk !== curDbKind) continue;
+    const inRange = r.ad >= from && r.ad <= to;
+    // 방문예약: 미래 ALL(s_f), 기간 내 확인필요(s_o)
+    if(r.st === 's'){
+      if(r.od){ if(inRange) s.s_o++; }
+      else s.s_f++;
+    }
+    // 상담예약(sched) = s/d/vc/ls/cl=1, 기간 내
+    if(inRange && (r.st==='s' || r.st==='d' || r.st==='vc' || r.st==='ls' || r.cl===1)){
+      schedNew++;
+    }
+  }
   s.sched = schedNew;
   s.r_ds = s.db ? Math.round(s.sched/s.db*1000)/10 : 0;
   s.r_sv = s.sched ? Math.round(s.visit/s.sched*1000)/10 : 0;
   s.r_vc = s.visit ? Math.round(s.cl/s.visit*1000)/10 : 0;
   s.r_dc = s.db ? Math.round(s.cl/s.db*1000)/10 : 0;
+  _statsCache.set(cacheKey, s);
   return s;
 }
 
@@ -3002,7 +3007,7 @@ function renderTeamAgentInsight(){
   </div>`;
   agentWrap.innerHTML = agHtml;
 }
-function renderAll(){ renderMode(); renderDBSummary(); render3MonthTrend(); renderTargets(); renderGaps(); renderKPI(); renderTab(); if(typeof updateCalControls==='function') updateCalControls(); }
+function renderAll(){ invalidateStatsCache(); renderMode(); renderDBSummary(); render3MonthTrend(); renderTargets(); renderGaps(); renderKPI(); renderTab(); if(typeof updateCalControls==='function') updateCalControls(); }
 
 // ── 회원 ────────────────────────────────────────────────
 function openMem(agent, stype, month){
@@ -3668,6 +3673,11 @@ function mergeRecords(staticRecs, liveRecs){
 }
 
 async function boot(){
+  // 1) 정적 데이터로 즉시 렌더 (체감 속도 우선 · stale-while-revalidate)
+  initFilters();
+  renderAll();
+  if(curLang!=='ko')setLang(curLang);
+  // 2) 백그라운드에서 시트 동기화 후 머지·재렌더
   const newD=await loadFromSheet();
   if(newD&&newD.records){
     const merged = mergeRecords(window.__STATIC_RECORDS, newD.records);
@@ -3677,10 +3687,8 @@ async function boot(){
     mergedD.mlabels = Object.assign({}, window.__STATIC_MLABELS, mergedD.mlabels);
     Object.keys(D).forEach(k=>delete D[k]);
     Object.assign(D, mergedD);
+    renderAll();
   }
-  initFilters();
-  renderAll();
-  if(curLang!=='ko')setLang(curLang);
 }
 
 // 수동 새로고침 함수 (필요시 콘솔에서 호출)
