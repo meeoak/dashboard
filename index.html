@@ -533,6 +533,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .mem-pill{display:inline-flex;font-size:11px;font-weight:700;border-radius:16px;padding:3px 12px;margin-top:5px}
 .mem-count{margin-left:auto;font-size:22px;font-weight:900}
 .mem-search{border:1px solid #ddd;border-radius:8px;padding:7px 12px;font-size:13px;width:100%;max-width:260px;outline:none;margin-bottom:10px}
+.mem-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;padding:12px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px}
+.mem-filters .mem-search{margin-bottom:0;max-width:240px}
+.mem-filter{border:1px solid #d1d5db;border-radius:7px;padding:7px 11px;font-size:12.5px;font-weight:600;color:#334155;background:white;cursor:pointer;outline:none;min-width:120px}
+.mem-filter:hover{border-color:#94a3b8}
+.mem-filter:focus{border-color:#0284c7;box-shadow:0 0 0 3px rgba(2,132,199,.15)}
+.mem-filter:not([value=""]):not(:invalid){background:#fef3c7;border-color:#f59e0b;color:#78350f}
+.mem-clear{border:1px solid #ef4444;background:white;color:#dc2626;border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s}
+.mem-clear:hover{background:#dc2626;color:white}
 .mem-tbl-wrap{background:#fff;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;overflow-x:auto}
 .mem-tbl{width:100%;border-collapse:collapse;min-width:1400px}
 .mem-tbl td.memo-cell{font-size:11px;color:#444;max-width:320px;white-space:pre-wrap;line-height:1.45}
@@ -822,9 +830,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 <div id="page-member"><div class="mem-wrap">
   <button class="back-btn" onclick="goBack()">← 대시보드로 돌아가기</button>
   <div class="mem-header" id="mem-header"></div>
-  <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
-    <input class="mem-search" type="text" placeholder="🔍 학생 이름 검색..." id="mem-search" oninput="filterMem()">
-    <div style="font-size:12px;color:#bbb" id="mem-count-lbl"></div>
+  <div class="mem-filters">
+    <input class="mem-search" type="text" placeholder="🔍 학생/학부모 이름 검색..." id="mem-search" oninput="filterMem()">
+    <select class="mem-filter" id="mem-f-team" onchange="filterMem()" title="팀">
+      <option value="">🏷️ 팀 전체</option>
+      <option value="TIM_GIAR">GIAR</option>
+      <option value="TIM_TINA">TINA</option>
+      <option value="TIM_LIDIA">LIDIA</option>
+    </select>
+    <select class="mem-filter" id="mem-f-agent" onchange="filterMem()" title="에이전트">
+      <option value="">👥 에이전트 전체</option>
+    </select>
+    <select class="mem-filter" id="mem-f-prov" onchange="filterMem()" title="지역">
+      <option value="">📍 지역 전체</option>
+    </select>
+    <select class="mem-filter" id="mem-f-ch" onchange="filterMem()" title="채널">
+      <option value="">📡 채널 전체</option>
+    </select>
+    <select class="mem-filter" id="mem-f-dk" onchange="filterMem()" title="DB 종류">
+      <option value="">📋 DB 전체</option>
+      <option value="OFF">OFF DB</option>
+      <option value="MKT">MKT DB</option>
+    </select>
+    <select class="mem-filter" id="mem-f-st" onchange="filterMem()" title="상태">
+      <option value="">✓ 상태 전체</option>
+      <option value="d">✅ 방문완료</option>
+      <option value="ls">⬜ 랑숭비짓</option>
+      <option value="vc">📹 비디오콜</option>
+      <option value="s">📅 방문예약</option>
+      <option value="w">⏳ 일정대기</option>
+      <option value="x">❌ 취소/거절</option>
+      <option value="none">⚪ 미진행</option>
+    </select>
+    <select class="mem-filter" id="mem-f-cl" onchange="filterMem()" title="클로징">
+      <option value="">🏆 클로징 전체</option>
+      <option value="1">🏆 클로징 있음</option>
+      <option value="0">- 클로징 없음</option>
+    </select>
+    <button class="mem-clear" onclick="clearMemFilters()" title="필터 초기화">🔄 초기화</button>
+    <div style="margin-left:auto;font-size:13px;color:#666;font-weight:600" id="mem-count-lbl"></div>
   </div>
   <div class="mem-tbl-wrap"><table class="mem-tbl">
     <thead><tr><th>#</th><th>팀</th><th>에이전트</th><th>학생</th><th>학부모</th><th>지역</th><th>채널</th><th>방문일</th><th>배정일</th><th>상태</th><th>클로징</th><th style="min-width:280px">상담내용</th></tr></thead>
@@ -2442,6 +2486,13 @@ function showMem(recs, agent, stype, month, date){
       <div style="font-size:11px;color:#aaa">건</div></div>`;
   document.getElementById('mem-search').value='';
   document.getElementById('mem-count-lbl').textContent = `총 ${recs.length}건`;
+  // 필터 드롭다운 옵션 자동 생성 + 초기화
+  if(typeof buildMemFilters==='function'){
+    ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
+      const el=document.getElementById(id); if(el)el.value='';
+    });
+    buildMemFilters();
+  }
   renderMemTable(recs);
   document.getElementById('page-main').style.display='none';
   document.getElementById('page-member').style.display='block';
@@ -2599,11 +2650,54 @@ function renderMemTable(recs){
   });
   document.getElementById('mem-tbody').innerHTML = h || '<tr><td colspan="12" style="text-align:center;padding:24px;color:#bbb">데이터 없음</td></tr>';
 }
+function buildMemFilters(){
+  // memCache 기준으로 드롭다운 옵션 자동 생성
+  const agents=new Set(), provs=new Set(), channels=new Set();
+  memCache.forEach(r=>{
+    if(r.a)agents.add(r.a);
+    if(r.pv)provs.add(r.pv);
+    if(r.ch)channels.add(r.ch);
+  });
+  const setOpts=(id,values,fmt)=>{
+    const sel=document.getElementById(id); if(!sel)return;
+    const cur=sel.value;
+    const firstOpt=sel.options[0].outerHTML;
+    sel.innerHTML=firstOpt+values.map(v=>`<option value="${v}">${fmt?fmt(v):v}</option>`).join('');
+    sel.value=values.includes(cur)?cur:'';
+  };
+  setOpts('mem-f-agent',[...agents].sort(),v=>(D.agent_meta[v]||{}).short||v);
+  setOpts('mem-f-prov',[...provs].sort());
+  setOpts('mem-f-ch',[...channels].sort());
+}
 function filterMem(){
-  const q = document.getElementById('mem-search').value.toLowerCase();
-  const filtered = q ? memCache.filter(r=>(r.nm||'').toLowerCase().includes(q)||(r.pa||'').toLowerCase().includes(q)) : memCache;
-  document.getElementById('mem-count-lbl').textContent = `${filtered.length}건 (전체 ${memCache.length}건)`;
+  const q=(document.getElementById('mem-search').value||'').toLowerCase();
+  const team=document.getElementById('mem-f-team').value;
+  const agent=document.getElementById('mem-f-agent').value;
+  const prov=document.getElementById('mem-f-prov').value;
+  const ch=document.getElementById('mem-f-ch').value;
+  const dk=document.getElementById('mem-f-dk').value;
+  const st=document.getElementById('mem-f-st').value;
+  const cl=document.getElementById('mem-f-cl').value;
+  const filtered=memCache.filter(r=>{
+    if(q&&!(r.nm||'').toLowerCase().includes(q)&&!(r.pa||'').toLowerCase().includes(q))return false;
+    if(team&&r.t!==team)return false;
+    if(agent&&r.a!==agent)return false;
+    if(prov&&r.pv!==prov)return false;
+    if(ch&&r.ch!==ch)return false;
+    if(dk&&r.dk!==dk)return false;
+    if(st&&r.st!==st)return false;
+    if(cl!==''&&String(r.cl||0)!==cl)return false;
+    return true;
+  });
+  document.getElementById('mem-count-lbl').textContent=`${filtered.length}건 / 전체 ${memCache.length}건`;
   renderMemTable(filtered);
+}
+function clearMemFilters(){
+  document.getElementById('mem-search').value='';
+  ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
+    const el=document.getElementById(id); if(el)el.value='';
+  });
+  filterMem();
 }
 function goBack(){
   document.getElementById('page-member').style.display='none';
