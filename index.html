@@ -2664,6 +2664,11 @@ function detectMemoColumn(headerRow){
   MEMO_COL_DETECTED=true;
 }
 
+// 정적 데이터에서 에이전트→팀 매핑 추출 (라이브 파싱 fallback용)
+const STATIC_AGENT_TEAM={};
+for(const r of (D.records||[])) if(r.a&&r.t) STATIC_AGENT_TEAM[r.a]=r.t;
+console.log(`📋 정적 에이전트→팀 매핑 ${Object.keys(STATIC_AGENT_TEAM).length}건`);
+
 function rowToRecord(row,today){
   if(!row||row.length<13)return null;
   const ad=parseSheetDate(row[1]);
@@ -2680,12 +2685,16 @@ function rowToRecord(row,today){
   const statusB=(row[18]||'').trim();
   const clType=(row[20]||'').trim();
   const memo=(row[MEMO_COL_IDX]||'').trim();
+  // 팀 감지: 전체 열에서 TIM_ 패턴 검색
   let team='';
-  for(let i=24;i<Math.min(row.length,28);i++){
+  for(let i=0;i<row.length;i++){
     const v=(row[i]||'').trim();
     if(/^TIM_\w+$/.test(v)){team=v;break;}
   }
-  if(!team)return null;
+  // 못 찾으면 정적 매핑에서 조회
+  if(!team&&STATIC_AGENT_TEAM[agent])team=STATIC_AGENT_TEAM[agent];
+  // 그래도 없으면 GIAR 기본값 (이름으로 추정 불가능한 경우)
+  if(!team)team='TIM_GIAR';
   let st='none';
   if(statusA==='Visit (방문)'&&statusB==='Visit Selesai (방문완료)')st='d';
   else if(statusB==='Visit Langsung (예약없이 방문)')st='ls';
@@ -2923,14 +2932,36 @@ async function loadFromSheet(){
 window.__STATIC_RECORDS = (D.records||[]).slice();
 window.__STATIC_MLABELS = Object.assign({}, D.mlabels||{});
 
-// 정적 records + 시트 records 머지 (시트가 가진 월만 시트 데이터로 교체)
+// 정적 records + 시트 records 머지
+// 각 월별로 더 많은 데이터를 가진 쪽 사용 (파싱 실패로 라이브가 적으면 정적 유지)
 function mergeRecords(staticRecs, liveRecs){
   if(!liveRecs||liveRecs.length===0) return staticRecs.slice();
-  const liveMonths = new Set();
-  for(const r of liveRecs) if(r.m) liveMonths.add(r.m);
-  const keptStatic = staticRecs.filter(r => !liveMonths.has(r.m));
-  console.log(`📊 데이터 머지: 정적 ${keptStatic.length}건 (${staticRecs.length-keptStatic.length}건 시트로 교체) + 시트 ${liveRecs.length}건 = 총 ${keptStatic.length+liveRecs.length}건`);
-  return [...keptStatic, ...liveRecs];
+  // 월별 카운트
+  const staticByMonth={}, liveByMonth={};
+  for(const r of staticRecs) if(r.m) staticByMonth[r.m]=(staticByMonth[r.m]||0)+1;
+  for(const r of liveRecs) if(r.m) liveByMonth[r.m]=(liveByMonth[r.m]||0)+1;
+  // 각 월별로 라이브 vs 정적 중 많은 쪽 사용
+  const useLiveMonths = new Set();
+  const monthLog = [];
+  for(const m of Object.keys(liveByMonth)){
+    const sc=staticByMonth[m]||0, lc=liveByMonth[m]||0;
+    if(lc>=sc){
+      useLiveMonths.add(m);
+      monthLog.push(`${m}: 라이브(${lc}) ≥ 정적(${sc}) → 라이브 사용`);
+    } else {
+      monthLog.push(`${m}: 라이브(${lc}) < 정적(${sc}) → 정적 유지`);
+    }
+  }
+  // 라이브에 없는 월은 정적 그대로 유지
+  for(const m of Object.keys(staticByMonth)){
+    if(!liveByMonth[m]) monthLog.push(`${m}: 정적만 있음(${staticByMonth[m]}) → 정적 유지`);
+  }
+  const keptStatic = staticRecs.filter(r => !useLiveMonths.has(r.m));
+  const usedLive = liveRecs.filter(r => useLiveMonths.has(r.m));
+  const merged = [...keptStatic, ...usedLive];
+  console.log('📊 월별 머지 결정:', monthLog.join(' | '));
+  console.log(`📊 최종: 정적 ${keptStatic.length}건 + 라이브 ${usedLive.length}건 = 총 ${merged.length}건`);
+  return merged;
 }
 
 async function boot(){
