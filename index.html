@@ -639,9 +639,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cstat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px}
 .cstat::after{content:'';position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;opacity:.1;pointer-events:none}
 .cstat:hover{transform:translateY(-3px);box-shadow:0 8px 20px #0002}
-.cstat .cs-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
-.cstat .cs-lbl{font-size:14px;font-weight:900;color:#0f172a;display:flex;align-items:center;gap:6px}
-.cstat .cs-num{font-size:50px;font-weight:900;line-height:1;letter-spacing:-2px;margin:6px 0 12px;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cstat .cs-top-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px;padding-bottom:2px}
+.cstat .cs-lbl{font-size:14.5px;font-weight:900;color:#0f172a;display:flex;align-items:center;gap:6px;padding-bottom:6px;flex:1;min-width:0}
+.cstat .cs-num{font-size:52px;font-weight:900;line-height:.9;letter-spacing:-2px;text-align:right;margin:0;flex-shrink:0;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .cstat .cs-metrics{display:flex;flex-direction:column;gap:9px;padding-top:12px;border-top:2px solid rgba(0,0,0,.1)}
 .cstat .cs-m{display:flex;justify-content:space-between;align-items:center;padding:3px 0;min-height:24px}
 .cstat .cs-m-lbl{color:#374151;font-size:12.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase}
@@ -649,7 +649,10 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cstat .cs-m-val.up{color:#15803d;background:#dcfce7;padding:3px 10px;border-radius:8px;box-shadow:inset 0 0 0 1.5px #86efac;font-size:16px}
 .cstat .cs-m-val.down{color:#b91c1c;background:#fee2e2;padding:3px 10px;border-radius:8px;box-shadow:inset 0 0 0 1.5px #fca5a5;font-size:16px}
 .cstat .cs-m-val.same{color:#6b7280;background:#f3f4f6;padding:3px 10px;border-radius:8px;font-size:15px}
-.cstat .cs-m-top{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cstat .cs-m-top{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-flex;align-items:baseline;gap:6px}
+.cstat .cs-top-name{font-size:16px;font-weight:900;color:#0f172a}
+.cstat .cs-top-cnt{font-size:11px;font-weight:800;color:#6b7280;background:#fff8;padding:1px 6px;border-radius:99px;box-shadow:inset 0 0 0 1px #e5e7eb}
+.cstat .cs-m-toprow{margin-top:2px;padding:6px 8px;background:rgba(255,255,255,.55);border-radius:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
 .cstat.cs-s{background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%)}
 .cstat.cs-s::before{background:linear-gradient(180deg,#3b82f6,#1d4ed8)}
 .cstat.cs-s::after{background:#1d4ed8}
@@ -688,13 +691,17 @@ body.focus-mode #detail-section-hd{display:none!important}
   .cal-report-title{font-size:16px}
   .cal-stat-cards{grid-template-columns:repeat(2,1fr);gap:6px}
   .cstat{padding:11px 11px 11px 16px}
-  .cstat .cs-num{font-size:36px;margin:4px 0 8px}
-  .cstat .cs-lbl{font-size:12.5px}
+  .cstat .cs-num{font-size:38px}
+  .cstat .cs-lbl{font-size:13px;padding-bottom:4px}
+  .cstat .cs-top-row{margin-bottom:9px;gap:6px}
   .cstat .cs-metrics{gap:6px;padding-top:10px}
   .cstat .cs-m-lbl{font-size:11px}
   .cstat .cs-m-val{font-size:14px}
   .cstat .cs-m-val.up,.cstat .cs-m-val.down,.cstat .cs-m-val.same{padding:2px 7px;font-size:13px}
-  .cstat .cs-m-top{max-width:80px;font-size:13.5px}
+  .cstat .cs-m-top{max-width:100px}
+  .cstat .cs-top-name{font-size:13.5px}
+  .cstat .cs-top-cnt{font-size:10px}
+  .cstat .cs-m-toprow{padding:4px 6px}
   .cal-report-legend{font-size:10.5px;gap:8px}
 }
 
@@ -2901,17 +2908,20 @@ function renderCal(){
       ['ls','⬜',T('cal_label_langsung'), totals.ls, prevTotals.ls, weekTotals.ls, topByStatus.ls],
     ].map(([k,icon,lbl,n,pn,wn,top])=>{
       const avg = (n/daysIn).toFixed(1);
-      const topTxt = top ? `🥇 ${top.name}` : '<span class="cs-m-val same">-</span>';
+      const share = n>0 && top ? Math.round(top.count/n*100) : 0;
+      const topHtml = top
+        ? `<span class="cs-top-name">${top.name}</span><span class="cs-top-cnt">${top.count}건${share?` · ${share}%`:''}</span>`
+        : `<span class="cs-m-val same">-</span>`;
       return `<div class="cstat cs-${k}">
-        <div class="cs-head">
+        <div class="cs-top-row">
           <div class="cs-lbl">${icon} ${lbl}</div>
+          <div class="cs-num">${n}</div>
         </div>
-        <div class="cs-num">${n}</div>
         <div class="cs-metrics">
-          <div class="cs-m"><span class="cs-m-lbl">전월</span>${deltaFmt(n,pn)}</div>
+          <div class="cs-m"><span class="cs-m-lbl">전월 대비</span>${deltaFmt(n,pn)}</div>
           <div class="cs-m"><span class="cs-m-lbl">이번주</span><span class="cs-m-val">${wn}건</span></div>
           <div class="cs-m"><span class="cs-m-lbl">일평균</span><span class="cs-m-val">${avg}</span></div>
-          <div class="cs-m"><span class="cs-m-lbl">TOP</span><span class="cs-m-val cs-m-top">${topTxt}</span></div>
+          <div class="cs-m cs-m-toprow"><span class="cs-m-lbl">🏆 TOP</span><span class="cs-m-val cs-m-top">${topHtml}</span></div>
         </div>
       </div>`;
     }).join('');
