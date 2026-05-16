@@ -450,9 +450,14 @@ body.focus-mode #detail-section-hd{display:none!important}
 /* 추가/초과 숫자 강조 영역 */
 .tcard-gap{padding-top:10px;margin-top:8px;border-top:1px dashed #ddd}
 .gap-counts{display:flex;align-items:stretch;gap:6px}
-.gap-c-item{flex:1;text-align:center;padding:10px 6px;background:#f8fafc;border-radius:8px;min-width:0;transition:all .12s;border:1.5px solid transparent}
+.gap-c-item{flex:1;text-align:center;padding:10px 6px;background:#f8fafc;border-radius:8px;min-width:0;transition:all .12s;border:1.5px solid transparent;position:relative}
+.gap-c-clickable{border-color:#fde68a;background:linear-gradient(180deg,#fefce8 0%,#fff 100%)}
+.gap-c-clickable:hover{background:#fef9c3;transform:translateY(-2px);box-shadow:0 4px 12px #1e3a8a30;border-color:#f59e0b}
 .gap-c-item[onclick]:hover{background:#fefce8;transform:translateY(-1px);box-shadow:0 3px 8px #1e3a8a30;border-color:#fcd34d}
 .gap-c-item[onclick]:active{transform:translateY(0)}
+.gap-c-tap{font-size:10px;margin-left:2px;opacity:.6}
+.tcard-clickable{border-bottom:2px dashed currentColor;padding-bottom:1px;transition:all .12s}
+.tcard-clickable:hover{filter:brightness(1.1);transform:scale(1.03)}
 .gap-c-need[onclick]:hover{filter:brightness(1.05)}
 .gap-c-lbl{font-size:11px;font-weight:800;color:#64748b;letter-spacing:-.2px;margin-bottom:5px;white-space:nowrap}
 .gap-c-val{font-size:22px;font-weight:900;line-height:1;color:#0f172a;white-space:nowrap;letter-spacing:-.8px}
@@ -3032,8 +3037,8 @@ function renderTargets(){
     const lblTxt = gi.gap > 0 ? T('over')+' '+T('gap_unit') : gi.gap === 0 ? T('exactly') : T('need_more')+' '+T('gap_unit');
     const clickAttr = `onclick="openMemTeam(curTeam,'${stypeStr}','${label}')" style="cursor:pointer"`;
     return `
-      <div class="gap-c-item" ${clickAttr} title="${T('tg_current')} → ${label} 회원 목록">
-        <div class="gap-c-lbl">${T('tg_current')}</div>
+      <div class="gap-c-item gap-c-clickable" ${clickAttr} title="${T('tg_current')} → ${label} 회원 목록">
+        <div class="gap-c-lbl">${T('tg_current')} <span class="gap-c-tap">📋</span></div>
         <div class="gap-c-val">${f(gi.actual)}</div>
       </div>
       <div class="gap-c-arrow">→</div>
@@ -3042,7 +3047,7 @@ function renderTargets(){
         <div class="gap-c-val">${f(gi.required)}</div>
       </div>
       <div class="gap-c-arrow"></div>
-      <div class="gap-c-item gap-c-need ${cls}" ${clickAttr} title="${T('tg_current')} → ${label}">
+      <div class="gap-c-item gap-c-need gap-c-clickable ${cls}" ${clickAttr} title="${T('tg_current')} → ${label}">
         <div class="gap-c-lbl">${ico} ${lblTxt}</div>
         <div class="gap-c-val">${valTxt}</div>
       </div>`;
@@ -3051,13 +3056,14 @@ function renderTargets(){
   const card = (label, ico, actual, target, ts, gi, stypeStr, popLabel, isFinal) => {
     const cls = ts.ach ? 'good' : (actual >= target*0.7 ? 'mid' : 'bad');
     const barCol = ts.ach ? '#16a34a' : (actual >= target*0.7 ? '#d97706' : '#dc2626');
+    const popClick = `onclick="openMemTeam(curTeam,'${stypeStr}','${popLabel}')"`;
     return `<div class="tcard ${cls}${isFinal?' final':''}">
       <div style="display:flex;align-items:center;gap:10px">
         <div class="tcard-ico">${ico}</div>
         <div class="tcard-info" style="flex:1">
           <div class="tcard-lbl">${label}</div>
           <div class="tcard-vals">
-            <span class="tcard-actual ${cls==='good'?'tg-good':cls==='mid'?'tg-mid':'tg-bad'}">${actual}%</span>
+            <span class="tcard-actual tcard-clickable ${cls==='good'?'tg-good':cls==='mid'?'tg-mid':'tg-bad'}" ${popClick} title="${T('tg_current')} → ${popLabel}" style="cursor:pointer">${actual}%</span>
             <span class="tcard-vs">/ ${T('target_short')}</span>
             <span class="tcard-target">${target}%</span>
             <span style="margin-left:auto;font-size:11px;font-weight:800" class="${cls==='good'?'tg-good':cls==='mid'?'tg-mid':'tg-bad'}">${ts.ico} ${ts.pct}%</span>
