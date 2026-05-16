@@ -624,6 +624,11 @@ body.focus-mode #detail-section-hd{display:none!important}
 .team-bg-G{background:#dbeafe;color:#1d4ed8;border-left-color:#1a73e8}
 .team-bg-T{background:#dcfce7;color:#15803d;border-left-color:#16a34a}
 .team-bg-L{background:#fee2e2;color:#dc2626;border-left-color:#ea4335}
+/* 완료된 방문 - 취소선 표시 */
+.cal-ag-chip.done{opacity:.55;background:#f3f4f6 !important;color:#6b7280 !important;border-left-color:#9ca3af !important}
+.cal-ag-chip.done > span:not(.cal-ag-chip-icon){text-decoration:line-through;text-decoration-thickness:1.5px}
+.cal-ag-chip.done:hover{opacity:.85}
+.cal-leg-done{font-size:11px;color:#6b7280;font-weight:700}
 
 /* ─ 통계 테이블 ─ */
 .month-tbl{width:100%;border-collapse:collapse;font-size:14px}
@@ -1228,35 +1233,21 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     <div class="cal-team-tabs" id="cal-team-tabs"></div>
     <div class="cal-agent-tabs" id="cal-agent-tabs"></div>
   </div>
-  <!-- 캘린더 (예정 위 + 완료 아래) -->
+  <!-- 캘린더 (예약 + 완료 통합) -->
   <div id="content-cal">
-    <!-- 방문예약 (앞으로 다가올 일정) -->
-    <div class="cal-wrap" style="border-bottom:6px solid #f5f5f5">
+    <div class="cal-wrap">
       <div class="cal-nav">
-        <span class="cal-title" id="cal-s-title">📅 방문예약 캘린더</span>
+        <span class="cal-title" id="cal-s-title">📅 방문 캘린더</span>
         <span class="cal-sub" id="cal-s-sub"></span>
         <div class="cal-legend">
-          <div class="leg" title="📅방문예약 · ⏳일정대기"><span style="font-weight:800">📅⏳</span></div>
+          <div class="leg" title="📅방문예약 · ⏳일정대기 · ✅완료 · 📹비디오 · ⬜랑숭"><span style="font-weight:800">📅⏳✅📹⬜</span></div>
+          <div class="leg" title="완료된 건은 취소선으로 표시"><span class="cal-leg-done"><s>완료</s></span></div>
           <div class="leg"><div class="ldot" style="background:#1a73e8"></div>GIAR</div>
           <div class="leg"><div class="ldot" style="background:#16a34a"></div>TINA</div>
           <div class="leg"><div class="ldot" style="background:#ea4335"></div>LIDIA</div>
         </div>
       </div>
       <div class="cal-grid" id="cal-s-grid"></div>
-    </div>
-    <!-- 방문완료 (이미 처리된 일정) -->
-    <div class="cal-wrap">
-      <div class="cal-nav">
-        <span class="cal-title" id="cal-d-title">✅ 방문완료 캘린더</span>
-        <span class="cal-sub" id="cal-d-sub"></span>
-        <div class="cal-legend">
-          <div class="leg" title="✅완료 · 📹비디오 · ⬜랑숭"><span style="font-weight:800">✅📹⬜</span></div>
-          <div class="leg"><div class="ldot" style="background:#1a73e8"></div>GIAR</div>
-          <div class="leg"><div class="ldot" style="background:#16a34a"></div>TINA</div>
-          <div class="leg"><div class="ldot" style="background:#ea4335"></div>LIDIA</div>
-        </div>
-      </div>
-      <div class="cal-grid" id="cal-d-grid"></div>
     </div>
   </div>
   <!-- 통계 -->
@@ -1489,6 +1480,7 @@ const LANG = {
     trend_db:'DB 배정', trend_book_rate:'상담예약율', trend_visit_rate:'상담완료율',
     trend_close_rate:'상담완료 대비 클로징율', trend_db_close:'디비대비 클로징율',
     cal_title_done:'✅ 방문완료 캘린더', cal_title_sched:'📅 방문예약 캘린더',
+    cal_title_all:'📅 방문 캘린더',
     cal_total:'총', cal_unit:'건',
     cal_label_done:'완료', cal_label_video:'비디오', cal_label_langsung:'랑숭',
     cal_label_book:'예약', cal_label_wait:'대기',
@@ -1566,6 +1558,7 @@ const LANG = {
     trend_db:'Alokasi DB', trend_book_rate:'Jadwal Konsultasi', trend_visit_rate:'Konsultasi Selesai',
     trend_close_rate:'Closing dari Konsultasi', trend_db_close:'Closing dari DB',
     cal_title_done:'✅ Kalender Visit Selesai', cal_title_sched:'📅 Kalender Jadwal',
+    cal_title_all:'📅 Kalender Kunjungan',
     cal_total:'Total', cal_unit:'',
     cal_label_done:'Selesai', cal_label_video:'Video', cal_label_langsung:'Langsung',
     cal_label_book:'Jadwal', cal_label_wait:'Menunggu',
@@ -2745,14 +2738,13 @@ function renderKPI(){
   document.getElementById('hdr-score').textContent = f(scoreVal) + '점';
 }
 
-// ── 캘린더 (완료/예정 공용) ──────────────────────────────
-function renderCal(kind){
-  // curFrom 기준 월의 캘린더 표시
+// ── 캘린더 (예약 + 완료 통합) ────────────────────────────
+function renderCal(){
+  // 예약 + 완료를 하나의 캘린더에서 표시. 완료된 건은 chip에 취소선으로 표시.
   const month = curFrom ? curFrom.slice(0,7) : (curMonth==='ALL' ? D.months[D.months.length-1] : curMonth);
   const calData = D.cal_summary[month];
   if(!calData) return;
-  // 방문예약 달력: 완료된 방문(d/ls/vc)도 포함해서 '완료' 상태로 표시 (사용자 추적용)
-  const types = kind==='done' ? ['d','ls','vc'] : ['s','w','d','ls','vc'];
+  const types = ['s','w','d','ls','vc'];
 
   const recs = D.cal_recs.filter(r=>{
     if(!r.vd.startsWith(month)) return false;
@@ -2776,48 +2768,39 @@ function renderCal(kind){
   let totals = {d:0,ls:0,vc:0,s:0,w:0};
   recs.forEach(r=>{ if(totals[r.st]!==undefined) totals[r.st]++; });
 
-  const titleEl = kind==='done' ? 'cal-d-title' : 'cal-s-title';
-  const subEl   = kind==='done' ? 'cal-d-sub'   : 'cal-s-sub';
-  const gridEl  = kind==='done' ? 'cal-d-grid'  : 'cal-s-grid';
-  const titleTxt= kind==='done' ? T('cal_title_done') : T('cal_title_sched');
   const monthLbl = (D.mlabels && D.mlabels[month]) || month;
-  document.getElementById(titleEl).textContent = monthLbl + ' ' + titleTxt;
+  document.getElementById('cal-s-title').textContent = monthLbl + ' ' + T('cal_title_all');
   const u = T('cal_unit');
-  document.getElementById(subEl).textContent = kind==='done'
-    ? `${T('cal_label_done')} ${totals.d} · ${T('cal_label_langsung')} ${totals.ls} · ${T('cal_label_video')} ${totals.vc} (${T('cal_total')} ${totals.d+totals.ls+totals.vc}${u})`
-    : `${T('cal_label_book')} ${totals.s} · ${T('cal_label_wait')} ${totals.w} · ${T('cal_label_done')} ${totals.d+totals.ls+totals.vc} (${T('cal_total')} ${totals.s+totals.w+totals.d+totals.ls+totals.vc}${u})`;
+  const doneN = totals.d + totals.ls + totals.vc;
+  const pendN = totals.s + totals.w;
+  document.getElementById('cal-s-sub').textContent =
+    `${T('cal_label_book')} ${totals.s} · ${T('cal_label_wait')} ${totals.w} · ${T('cal_label_done')} ${doneN} (${T('cal_total')} ${pendN+doneN}${u})`;
 
   const dows = [T('dow_mon'),T('dow_tue'),T('dow_wed'),T('dow_thu'),T('dow_fri'),T('dow_sat'),T('dow_sun')];
   let h = dows.map((d,i)=>`<div class="cal-dow ${i===5?'sat':i===6?'sun':''}">${d}</div>`).join('');
   for(let i=0;i<firstDow;i++) h+=`<div class="cal-cell empty"></div>`;
 
+  const doneSt = new Set(['d','ls','vc']);
+
   calData.days.forEach(day=>{
     const ds = day.date;
     const isToday = ds===D.today;
-    const isFuture = ds > D.today;
     const dow = day.dow_i;
     const info = byDate[ds]||{d:[],ls:[],vc:[],s:[],w:[]};
     const total = types.reduce((acc,t)=>acc+info[t].length,0);
 
     let badges='';
-    if(kind==='done'){
-      if(info.d.length)  badges+=`<div class="cal-badge cb-d" onclick="event.stopPropagation();openDayType('${ds}','d')">✅ ${T('cal_label_done')} ${info.d.length}</div>`;
-      if(info.vc.length) badges+=`<div class="cal-badge cb-vc" onclick="event.stopPropagation();openDayType('${ds}','vc')">📹 ${T('cal_label_video')} ${info.vc.length}</div>`;
-      if(info.ls.length) badges+=`<div class="cal-badge cb-ls" onclick="event.stopPropagation();openDayType('${ds}','ls')">⬜ ${T('cal_label_langsung')} ${info.ls.length}</div>`;
-    } else {
-      if(info.s.length)  badges+=`<div class="cal-badge cb-s" onclick="event.stopPropagation();openDayType('${ds}','s')">📅 ${T('cal_label_book')} ${info.s.length}</div>`;
-      if(info.w.length)  badges+=`<div class="cal-badge cb-w" onclick="event.stopPropagation();openDayType('${ds}','w')">⏳ ${T('cal_label_wait')} ${info.w.length}</div>`;
-      // 예약 달력에서도 완료된 건은 ✅ 완료 배지로 표시
-      const doneN = info.d.length + info.ls.length + info.vc.length;
-      if(doneN) badges+=`<div class="cal-badge cb-d" onclick="event.stopPropagation();openDayDone('${ds}')">✅ ${T('cal_label_done')} ${doneN}</div>`;
-    }
+    if(info.s.length)  badges+=`<div class="cal-badge cb-s" onclick="event.stopPropagation();openDayType('${ds}','s')">📅 ${T('cal_label_book')} ${info.s.length}</div>`;
+    if(info.w.length)  badges+=`<div class="cal-badge cb-w" onclick="event.stopPropagation();openDayType('${ds}','w')">⏳ ${T('cal_label_wait')} ${info.w.length}</div>`;
+    const doneDay = info.d.length + info.ls.length + info.vc.length;
+    if(doneDay) badges+=`<div class="cal-badge cb-d" onclick="event.stopPropagation();openDayDone('${ds}')">✅ ${T('cal_label_done')} ${doneDay}</div>`;
 
-    // 각 건별 개별 chip (×3이면 3개 chip 따로 표시)
+    // 각 건별 개별 chip: 대기 중인 예약을 먼저, 완료된 건은 아래로 (취소선 표시)
     const recList = [];
     types.forEach(t=>info[t].forEach(r=>{
       recList.push({a:r.a, st:r.st});
     }));
-    const stOrder = {d:1, vc:2, ls:3, s:4, w:5};
+    const stOrder = {s:1, w:2, d:3, vc:4, ls:5};
     recList.sort((a,b)=>{
       const oa = stOrder[a.st]||9, ob = stOrder[b.st]||9;
       if(oa !== ob) return oa - ob;
@@ -2828,7 +2811,8 @@ function renderCal(kind){
       const firstName = r.a.split(' ')[0];
       const meta = D.agent_meta[r.a]||{};
       const teamKey = TK[meta.team]||'G';
-      return `<div class="cal-ag-chip team-bg-${teamKey}"
+      const doneCls = doneSt.has(r.st) ? ' done' : '';
+      return `<div class="cal-ag-chip team-bg-${teamKey}${doneCls}"
         onclick="event.stopPropagation();openDayAgent('${ds}','${r.a}')"
         title="${meta.short||r.a} · ${STLBL[r.st]}">
         <span class="cal-ag-chip-icon">${stIcon[r.st]}</span><span style="overflow:hidden;text-overflow:ellipsis">${firstName}</span>
@@ -2838,12 +2822,12 @@ function renderCal(kind){
     const body = total===0 ? `<div class="cal-no-visit">-</div>`
       : `<div class="cal-badges">${badges}</div><div class="cal-ag-chips">${chips}</div>`;
 
-    h+=`<div class="cal-cell ${isToday?'today':''} ${dow===5?'sat':''} ${dow===6?'sun':''} ${isFuture&&kind==='done'?'future':''}" onclick="openDayAll('${ds}')">
+    h+=`<div class="cal-cell ${isToday?'today':''} ${dow===5?'sat':''} ${dow===6?'sun':''}" onclick="openDayAll('${ds}')">
       <div class="cal-daynum">${day.day}${dow===5||dow===6?`<span style="font-size:10px;color:${dow===6?'#dc2626':'#2563eb'};font-weight:600">${day.dow}</span>`:''}${isToday?'<span class="today-mark"></span>':''}</div>
       ${body}
     </div>`;
   });
-  document.getElementById(gridEl).innerHTML = h;
+  document.getElementById('cal-s-grid').innerHTML = h;
 }
 
 // ── 통계 테이블 ──────────────────────────────────────────
@@ -3189,7 +3173,7 @@ function goAllDashboard(){
   window.scrollTo(0, 0);
 }
 function renderTab(){
-  if(curTab==='cal'){ renderCal('sched'); renderCal('done'); }
+  if(curTab==='cal'){ renderCal(); }
   else if(curTab==='stats') renderStats();
   else if(curTab==='rank') renderRank();
   else if(curTab==='team_insight') renderTeamInsightOnly();
