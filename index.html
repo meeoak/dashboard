@@ -3354,6 +3354,8 @@ function renderRank(){
     const md = t.length===3 ? `${parseInt(t[1])}/${parseInt(t[2])}` : '';
     paceLbl = `📍 오늘${md?' '+md:''} · ${pacePct}%`;
   }
+  // 에이전트별 활동지수 사전 계산 (클로징×5 + 완료/랑숭/비디오 ×1)
+  const allAgents = Object.keys(D.agent_total);
   // 전월 활동지수 사전 계산 — 팀별·에이전트별
   const prevRange = previousMonthRange();
   const prevAgentIdx = {};   // agent → activity index
@@ -3373,8 +3375,6 @@ function renderRank(){
       }
     });
   }
-  // 에이전트별 활동지수 사전 계산 (클로징×5 + 완료/랑숭/비디오 ×1)
-  const allAgents = Object.keys(D.agent_total);
   const agentStats = {};
   allAgents.forEach(a=>{
     const s = statsRange(curFrom, curTo, null, a);
