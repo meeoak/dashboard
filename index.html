@@ -3606,7 +3606,7 @@ ${agentUrgent.map(({agent, short, team, urgent})=>{
             <td class="reason">${esc(_formatUrgentReason(u, lang))}</td>
             <td>${esc(u.ad||'-')}</td>
             <td class="phone">${esc(u.ph||'-')}</td>
-            <td class="memo-cell" style="white-space:normal;word-break:break-word;line-height:1.4;color:#0f172a;font-size:10.5px">${(u.memo||'').trim()?esc(u.memo.trim()):'<span style="color:#cbd5e1;font-style:italic">메모 없음</span>'}</td>
+            <td class="memo-cell" style="white-space:normal;word-break:break-word;line-height:1.4;color:#0f172a;font-size:10.5px">${(u.memo||'').trim()?esc(lang==='ko'?translateMemo(u.memo.trim()):u.memo.trim()):'<span style="color:#cbd5e1;font-style:italic">'+(lang==='id'?'Tidak ada catatan':'메모 없음')+'</span>'}</td>
           </tr>`).join('')}
       </tbody>
     </table>
@@ -4017,7 +4017,7 @@ function _buildAgentReportSection(agent, rank, lang){
               <td>${esc(_formatUrgentReason(u, lang))}</td>
               <td>${esc(u.ad||'-')}</td>
               <td style="font-family:'Courier New',monospace;font-size:10.5px;font-weight:700">${esc(u.ph||'-')}</td>
-              <td style="white-space:normal;word-break:break-word;line-height:1.4;color:#0f172a;font-size:10.5px;min-width:180px">${(u.memo||'').trim()?esc(u.memo.trim()):'<span style="color:#cbd5e1;font-style:italic">메모 없음</span>'}</td>
+              <td style="white-space:normal;word-break:break-word;line-height:1.4;color:#0f172a;font-size:10.5px;min-width:180px">${(u.memo||'').trim()?esc(lang==='ko'?translateMemo(u.memo.trim()):u.memo.trim()):'<span style="color:#cbd5e1;font-style:italic">'+(lang==='id'?'Tidak ada catatan':'메모 없음')+'</span>'}</td>
             </tr>`).join('')}
         </tbody>
       </table>`}
@@ -4227,10 +4227,12 @@ function renderRecent7DaysByTeam(){
       const updateDate = (r.vd && r.vd >= fromStr) ? r.vd : r.ad;
       const dateShort = (updateDate||'').slice(5).replace('-','/');
       const agentShort = (D.agent_meta[r.a]||{}).short || r.a;
-      const memo = (r.memo||'').trim();
+      const memoRaw = (r.memo||'').trim();
+      // 한국어 모드일 때 자동 번역
+      const memo = (curLang === 'ko' && memoRaw) ? translateMemo(memoRaw) : memoRaw;
       const memoCell = memo
-        ? `<td class="r3d-memo" title="${esc(memo)}">${esc(memo.slice(0,60))}${memo.length>60?'…':''}</td>`
-        : `<td class="r3d-memo empty">메모 없음</td>`;
+        ? `<td class="r3d-memo" title="${esc(memoRaw)}">${esc(memo.slice(0,60))}${memo.length>60?'…':''}</td>`
+        : `<td class="r3d-memo empty">${curLang==='id'?'Tidak ada catatan':'메모 없음'}</td>`;
       return `<tr>
         <td class="r3d-d">${dateShort}</td>
         <td class="r3d-m"><b>${esc(r.nm||'-')}</b>${r.pa?`<small>${esc(r.pa)}</small>`:''}</td>
