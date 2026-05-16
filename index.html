@@ -818,24 +818,38 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-agent-stat.urg{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
 .r3d-agent-stat.zero{background:#fafafa;color:#94a3b8;border-color:#f1f5f9}
 /* 요약 칩 행 */
-.r3d-urg-summary{padding:10px 14px;display:flex;align-items:center;flex-wrap:wrap;gap:7px;background:#fafbfc;border-bottom:1px dashed #e5e7eb}
-.r3d-urg-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:800;border:1.5px solid;letter-spacing:-.2px}
-.r3d-urg-chip.zero{opacity:.35;border-style:dashed}
-.r3d-urg-chip.c-noMemo{background:#fef3c7;color:#92400e;border-color:#fde68a}
-.r3d-urg-chip.c-overdue{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
-.r3d-urg-chip.c-idle{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
-.r3d-urg-chip.c-wait{background:#dbeafe;color:#1e3a8a;border-color:#bfdbfe}
-.r3d-urg-chip.c-soon{background:#dbeafe;color:#1e3a8a;border-color:#bfdbfe}
-.r3d-urg-toggle{cursor:pointer;background:#fff;border:1.5px solid #cbd5e1;border-radius:7px;padding:4px 12px;font-size:11.5px;font-weight:800;color:#475569;margin-left:auto;display:flex;align-items:center;gap:5px;transition:all .12s}
-.r3d-urg-toggle:hover{background:#f8fafc;border-color:#1e3a8a;color:#1e3a8a}
+.r3d-urg-summary{padding:11px 14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:linear-gradient(180deg,#fef2f2,#fff5f5);border-top:2px solid #fecaca;border-bottom:2px solid #fecaca;position:relative}
+.r3d-urg-summary::before{content:'🚨 긴급관리';display:inline-flex;align-items:center;background:#dc2626;color:#fff;font-size:11.5px;font-weight:900;padding:4px 10px;border-radius:7px;letter-spacing:-.3px;box-shadow:0 1px 3px rgba(220,38,38,.3);margin-right:4px}
+.r3d-urg-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:9px;font-weight:900;border:2px solid;letter-spacing:-.2px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.r3d-urg-chip b{font-size:18px;font-weight:900;line-height:1}
+.r3d-urg-chip span{font-size:11px;font-weight:800;letter-spacing:-.2px;line-height:1.1}
+.r3d-urg-chip.zero{opacity:.32;border-style:dashed;box-shadow:none}
+.r3d-urg-chip.c-noMemo{color:#92400e;border-color:#d97706}
+.r3d-urg-chip.c-overdue{color:#7f1d1d;border-color:#dc2626}
+.r3d-urg-chip.c-idle{color:#7f1d1d;border-color:#dc2626}
+.r3d-urg-chip.c-wait{color:#1e3a8a;border-color:#2563eb}
+.r3d-urg-chip.c-soon{color:#1e3a8a;border-color:#2563eb}
+.r3d-urg-toggle{cursor:pointer;background:#fff;border:2px solid #cbd5e1;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:900;color:#475569;margin-left:auto;display:flex;align-items:center;gap:5px;transition:all .12s}
+.r3d-urg-toggle:hover{background:#1e3a8a;border-color:#1e3a8a;color:#fff}
 .r3d-urg-list-wrap{display:none}
 .r3d-urg-list-wrap.expanded{display:block}
 /* 긴급 회원 테이블 */
-.r3d-urg-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.r3d-urg-tbl td{padding:7px 10px;border-bottom:1px solid #f5f5f5;vertical-align:middle;cursor:pointer;transition:background .12s}
+.r3d-urg-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+.r3d-urg-tbl td{padding:8px 10px;border-bottom:1px solid #f5f5f5;vertical-align:middle;cursor:pointer;transition:background .12s}
 .r3d-urg-tbl tr:last-child td{border-bottom:none}
 .r3d-urg-tbl tr:hover td{background:#fef9c3}
-.r3d-urg-icon{font-size:14px;width:24px;text-align:center}
+.r3d-urg-tbl tr td:first-child{border-left:5px solid transparent;padding-left:10px}
+.r3d-urg-tbl tr.kind-noMemo td:first-child{border-left-color:#d97706}
+.r3d-urg-tbl tr.kind-overdue td:first-child{border-left-color:#dc2626}
+.r3d-urg-tbl tr.kind-idle td:first-child{border-left-color:#dc2626}
+.r3d-urg-tbl tr.kind-wait td:first-child{border-left-color:#2563eb}
+.r3d-urg-tbl tr.kind-soon td:first-child{border-left-color:#2563eb}
+.r3d-urg-band{display:inline-flex;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:900;padding:4px 8px;border-radius:6px;white-space:nowrap;letter-spacing:-.3px;border:1.5px solid;min-width:96px;line-height:1.1}
+.r3d-urg-tbl tr.kind-noMemo .r3d-urg-band{background:#fef3c7;color:#92400e;border-color:#fde68a}
+.r3d-urg-tbl tr.kind-overdue .r3d-urg-band{background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
+.r3d-urg-tbl tr.kind-idle .r3d-urg-band{background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
+.r3d-urg-tbl tr.kind-wait .r3d-urg-band{background:#dbeafe;color:#1e3a8a;border-color:#bfdbfe}
+.r3d-urg-tbl tr.kind-soon .r3d-urg-band{background:#dbeafe;color:#1e3a8a;border-color:#bfdbfe}
 .r3d-urg-nm{font-weight:800;color:#0f172a}
 .r3d-urg-nm small{display:block;color:#64748b;font-weight:600;font-size:10.5px;margin-top:1px}
 .r3d-urg-reason{color:#475569;font-weight:700;font-size:11.5px}
@@ -861,7 +875,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-action-hint.warn{background:#d97706;color:#fff}
 @keyframes hintBlink{0%,100%{opacity:1}50%{opacity:.55}}
 /* 요약 칩 글씨 키움 */
-.r3d-urg-chip{font-size:13.5px;padding:5px 12px}
+.r3d-urg-chip{padding:6px 12px}
+.r3d-urg-chip b{font-size:19px}
+.r3d-urg-chip span{font-size:11.5px}
 .r3d-urg-toggle{font-size:12.5px;padding:5px 14px}
 @media(max-width:640px){
   .r3d-grid{padding:10px 12px;gap:10px}
@@ -1433,8 +1449,6 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
         <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
         <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('ko')" title="전체 에이전트 한국어 일괄 PDF" style="padding:8px 14px;font-size:12px">📄 전체 · KR</button>
         <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('id')" title="Semua agen Laporan Bahasa PDF" style="padding:8px 14px;font-size:12px">📄 전체 · ID</button>
-        <button class="ins-ag-d-btn ins-ag-d-btn-sheet" onclick="sendAllAgentReportsToSheet()" title="전체 에이전트 보고서를 구글 시트로 전송" style="padding:8px 14px;font-size:12px">📤 전체 시트 전송</button>
-        <button class="ins-ag-d-btn ins-ag-d-btn-cfg" onclick="openSheetConfig()" title="Apps Script Webhook URL 설정" style="padding:8px 10px;font-size:12px">⚙️</button>
       </div>
     </div>
     <div class="ins-agent-wrap" id="ins-agent-wrap"></div>
@@ -3503,9 +3517,6 @@ function renderUrgentBanner(){
         <div class="ub-title">긴급 관리 필요 ${totals.total}건 <span style="font-size:12px;font-weight:700;background:rgba(127,29,29,.12);color:#7f1d1d;padding:2px 9px;border-radius:6px;margin-left:6px">${scopeLbl}</span></div>
         <div class="ub-sub">배정 후 2주 이내 · 이관 임박 · 매일 자동 업데이트 (오늘 ${todayStr})</div>
       </div>
-      <div class="ub-actions">
-        <button class="ub-pdf-btn" onclick="sendAllAgentReportsToSheet()" title="현재 범위 에이전트들의 긴급 관리 보고서를 구글 시트로 전송 (Apps Script 연동)">📤 시트로 내보내기</button>
-      </div>
     </div>
     <div class="ub-stats">
       ${totals.noMemo>0?`<div class="ub-stat ub-stat-amber" onclick="openUrgentByType('noMemo')" title="상담기록도 없고 옵션도 선택 안된 회원 목록 (아무 액션도 기록 안 됨)"><b>${totals.noMemo}</b><span>📝 상담기록없음</span></div>`:''}
@@ -4330,9 +4341,18 @@ function _buildAgentReportSection(agent, rank, lang){
 //    이후 버튼 한 번으로 시트에 일일 보고서 자동 누적
 // ═════════════════════════════════════════════════════════════
 const SHEET_WEBHOOK_KEY = 'dashboard.sheetWebhookUrl.v1';
-const SHEET_WEBHOOK_DEFAULT = 'https://script.google.com/macros/s/AKfycbxjNMdrf7-aJ8he3UWhRku_mTwDH00pE9pOiT2BOlH3zZTHYVQK4Gz-Ygr68cvLjdgBRQ/exec';
+const SHEET_WEBHOOK_DEFAULT = 'https://script.google.com/macros/s/AKfycbyucQaf2g3vDlXkRlGTSg8wZ0SiVdUmWJXA_UQH-wR6rcZJfxsXWpzrn1xHlkaUQeyXYg/exec';
+function isValidWebhookUrl(u){
+  // Apps Script 웹앱 URL만 허용: https://script.google.com/macros/s/.../exec
+  return typeof u === 'string' && /^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec\b/.test(u.trim());
+}
 function getSheetWebhookUrl(){
-  try { return localStorage.getItem(SHEET_WEBHOOK_KEY) || SHEET_WEBHOOK_DEFAULT; } catch(e){ return SHEET_WEBHOOK_DEFAULT; }
+  try {
+    const v = localStorage.getItem(SHEET_WEBHOOK_KEY);
+    // 잘못된 URL이 저장돼 있으면 무시하고 기본값 사용 (예: 시트 보기 URL 잘못 붙여넣은 경우)
+    if(v && isValidWebhookUrl(v)) return v;
+    return SHEET_WEBHOOK_DEFAULT;
+  } catch(e){ return SHEET_WEBHOOK_DEFAULT; }
 }
 function setSheetWebhookUrl(url){
   try { localStorage.setItem(SHEET_WEBHOOK_KEY, url||''); } catch(e){}
@@ -4340,12 +4360,19 @@ function setSheetWebhookUrl(url){
 function openSheetConfig(){
   const cur = getSheetWebhookUrl();
   const msg =
-    '구글 Apps Script Web App URL을 입력하세요.\n' +
-    '(처음이면 README의 google-apps-script.gs 코드를 시트에 배포한 후 발급된 URL을 붙여넣기)\n\n' +
+    'Apps Script Web App URL을 입력하세요.\n' +
+    '형식: https://script.google.com/macros/s/.../exec\n' +
+    '⚠️ 스프레드시트 보기 URL(docs.google.com/spreadsheets/...) 이 아닙니다!\n\n' +
     '현재 값: ' + (cur ? cur.slice(0,60)+'…' : '(미설정)');
   const next = prompt(msg, cur);
   if(next === null) return; // cancel
-  setSheetWebhookUrl(next.trim());
+  const trimmed = (next||'').trim();
+  if(trimmed && !isValidWebhookUrl(trimmed)){
+    showSheetStatus('⚠️ 형식 오류: script.google.com/macros/s/.../exec 형태여야 함', '#dc2626');
+    setTimeout(hideSheetStatus, 8000);
+    return;
+  }
+  setSheetWebhookUrl(trimmed);
   showSheetStatus('⚙️ Webhook URL 저장됨', '#16a34a');
   setTimeout(hideSheetStatus, 2500);
 }
@@ -4406,14 +4433,34 @@ async function _postAgentPayload(payload){
     throw new Error('webhook_not_set');
   }
   // text/plain body (Apps Script CORS 우회 — preflight 없음)
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-    body: JSON.stringify(payload),
-    redirect: 'follow'
-  });
-  if(!resp.ok) throw new Error('HTTP ' + resp.status);
-  return resp.json().catch(()=> ({ok:true}));
+  let resp;
+  try{
+    resp = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+  } catch(netErr){
+    // CORS / 네트워크 차단 / DNS 등 fetch 자체 실패
+    throw new Error('NETWORK: ' + (netErr && netErr.message || netErr));
+  }
+  if(!resp.ok) throw new Error('HTTP ' + resp.status + ' ' + (resp.statusText||''));
+  const text = await resp.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch(_) {
+    // Apps Script가 JSON이 아닌 HTML(예: 로그인 페이지)을 반환한 경우
+    throw new Error('BAD_RESPONSE: ' + (text||'').slice(0, 160).replace(/\s+/g,' '));
+  }
+  if(data && data.ok === false){
+    throw new Error('SERVER: ' + (data.error || JSON.stringify(data)).slice(0, 200));
+  }
+  // 성공 응답엔 appended/sheet 필드가 있어야 정상 (doPost 경유 확인)
+  if(typeof data.appended === 'undefined' && typeof data.sheet === 'undefined'){
+    throw new Error('NOT_WRITTEN: 응답에 쓰기 결과 없음 — Apps Script 배포가 doPost가 아닌 doGet으로 처리한 듯 (재배포 필요): ' + JSON.stringify(data).slice(0,160));
+  }
+  return data;
 }
 async function sendAgentReportToSheet(agent){
   try{
@@ -4451,7 +4498,7 @@ async function sendAllAgentReportsToSheet(){
     return;
   }
   if(!confirm(`${active.length}명 에이전트 보고서를 시트로 전송할까요?`)) return;
-  let ok = 0, fail = 0;
+  let ok = 0, fail = 0, firstErr = '';
   for(let i = 0; i < active.length; i++){
     const a = active[i];
     const short = (D.agent_meta[a]||{}).short || a;
@@ -4461,11 +4508,23 @@ async function sendAllAgentReportsToSheet(){
       ok++;
     }catch(e){
       console.error('Send fail:', a, e);
+      if(!firstErr) firstErr = (e && e.message) || String(e);
       fail++;
+      // 같은 원인으로 23번 다 실패할 가능성이 높음 — 첫 실패에서 중단
+      if(fail === 1 && ok === 0 && i < active.length - 1){
+        showSheetStatus(`⚠️ 시트 전송 실패 (중단): ${firstErr}`, '#dc2626');
+        setTimeout(hideSheetStatus, 12000);
+        return;
+      }
     }
   }
-  showSheetStatus(`✅ 전송 완료: 성공 ${ok}명${fail?` · 실패 ${fail}명`:''}`, fail?'#d97706':'#16a34a');
-  setTimeout(hideSheetStatus, 6000);
+  if(fail > 0){
+    showSheetStatus(`⚠️ 성공 ${ok}명 · 실패 ${fail}명 — 원인: ${firstErr}`, '#d97706');
+    setTimeout(hideSheetStatus, 12000);
+  } else {
+    showSheetStatus(`✅ 전송 완료: 성공 ${ok}명`, '#16a34a');
+    setTimeout(hideSheetStatus, 6000);
+  }
 }
 
 function openAgentReport(agent, lang){
@@ -4677,13 +4736,29 @@ function renderRecent7DaysByTeam(){
   }).join('');
 
   // 긴급 회원 리스트 렌더링 헬퍼 (에이전트별)
+  const kindBandMap = {
+    'kind-noMemo':  {icon:'📝', lbl:'상담기록없음'},
+    'kind-overdue': {icon:'⚠️', lbl:'방문일 지남'},
+    'kind-idle':    {icon:'🚨', lbl:'응답없음'},
+    'kind-wait':    {icon:'⏳', lbl:'일정대기'},
+    'kind-soon':    {icon:'📅', lbl:'방문 임박'},
+  };
   const renderUrgRows = (urgent, agentName)=>{
     if(!urgent.length) return `<div class="r3d-urg-empty">긴급 관리 대상 없음</div>`;
     return `<table class="r3d-urg-tbl">${urgent.map(u=>{
       const ddayCls = u.daysLeft<=3 ? '' : (u.daysLeft<=7 ? 'warn' : 'ok');
       const recKey = esc(JSON.stringify({a:u.a, nm:u.nm||'', ad:u.ad||''}));
-      return `<tr data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
-        <td class="r3d-urg-icon">${u.urgentIcon||'•'}</td>
+      const memoEmpty = !u.memo || !String(u.memo).trim();
+      const noOption = u.st === 'none';
+      let kindCls = '';
+      if(memoEmpty && noOption) kindCls = 'kind-noMemo';
+      else if(u.urgentIcon === '⚠️') kindCls = 'kind-overdue';
+      else if(!memoEmpty && !noOption) kindCls = 'kind-idle';
+      else if(u.urgentIcon === '⏳') kindCls = 'kind-wait';
+      else if(u.urgentIcon === '📅') kindCls = 'kind-soon';
+      const band = kindBandMap[kindCls] || {icon:u.urgentIcon||'•', lbl:''};
+      return `<tr class="${kindCls}" data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
+        <td><span class="r3d-urg-band">${band.icon} ${esc(band.lbl)}</span></td>
         <td class="r3d-urg-nm"><b>${esc(u.nm||'-')}</b>${u.pa?`<small>${esc(u.pa)}</small>`:''}</td>
         <td class="r3d-urg-reason">${esc(u.reason||'-')}</td>
         <td class="r3d-urg-dday ${ddayCls}">D-${u.daysLeft<0?0:u.daysLeft}</td>
@@ -4731,9 +4806,9 @@ function renderRecent7DaysByTeam(){
 
   // 위험 순위 배지 (영업팀 관리: TOP=최악, 메달 아님)
   const rankBadge = (i)=>{
-    if(i===0) return '<span class="r3d-rank danger-1">🚨 1위</span>';
-    if(i===1) return '<span class="r3d-rank danger-2">🔥 2위</span>';
-    if(i===2) return '<span class="r3d-rank danger-3">⚠️ 3위</span>';
+    if(i===0) return '<span class="r3d-rank danger-1">🚨 긴급 1위</span>';
+    if(i===1) return '<span class="r3d-rank danger-2">🔥 긴급 2위</span>';
+    if(i===2) return '<span class="r3d-rank danger-3">⚠️ 긴급 3위</span>';
     return `<span class="r3d-rank">#${i+1}</span>`;
   };
   // 심각도 클래스 (긴급 합산 기준)
@@ -4754,7 +4829,7 @@ function renderRecent7DaysByTeam(){
     const sev = sevClass(d.urgentTotal);
     const sevCardCls = (idx===0 && d.urgentTotal>=15) ? 'rank-top' : (sev==='sev-red' ? 'sev-red-card' : '');
     const chip = (cls, icon, lbl, n)=>
-      `<span class="r3d-urg-chip ${cls} ${n===0?'zero':''}" title="${lbl}">${icon} ${n}</span>`;
+      `<span class="r3d-urg-chip ${cls} ${n===0?'zero':''}" title="${lbl}"><b>${n}</b><span>${icon} ${lbl}</span></span>`;
     html += `
     <div class="r3d-agent-card ${sevCardCls}" style="border-left-color:${color}">
       <div class="r3d-agent-hd">
@@ -5049,7 +5124,6 @@ function renderAgentCardsOnly(){
           <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}','ko')" title="한국어 일일 보고서 PDF">📄 KR</button>
           <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}','id')" title="Laporan Harian PDF (Bahasa)">📄 ID</button>
           <button class="ins-ag-d-btn" onclick="openMem('${x.a}','db')" title="회원 목록 보기">📋 회원 목록</button>
-          <button class="ins-ag-d-btn ins-ag-d-btn-sheet" onclick="sendAgentReportToSheet('${x.a}')" title="구글 시트로 전송 (Apps Script 연동)">📤 시트</button>
         </div>
       </div>
 
