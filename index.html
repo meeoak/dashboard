@@ -3330,7 +3330,7 @@ ${agentUrgent.map(({agent, short, team, urgent})=>{
             <td class="reason">${esc(_formatUrgentReason(u, lang))}</td>
             <td>${esc(u.ad||'-')}</td>
             <td class="phone">${esc(u.ph||'-')}</td>
-            <td class="memo-cell">${u.memo?esc(u.memo):'<span style="color:#cbd5e1">-</span>'}</td>
+            <td class="memo-cell" style="white-space:normal;word-break:break-word;line-height:1.4;color:#0f172a;font-size:10.5px">${(u.memo||'').trim()?esc(u.memo.trim()):'<span style="color:#cbd5e1;font-style:italic">메모 없음</span>'}</td>
           </tr>`).join('')}
       </tbody>
     </table>
@@ -3741,7 +3741,7 @@ function _buildAgentReportSection(agent, rank, lang){
               <td>${esc(_formatUrgentReason(u, lang))}</td>
               <td>${esc(u.ad||'-')}</td>
               <td style="font-family:'Courier New',monospace;font-size:10.5px;font-weight:700">${esc(u.ph||'-')}</td>
-              <td style="white-space:normal;word-break:break-word;line-height:1.4;color:#0f172a">${u.memo?esc(u.memo):'<span style="color:#cbd5e1">-</span>'}</td>
+              <td style="white-space:normal;word-break:break-word;line-height:1.4;color:#0f172a;font-size:10.5px;min-width:180px">${(u.memo||'').trim()?esc(u.memo.trim()):'<span style="color:#cbd5e1;font-style:italic">메모 없음</span>'}</td>
             </tr>`).join('')}
         </tbody>
       </table>`}
