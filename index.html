@@ -4331,8 +4331,17 @@ function _buildAgentReportSection(agent, rank, lang){
 // ═════════════════════════════════════════════════════════════
 const SHEET_WEBHOOK_KEY = 'dashboard.sheetWebhookUrl.v1';
 const SHEET_WEBHOOK_DEFAULT = 'https://script.google.com/macros/s/AKfycbyucQaf2g3vDlXkRlGTSg8wZ0SiVdUmWJXA_UQH-wR6rcZJfxsXWpzrn1xHlkaUQeyXYg/exec';
+function isValidWebhookUrl(u){
+  // Apps Script 웹앱 URL만 허용: https://script.google.com/macros/s/.../exec
+  return typeof u === 'string' && /^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec\b/.test(u.trim());
+}
 function getSheetWebhookUrl(){
-  try { return localStorage.getItem(SHEET_WEBHOOK_KEY) || SHEET_WEBHOOK_DEFAULT; } catch(e){ return SHEET_WEBHOOK_DEFAULT; }
+  try {
+    const v = localStorage.getItem(SHEET_WEBHOOK_KEY);
+    // 잘못된 URL이 저장돼 있으면 무시하고 기본값 사용 (예: 시트 보기 URL 잘못 붙여넣은 경우)
+    if(v && isValidWebhookUrl(v)) return v;
+    return SHEET_WEBHOOK_DEFAULT;
+  } catch(e){ return SHEET_WEBHOOK_DEFAULT; }
 }
 function setSheetWebhookUrl(url){
   try { localStorage.setItem(SHEET_WEBHOOK_KEY, url||''); } catch(e){}
@@ -4340,12 +4349,19 @@ function setSheetWebhookUrl(url){
 function openSheetConfig(){
   const cur = getSheetWebhookUrl();
   const msg =
-    '구글 Apps Script Web App URL을 입력하세요.\n' +
-    '(처음이면 README의 google-apps-script.gs 코드를 시트에 배포한 후 발급된 URL을 붙여넣기)\n\n' +
+    'Apps Script Web App URL을 입력하세요.\n' +
+    '형식: https://script.google.com/macros/s/.../exec\n' +
+    '⚠️ 스프레드시트 보기 URL(docs.google.com/spreadsheets/...) 이 아닙니다!\n\n' +
     '현재 값: ' + (cur ? cur.slice(0,60)+'…' : '(미설정)');
   const next = prompt(msg, cur);
   if(next === null) return; // cancel
-  setSheetWebhookUrl(next.trim());
+  const trimmed = (next||'').trim();
+  if(trimmed && !isValidWebhookUrl(trimmed)){
+    showSheetStatus('⚠️ 형식 오류: script.google.com/macros/s/.../exec 형태여야 함', '#dc2626');
+    setTimeout(hideSheetStatus, 8000);
+    return;
+  }
+  setSheetWebhookUrl(trimmed);
   showSheetStatus('⚙️ Webhook URL 저장됨', '#16a34a');
   setTimeout(hideSheetStatus, 2500);
 }
