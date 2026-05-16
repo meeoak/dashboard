@@ -808,6 +808,30 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-more-btn:hover{background:#eff6ff}
 .r3d-empty-team{padding:18px;text-align:center;color:#94a3b8;font-style:italic;font-size:12px}
 .r3d-empty{padding:24px;text-align:center;color:#94a3b8;font-style:italic;font-size:12px;background:#fff;border:1.5px dashed #cbd5e1;border-radius:10px}
+/* 에이전트 단위 카드 (팀 선택 시) */
+.r3d-agent-card{background:#fff;border:1px solid #e2e8f0;border-left:4px solid;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.r3d-agent-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:linear-gradient(180deg,#f8fafc,#fff);border-bottom:1px solid #e5e7eb;gap:10px;flex-wrap:wrap}
+.r3d-agent-name{font-size:15px;font-weight:900;color:#0f172a;letter-spacing:-.3px;display:flex;align-items:center;gap:6px}
+.r3d-agent-team-tag{font-size:9.5px;font-weight:800;padding:1.5px 6px;border-radius:5px;color:#fff;letter-spacing:.2px}
+.r3d-agent-stats{display:flex;gap:6px;font-size:11px;font-weight:800;flex-wrap:wrap}
+.r3d-agent-stat{padding:3px 9px;border-radius:6px;background:#f1f5f9;color:#475569;border:1px solid #e5e7eb}
+.r3d-agent-stat.urg{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+.r3d-agent-stat.zero{background:#fafafa;color:#94a3b8;border-color:#f1f5f9}
+.r3d-agent-sec{padding:0}
+.r3d-agent-sec + .r3d-agent-sec{border-top:1px dashed #e5e7eb}
+.r3d-agent-sec-hd{padding:8px 14px 4px;font-size:10.5px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;background:#fcfcfd}
+.r3d-urg-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.r3d-urg-tbl td{padding:7px 10px;border-bottom:1px solid #f5f5f5;vertical-align:middle;cursor:pointer;transition:background .12s}
+.r3d-urg-tbl tr:last-child td{border-bottom:none}
+.r3d-urg-tbl tr:hover td{background:#fef9c3}
+.r3d-urg-icon{font-size:14px;width:24px;text-align:center}
+.r3d-urg-nm{font-weight:800;color:#0f172a}
+.r3d-urg-nm small{display:block;color:#64748b;font-weight:600;font-size:10.5px;margin-top:1px}
+.r3d-urg-reason{color:#475569;font-weight:700;font-size:11.5px}
+.r3d-urg-dday{font-weight:900;font-size:11.5px;color:#dc2626;text-align:right;white-space:nowrap}
+.r3d-urg-dday.warn{color:#d97706}
+.r3d-urg-dday.ok{color:#64748b}
+.r3d-urg-empty{padding:12px 14px;text-align:center;color:#94a3b8;font-size:11.5px;font-style:italic}
 @media(max-width:640px){
   .r3d-grid{padding:10px 12px;gap:10px}
   .r3d-team-hd{padding:10px 12px}
@@ -4600,64 +4624,167 @@ function renderRecent7DaysByTeam(){
     const vdInWindow = r.vd && r.vd >= fromStr && r.vd <= todayStr;
     return vdInWindow ? r.vd : r.ad;
   };
-  const teams = curTeam==='ALL' ? ['TIM_GIAR','TIM_TINA','TIM_LIDIA'] : [curTeam];
-  let html = '';
-  teams.forEach(t=>{
-    // 최근 7일 내 활동: 배정일 OR 방문일이 fromStr~today 범위 — 에이전트 필터도 적용
-    // 미래 예약 방문(vd>today)은 '업데이트'로 보지 않음
-    const recs = (D.records||[]).filter(r=>{
-      if(r.t !== t) return false;
-      if(curAgent !== 'ALL' && r.a !== curAgent) return false;
-      const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
-      const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
-      return adInWin || vdInWin;
-    });
-    // 최신순 정렬 (업데이트 일자 기준)
-    recs.sort((a,b)=> (pickUpdateDate(b)||'').localeCompare(pickUpdateDate(a)||''));
-    const total = recs.length;
-    const color = TC[t] || '#888';
-    const name = teamShortName(t) + (curAgent !== 'ALL' ? ` · ${(D.agent_meta[curAgent]||{}).short || curAgent}` : '');
+  // 7일 업데이트 행 렌더링 헬퍼 (팀/에이전트 단위 공용)
+  const initialShown = 15;
+  const render7DRows = (recs)=> recs.slice(0, initialShown).map(r=>{
+    const updateDate = pickUpdateDate(r);
+    const agentShort = (D.agent_meta[r.a]||{}).short || r.a;
+    const memoRaw = (r.memo||'').trim();
+    const memo = (curLang === 'ko' && memoRaw) ? translateMemo(memoRaw) : memoRaw;
+    const memoCell = memo
+      ? `<td class="r3d-memo" title="${esc(memoRaw)}">${esc(memo.slice(0,60))}${memo.length>60?'…':''}</td>`
+      : `<td class="r3d-memo empty">${curLang==='id'?'Tidak ada catatan':'메모 없음'}</td>`;
+    const recKey = esc(JSON.stringify({a:r.a, nm:r.nm||'', ad:r.ad||''}));
+    return `<tr class="r3d-row" data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
+      <td class="r3d-d">${fmtDate(updateDate)}</td>
+      <td class="r3d-d r3d-ad">${fmtDate(r.ad)}</td>
+      <td class="r3d-m"><b>${esc(r.nm||'-')}</b>${r.pa?`<small>${esc(r.pa)}</small>`:''}</td>
+      <td class="r3d-ag">${esc(agentShort)}</td>
+      <td class="r3d-st">${stPill(r)}</td>
+      ${memoCell}
+    </tr>`;
+  }).join('');
 
-    const initialShown = 15;
-    const visibleRecs = recs.slice(0, initialShown);
-    const rows = visibleRecs.map(r=>{
-      const updateDate = pickUpdateDate(r);
-      const agentShort = (D.agent_meta[r.a]||{}).short || r.a;
-      const memoRaw = (r.memo||'').trim();
-      // 한국어 모드일 때 자동 번역
-      const memo = (curLang === 'ko' && memoRaw) ? translateMemo(memoRaw) : memoRaw;
-      const memoCell = memo
-        ? `<td class="r3d-memo" title="${esc(memoRaw)}">${esc(memo.slice(0,60))}${memo.length>60?'…':''}</td>`
-        : `<td class="r3d-memo empty">${curLang==='id'?'Tidak ada catatan':'메모 없음'}</td>`;
-      const recKey = esc(JSON.stringify({a:r.a, nm:r.nm||'', ad:r.ad||''}));
-      return `<tr class="r3d-row" data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
-        <td class="r3d-d">${fmtDate(updateDate)}</td>
-        <td class="r3d-d r3d-ad">${fmtDate(r.ad)}</td>
-        <td class="r3d-m"><b>${esc(r.nm||'-')}</b>${r.pa?`<small>${esc(r.pa)}</small>`:''}</td>
-        <td class="r3d-ag">${esc(agentShort)}</td>
-        <td class="r3d-st">${stPill(r)}</td>
-        ${memoCell}
+  // 긴급 회원 리스트 렌더링 헬퍼 (에이전트별)
+  const renderUrgRows = (urgent, agentName)=>{
+    if(!urgent.length) return `<div class="r3d-urg-empty">긴급 관리 대상 없음</div>`;
+    return `<table class="r3d-urg-tbl">${urgent.map(u=>{
+      const ddayCls = u.daysLeft<=3 ? '' : (u.daysLeft<=7 ? 'warn' : 'ok');
+      const recKey = esc(JSON.stringify({a:u.a, nm:u.nm||'', ad:u.ad||''}));
+      return `<tr data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
+        <td class="r3d-urg-icon">${u.urgentIcon||'•'}</td>
+        <td class="r3d-urg-nm"><b>${esc(u.nm||'-')}</b>${u.pa?`<small>${esc(u.pa)}</small>`:''}</td>
+        <td class="r3d-urg-reason">${esc(u.reason||'-')}</td>
+        <td class="r3d-urg-dday ${ddayCls}">D-${u.daysLeft<0?0:u.daysLeft}</td>
       </tr>`;
-    }).join('');
+    }).join('')}</table>`;
+  };
 
-    html += `
-    <div class="r3d-team-card" style="border-left-color:${color}">
-      <div class="r3d-team-hd">
-        <span class="r3d-team-name" style="color:${color}">${name}</span>
-        <span class="r3d-team-total">총 ${total}건 업데이트</span>
-      </div>
-      ${total === 0
-        ? '<div class="r3d-empty-team">최근 7일 업데이트 없음</div>'
-        : `<table class="r3d-detail-tbl">
-            <thead><tr><th title="상태 업데이트일">📅 업데이트</th><th title="DB 배정일">📋 배정일</th><th>회원명 (후원자)</th><th>에이전트</th><th>상태/옵션</th><th>📝 상담기록</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
-          ${total > initialShown ? `<button class="r3d-more-btn" onclick="openRecent7DTeam('${t}','${fromStr}')">+${total-initialShown}건 더 보기 →</button>` : ''}`
-      }
-    </div>`;
-  });
+  let html = '';
+
+  if(curTeam === 'ALL'){
+    // 전체 팀 모드 — 기존 팀 카드 형태 유지
+    ['TIM_GIAR','TIM_TINA','TIM_LIDIA'].forEach(t=>{
+      const recs = (D.records||[]).filter(r=>{
+        if(r.t !== t) return false;
+        if(curAgent !== 'ALL' && r.a !== curAgent) return false;
+        const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
+        const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+        return adInWin || vdInWin;
+      });
+      recs.sort((a,b)=> (pickUpdateDate(b)||'').localeCompare(pickUpdateDate(a)||''));
+      const total = recs.length;
+      const color = TC[t] || '#888';
+      const name = teamShortName(t) + (curAgent !== 'ALL' ? ` · ${(D.agent_meta[curAgent]||{}).short || curAgent}` : '');
+      const rows = render7DRows(recs);
+      html += `
+      <div class="r3d-team-card" style="border-left-color:${color}">
+        <div class="r3d-team-hd">
+          <span class="r3d-team-name" style="color:${color}">${name}</span>
+          <span class="r3d-team-total">총 ${total}건 업데이트</span>
+        </div>
+        ${total === 0
+          ? '<div class="r3d-empty-team">최근 7일 업데이트 없음</div>'
+          : `<table class="r3d-detail-tbl">
+              <thead><tr><th title="상태 업데이트일">📅 업데이트</th><th title="DB 배정일">📋 배정일</th><th>회원명 (후원자)</th><th>에이전트</th><th>상태/옵션</th><th>📝 상담기록</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+            ${total > initialShown ? `<button class="r3d-more-btn" onclick="openRecent7DTeam('${t}','${fromStr}')">+${total-initialShown}건 더 보기 →</button>` : ''}`
+        }
+      </div>`;
+    });
+  } else {
+    // 팀 선택 모드 — 에이전트별 카드로 분리 + 긴급 관리 리스트 포함
+    const team = curTeam;
+    const color = TC[team] || '#888';
+    const teamLbl = teamShortName(team);
+    const agents = curAgent !== 'ALL' ? [curAgent] : (D.team_members[team]||[]);
+    agents.forEach(a=>{
+      const meta = D.agent_meta[a]||{};
+      const short = meta.short || a;
+      // 최근 7일 업데이트
+      const recs = (D.records||[]).filter(r=>{
+        if(r.a !== a) return false;
+        const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
+        const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+        return adInWin || vdInWin;
+      });
+      recs.sort((a2,b2)=> (pickUpdateDate(b2)||'').localeCompare(pickUpdateDate(a2)||''));
+      const total = recs.length;
+      // 긴급 회원 리스트
+      const urgent = findUrgentForAgent(a, todayStr);
+      const urgCount = urgent.length;
+      // 업데이트도 긴급도 0이면 카드 자체 생략
+      if(total===0 && urgCount===0) return;
+      const rows = render7DRows(recs);
+      html += `
+      <div class="r3d-agent-card" style="border-left-color:${color}">
+        <div class="r3d-agent-hd">
+          <span class="r3d-agent-name"><span class="r3d-agent-team-tag" style="background:${color}">${teamLbl}</span>${esc(short)}</span>
+          <div class="r3d-agent-stats">
+            <span class="r3d-agent-stat${total===0?' zero':''}">📅 최근 7일 ${total}건</span>
+            <span class="r3d-agent-stat${urgCount===0?' zero':' urg'}">🚨 긴급 ${urgCount}건</span>
+          </div>
+        </div>
+        <div class="r3d-agent-sec">
+          <div class="r3d-agent-sec-hd">📅 최근 7일 업데이트</div>
+          ${total === 0
+            ? '<div class="r3d-empty-team">최근 7일 업데이트 없음</div>'
+            : `<table class="r3d-detail-tbl">
+                <thead><tr><th title="상태 업데이트일">📅 업데이트</th><th title="DB 배정일">📋 배정일</th><th>회원명 (후원자)</th><th>에이전트</th><th>상태/옵션</th><th>📝 상담기록</th></tr></thead>
+                <tbody>${rows}</tbody>
+              </table>
+              ${total > initialShown ? `<button class="r3d-more-btn" onclick="openRecent7DAgent('${a.replace(/'/g,"\\'")}','${fromStr}')">+${total-initialShown}건 더 보기 →</button>` : ''}`
+          }
+        </div>
+        <div class="r3d-agent-sec">
+          <div class="r3d-agent-sec-hd">🚨 긴급 관리 대상 (${urgCount}건)</div>
+          ${renderUrgRows(urgent, a)}
+        </div>
+      </div>`;
+    });
+    if(!html) html = '<div class="r3d-empty">선택한 팀/에이전트에 표시할 데이터가 없습니다</div>';
+  }
   if(!html) html = '<div class="r3d-empty">팀이 선택되지 않았습니다</div>';
   wrap.innerHTML = html;
+}
+
+// 에이전트별 7일 업데이트 — 더 보기 (전체 모달)
+function openRecent7DAgent(agent, fromStr){
+  const todayStr = D.today;
+  const recs = (D.records||[]).filter(r=>{
+    if(r.a !== agent) return false;
+    const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
+    const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+    return adInWin || vdInWin;
+  });
+  const pickD = (r)=>{
+    const vdIn = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+    return vdIn ? r.vd : r.ad;
+  };
+  recs.sort((a,b)=> (pickD(b)||'').localeCompare(pickD(a)||''));
+  memCache = recs;
+  const meta = D.agent_meta[agent]||{};
+  const tcol = TC[meta.team]||'#888';
+  document.getElementById('mem-header').innerHTML = `
+    <div class="mem-av" style="background:${tcol}">📅</div>
+    <div class="mem-info"><h2>📅 ${meta.short||agent} · 최근 7일 업데이트</h2><p>${fromStr} ~ ${todayStr}</p>
+      <span class="mem-pill" style="background:#dbeafe;color:#1e3a8a">업데이트 ${recs.length}건</span></div>
+    <div style="margin-left:auto;text-align:right">
+      <div class="mem-count">${recs.length}</div>
+      <div style="font-size:11px;color:#aaa">건</div></div>`;
+  document.getElementById('mem-search').value='';
+  document.getElementById('mem-count-lbl').textContent = `총 ${recs.length}건`;
+  if(typeof buildMemFilters==='function'){
+    ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
+      const el=document.getElementById(id); if(el)el.value='';
+    });
+    buildMemFilters();
+  }
+  renderMemTable(recs);
+  document.getElementById('page-main').style.display='none';
+  document.getElementById('page-member').style.display='block';
+  window.scrollTo(0,0);
 }
 
 // 최근 7일 더 보기 — 팀 전체 회원 목록
