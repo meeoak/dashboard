@@ -208,7 +208,10 @@ body.focus-mode #detail-section-hd{display:none!important}
 .preset-btn{background:#fafafa;border:1px solid #e5e5e5;border-radius:14px;padding:5px 11px;font-size:11px;font-weight:700;color:#666;cursor:pointer;transition:all .12s}
 .preset-btn:hover{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
 .preset-btn.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
-.today-lbl{font-size:11px;color:#aaa;margin-left:auto}
+.today-lbl{font-size:11px;color:#aaa;margin-left:auto;display:inline-flex;align-items:center;gap:8px}
+.today-lbl .clock-time{font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;font-size:13px;font-weight:800;color:#1e3a8a;background:#eff6ff;border:1px solid #c7d2fe;border-radius:8px;padding:3px 8px;letter-spacing:0.5px}
+.today-lbl .clock-time .clock-sep{color:#94a3b8;animation:clock-blink 1s steps(2,start) infinite}
+@keyframes clock-blink{50%{opacity:0.35}}
 .range-info{display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:#1e3a8a;font-size:11px;font-weight:700;border-radius:14px;padding:5px 11px;border:1px solid #fde68a;margin-left:8px}
 
 /* ─ 섹션 제목 ─ */
@@ -2159,7 +2162,18 @@ function initFilters(){
   document.getElementById('date-to').min = D.date_min;
   document.getElementById('date-to').max = D.date_max_ext;
   buildAgentSelect();
-  document.getElementById('today-lbl').textContent = T('today_lbl') + ' ' + D.today;
+  renderClock();
+  if(!window._clockTimer) window._clockTimer = setInterval(renderClock, 1000);
+}
+// 오른쪽 상단 실시간 시계 (시:분:초)
+function renderClock(){
+  const el = document.getElementById('today-lbl');
+  if(!el) return;
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const hh = pad(now.getHours()), mm = pad(now.getMinutes()), ss = pad(now.getSeconds());
+  el.innerHTML = `<span class="clock-date">${T('today_lbl')} ${D.today}</span>`
+    + `<span class="clock-time">🕐 ${hh}<span class="clock-sep">:</span>${mm}<span class="clock-sep">:</span>${ss}</span>`;
 }
 function buildAgentSelect(){
   const sa = document.getElementById('fsel-agent');
