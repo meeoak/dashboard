@@ -136,6 +136,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .scope-bar{background:linear-gradient(180deg,#0f0f1f,#16162a);border-bottom:2px solid #1e3a8a;padding:0 20px;box-shadow:0 4px 16px #00000040}
 .scope-in{max-width:1180px;margin:0 auto;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0}
 .scope-in::-webkit-scrollbar{display:none}
+/* 상단 빠른 이동 탭 (상세 분석 점프) */
+.quick-nav-bar{background:linear-gradient(180deg,#fef9c3,#fffbeb);border-bottom:1.5px solid #fcd34d;padding:0 20px;box-shadow:0 2px 6px rgba(252,211,77,.18)}
+.quick-nav-in{max-width:1180px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:8px 0;align-items:center;flex-wrap:wrap}
+.quick-nav-in::-webkit-scrollbar{display:none}
+.quick-nav-lbl{font-size:12px;font-weight:900;color:#854d0e;letter-spacing:-.3px;flex-shrink:0;margin-right:4px}
+.quick-nav-btn{background:#fff;border:1.5px solid #fcd34d;color:#854d0e;font-size:12.5px;font-weight:900;padding:7px 14px;border-radius:9px;cursor:pointer;transition:all .15s;letter-spacing:-.3px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.quick-nav-btn:hover{background:#fef3c7;border-color:#d97706;color:#713f12;transform:translateY(-1px);box-shadow:0 3px 8px rgba(217,119,6,.2)}
+.quick-nav-btn.on{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-color:#1e3a8a;box-shadow:0 2px 8px rgba(30,58,138,.3)}
+@media(max-width:640px){
+  .quick-nav-bar{padding:0 10px}
+  .quick-nav-in{padding:6px 0;gap:5px;flex-wrap:nowrap}
+  .quick-nav-lbl{font-size:11px;margin-right:2px}
+  .quick-nav-btn{font-size:11px;padding:5px 9px;border-radius:7px}
+}
 .scope-btn{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);padding:13px 22px;font-size:15px;font-weight:900;color:#aaa;cursor:pointer;white-space:nowrap;border-radius:10px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:-0.3px;min-width:140px;height:48px}
 .scope-btn:hover{color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
 .scope-btn.on{color:#fff;background:linear-gradient(135deg,#1e3a8a,#2563eb);border-color:#1e3a8a;box-shadow:0 4px 16px #1e3a8a66,0 0 0 3px #1e3a8a40}
@@ -915,6 +929,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
   <button class="scope-btn" data-scope="TIM_GIAR"  onclick="selectScope('TIM_GIAR')"><span class="scope-dot" style="background:#1a73e8"></span>TIM_GIAR</button>
   <button class="scope-btn" data-scope="TIM_TINA"  onclick="selectScope('TIM_TINA')"><span class="scope-dot" style="background:#16a34a"></span>TIM_TINA</button>
   <button class="scope-btn" data-scope="TIM_LIDIA" onclick="selectScope('TIM_LIDIA')"><span class="scope-dot" style="background:#ea4335"></span>TIM_LIDIA</button>
+</div></div>
+
+<!-- 빠른 이동 탭 (상단 quick-nav) — 클릭 시 상세 분석으로 바로 점프 -->
+<div class="quick-nav-bar"><div class="quick-nav-in">
+  <span class="quick-nav-lbl">📂 빠른 이동:</span>
+  <button class="quick-nav-btn" onclick="jumpToTab('cal')" data-qnav="cal">📅 방문 캘린더</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats">👥 에이전트 현황</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank">🏆 랭킹 & 배틀</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('insight')" data-qnav="insight">🔥 팀·에이전트 인사이트</button>
 </div></div>
 
 <!-- 모드 표시 -->
@@ -2933,8 +2956,23 @@ function switchTab(tab){
     if(tabEl) tabEl.classList.toggle('on', t===tab);
     if(contEl) contEl.style.display = t===tab?'block':'none';
   });
+  // 상단 quick-nav 버튼 상태도 동기화
+  document.querySelectorAll('.quick-nav-btn[data-qnav]').forEach(b=>{
+    b.classList.toggle('on', b.dataset.qnav === tab);
+  });
   curTab = tab;
   renderTab();
+}
+
+// 상단 빠른 이동: 탭 전환 + 해당 콘텐츠로 스크롤
+function jumpToTab(tab){
+  switchTab(tab);
+  // 탭 콘텐츠 영역으로 부드럽게 스크롤
+  const tabsBar = document.querySelector('.tabs-bar');
+  if(tabsBar){
+    const top = tabsBar.getBoundingClientRect().top + window.pageYOffset - 8;
+    window.scrollTo({top, behavior:'smooth'});
+  }
 }
 function renderTab(){
   if(curTab==='cal'){ renderCal('sched'); renderCal('done'); }
