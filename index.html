@@ -366,10 +366,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .kpi-tbl tbody tr.row-all:hover td{background:linear-gradient(90deg,#fefce8,#eff6ff)}
 .kpi-tbl .team-cell{text-align:left;padding-left:18px;font-size:14px;font-weight:900;letter-spacing:-.3px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:140px}
 .kpi-tbl .team-cell-row{display:flex;align-items:center;gap:7px;width:100%}
-.kpi-tbl .row-agent td{background:#fafbfc!important;border-bottom:1px dashed #e5e7eb;padding-top:8px;padding-bottom:8px}
-.kpi-tbl .row-agent:hover td{background:#fef3c7!important}
-.kpi-tbl .row-agent .agent-cell{font-style:italic;font-weight:600;font-size:12.5px;display:flex;align-items:center;gap:4px}
-.kpi-tbl .row-agent .num-val{font-size:13px}
+.kpi-tbl .row-agent td{background:#fafbfc!important;border-bottom:1px dashed #e5e7eb;padding:0!important}
+.kpi-tbl .row-agent:hover td{background:#fffbeb!important}
+/* 에이전트 행 — 격차 섹션의 카드 스타일과 동일 */
+.kpi-row-agent{display:flex;align-items:center;gap:10px;padding:9px 18px 9px 36px;font-size:12.5px}
+.kpi-row-agent .ka-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px #fff,0 0 0 3px currentColor}
+.kpi-row-agent .ka-name{font-weight:800;color:#0f172a;font-size:13px;flex:0 0 140px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-row-agent .ka-db{font-size:11px;color:#475569;font-weight:800;background:#f1f5f9;padding:2px 9px;border-radius:8px;flex-shrink:0;border:1px solid #cbd5e1;letter-spacing:-.2px}
+.kpi-row-agent .ka-metrics{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:6px;min-width:0}
+@media(max-width:1100px){.kpi-row-agent .ka-metrics{grid-template-columns:repeat(3,1fr)}}
+.kpi-row-agent .ka-metric{display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:8px;background:#fff;border:1.5px solid #e5e7eb;justify-content:center;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s}
+.kpi-row-agent .ka-metric:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.08);border-color:#94a3b8}
+.kpi-row-agent .ka-metric.zero{opacity:.4;background:#f8fafc;cursor:default}
+.kpi-row-agent .ka-metric.zero:hover{transform:none;box-shadow:none;border-color:#e5e7eb}
+.kpi-row-agent .ka-m-emo{font-size:12px;flex-shrink:0}
+.kpi-row-agent .ka-m-num{font-weight:900;font-size:13px;letter-spacing:-.2px}
+.kpi-row-agent .ka-overdue{display:inline-block;font-size:9.5px;font-weight:800;background:#fee2e2;color:#7f1d1d;padding:1px 5px;border-radius:5px;margin-left:3px;cursor:pointer}
 .team-chevron-btn:hover{transform:scale(1.08);box-shadow:0 3px 8px rgba(0,0,0,0.25)!important;filter:brightness(1.1)}
 .team-chevron-btn:active{transform:scale(0.95)}
 .kpi-tbl .team-emo{font-size:18px}
@@ -2242,32 +2254,44 @@ function renderFunnel(){
 
 // ── KPI 테이블 (간결한 5행 표) ─────────────────────────
 function kpiTblRowAgent(agent, teamColor, st, dataTeam){
-  const num = (v, st_, color_) => {
-    if(!v) return `<span class="num-val zero">-</span>`;
-    return `<span class="num-val" style="color:${color_};font-size:13px" onclick="kpiTblClickAgent(event,'${st_}','${agent}')">${f(v)}</span>`;
-  };
-  const sCell = () => {
-    const sf=st.s_f||0, so=st.s_o||0;
-    if(sf===0&&so===0) return `<span class="num-val zero">-</span>`;
-    let html = sf>0
-      ? `<span class="num-val" style="color:#2563eb;font-size:13px" onclick="kpiTblClickAgent(event,'s_f','${agent}')">${f(sf)}</span>`
-      : `<span class="num-val zero">-</span>`;
-    if(so>0) html += `<div style="margin-top:3px"><span class="overdue-tag" style="font-size:9px;padding:1px 5px" onclick="kpiTblClickAgent(event,'s_o','${agent}')" title="방문일 지남 - 클릭시 명단">⚠️ ${f(so)}</span></div>`;
-    return html;
-  };
   const short = (D.agent_meta[agent]||{}).short || agent;
   const hidden = window.__teamCollapsed && window.__teamCollapsed[dataTeam] ? 'style="display:none"' : '';
+  // 카드 스타일 메트릭 박스
+  const metric = (emo, v, stype, color)=>{
+    if(!v) return `<div class="ka-metric zero"><span class="ka-m-emo">${emo}</span><span class="ka-m-num">-</span></div>`;
+    return `<div class="ka-metric" onclick="kpiTblClickAgent(event,'${stype}','${agent}')"><span class="ka-m-emo">${emo}</span><span class="ka-m-num" style="color:${color}">${f(v)}</span></div>`;
+  };
+  // 방문예약 (미래 + 확인필요)
+  const sf=st.s_f||0, so=st.s_o||0;
+  let sCell = '';
+  if(sf===0 && so===0){
+    sCell = `<div class="ka-metric zero"><span class="ka-m-emo">📅</span><span class="ka-m-num">-</span></div>`;
+  } else {
+    let inner = sf>0
+      ? `<span class="ka-m-emo">📅</span><span class="ka-m-num" style="color:#2563eb">${f(sf)}</span>`
+      : `<span class="ka-m-emo">📅</span><span class="ka-m-num" style="color:#cbd5e1">-</span>`;
+    if(so>0) inner += `<span class="ka-overdue" onclick="event.stopPropagation();kpiTblClickAgent(event,'s_o','${agent}')" title="방문일 지남 - 클릭시 명단">⚠️${f(so)}</span>`;
+    sCell = `<div class="ka-metric" onclick="kpiTblClickAgent(event,'s_f','${agent}')">${inner}</div>`;
+  }
+  const dbCell = st.db
+    ? `<span class="ka-db" onclick="kpiTblClickAgent(event,'db','${agent}')" style="cursor:pointer">DB ${f(st.db)}</span>`
+    : `<span class="ka-db" style="opacity:.5">DB -</span>`;
   return `<tr class="row-agent" data-team="${dataTeam}" data-agent="${agent}" ${hidden}>
-    <td class="team-cell agent-cell" style="padding-left:32px;color:#475569;font-size:12.5px;font-weight:600">
-      <span style="color:${teamColor};margin-right:6px;font-weight:900">└</span>${short}
+    <td colspan="8">
+      <div class="kpi-row-agent">
+        <span class="ka-dot" style="background:${teamColor};color:${teamColor}"></span>
+        <span class="ka-name" title="${agent}">${short}</span>
+        ${dbCell}
+        <div class="ka-metrics">
+          ${metric('✅', st.d, 'd', '#16a34a')}
+          ${metric('⬜', st.ls, 'ls', '#1d4ed8')}
+          ${metric('📹', st.vc, 'vc', '#7c3aed')}
+          ${sCell}
+          ${metric('⏳', st.w, 'w', '#d97706')}
+          ${metric('🏆', st.cl, 'cl', '#dc2626')}
+        </div>
+      </div>
     </td>
-    <td>${st.db ? `<span class="num-val col-db" style="font-size:13px" onclick="kpiTblClickAgent(event,'db','${agent}')">${f(st.db)}</span>` : `<span class="num-val zero">-</span>`}</td>
-    <td>${num(st.d,'d','#16a34a')}</td>
-    <td>${num(st.ls,'ls','#1d4ed8')}</td>
-    <td>${num(st.vc,'vc','#7c3aed')}</td>
-    <td>${sCell()}</td>
-    <td>${num(st.w,'w','#d97706')}</td>
-    <td>${num(st.cl,'cl','#dc2626')}</td>
   </tr>`;
 }
 function kpiTblClickAgent(event, stype, agent){
