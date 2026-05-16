@@ -1017,7 +1017,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
     <select class="mem-filter" id="mem-f-prov" onchange="filterMem()" title="지역">
       <option value="">📍 지역 전체</option>
     </select>
-    <select class="mem-filter" id="mem-f-ch" onchange="filterMem()" title="채널">
+    <select class="mem-filter" id="mem-f-ch" onchange="filterMem()" title="채널" style="display:none">
       <option value="">📡 채널 전체</option>
     </select>
     <select class="mem-filter" id="mem-f-dk" onchange="filterMem()" title="DB 종류">
@@ -1062,7 +1062,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
     </div>
   </div>
   <div class="mem-tbl-wrap"><table class="mem-tbl">
-    <thead><tr><th>#</th><th>팀</th><th>에이전트</th><th>학생</th><th>학부모</th><th>지역</th><th>채널</th><th>방문일</th><th>배정일</th><th>상태</th><th>클로징</th><th style="min-width:280px">상담내용</th></tr></thead>
+    <thead><tr><th>#</th><th>팀</th><th>에이전트</th><th>학생</th><th>학부모</th><th>지역</th><th>방문일</th><th>배정일</th><th>상태</th><th>클로징</th><th style="min-width:340px">📝 상담기록</th></tr></thead>
     <tbody id="mem-tbody"></tbody>
   </table></div>
 </div></div>
@@ -2979,6 +2979,12 @@ function _reportT(lang){
       stage_sched: '📅 Konsultasi',
       stage_visit: '✅ Kunjungan',
       stage_close: '🏆 Closing',
+      sub_upcoming_lbl: '📅 Konsultasi Akan Datang',
+      sub_upcoming_hint: 'Mendatang',
+      sub_wait_lbl: '⏳ Menunggu Jadwal',
+      sub_wait_hint: 'Perlu follow-up',
+      sub_overdue_lbl: '⚠️ Perlu Konfirmasi',
+      sub_overdue_hint: 'Lewat tanggal kunjungan',
       rate_ds: 'Rate Konsultasi',
       rate_sv: 'Rate Kunjungan',
       rate_vc: 'Rate Closing',
@@ -3051,6 +3057,12 @@ function _reportT(lang){
     stage_sched: '📅 예약',
     stage_visit: '✅ 방문',
     stage_close: '🏆 클로',
+    sub_upcoming_lbl: '📅 방문예정',
+    sub_upcoming_hint: '앞으로',
+    sub_wait_lbl: '⏳ 일정대기',
+    sub_wait_hint: '후속 필요',
+    sub_overdue_lbl: '⚠️ 확인필요',
+    sub_overdue_hint: '방문일 지남',
     rate_ds: '예약율',
     rate_sv: '방문율',
     rate_vc: '클로율',
@@ -3301,6 +3313,13 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 .f-rate.good{background:#16a34a}
 .f-rate.bad{background:#dc2626}
 .f-rate small{display:block;font-size:9px;opacity:.92;font-weight:700;margin-top:2px}
+/* 보조 펀널: 방문예정 / 일정대기 / 확인필요 */
+.ag-sub-funnel{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:6px}
+.ag-sf-stage{background:linear-gradient(135deg,#f8fafc,#fff);border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:11px}
+.ag-sf-stage.urgent{border-color:#fca5a5;background:linear-gradient(135deg,#fef2f2,#fff)}
+.ag-sf-num{font-size:26px;font-weight:900;line-height:1;letter-spacing:-.8px;flex-shrink:0;min-width:38px;text-align:center}
+.ag-sf-lbl{font-size:12px;font-weight:900;color:#0f172a;letter-spacing:-.2px;line-height:1.2}
+.ag-sf-sub{font-size:10px;font-weight:700;color:#64748b;margin-top:2px}
 /* 🎯 목표 대비 실적 KPI 카드 (강조) */
 .ag-kpi-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .ag-kpi-card{border:2.5px solid;border-radius:12px;padding:14px 12px;text-align:center;position:relative}
@@ -3464,6 +3483,21 @@ function _buildAgentReportSection(agent, rank, lang){
         <div class="f-stage"><div class="f-num" style="color:#16a34a">${visit}</div><div class="f-lbl">${esc(t.stage_visit)}</div></div>
         <div class="f-arrow"><div class="f-rate ${r_vc_ok?'good':'bad'}">${r_vc}%<small>${esc(t.rate_vc)}</small></div></div>
         <div class="f-stage"><div class="f-num" style="color:#dc2626">${cl}</div><div class="f-lbl">${esc(t.stage_close)}</div></div>
+      </div>
+      <!-- 보조 펀널: 방문예정 / 일정대기 / 확인필요 -->
+      <div class="ag-sub-funnel" style="margin-top:10px">
+        <div class="ag-sf-stage">
+          <div class="ag-sf-num" style="color:#2563eb">${x.s_f||0}</div>
+          <div><div class="ag-sf-lbl">${esc(t.sub_upcoming_lbl)}</div><div class="ag-sf-sub">${esc(t.sub_upcoming_hint)}</div></div>
+        </div>
+        <div class="ag-sf-stage">
+          <div class="ag-sf-num" style="color:#d97706">${x.w||0}</div>
+          <div><div class="ag-sf-lbl">${esc(t.sub_wait_lbl)}</div><div class="ag-sf-sub">${esc(t.sub_wait_hint)}</div></div>
+        </div>
+        ${x.s_o>0?`<div class="ag-sf-stage urgent">
+          <div class="ag-sf-num" style="color:#dc2626">${x.s_o}</div>
+          <div><div class="ag-sf-lbl">${esc(t.sub_overdue_lbl)}</div><div class="ag-sf-sub">${esc(t.sub_overdue_hint)}</div></div>
+        </div>`:''}
       </div>
     </div>
     <!-- 🎯 목표 대비 실적 (강조) -->
@@ -4125,14 +4159,13 @@ function renderMemTable(recs){
       <td><div style="font-size:13px;font-weight:600">${r.nm||'-'}</div><div style="font-size:11px;color:#aaa">${r.ph||''}</div></td>
       <td style="font-size:12px">${r.pa||'-'}</td>
       <td style="font-size:11px;color:#888">${r.pv||'-'}</td>
-      <td style="font-size:11px;color:#888">${r.ch||'-'}</td>
       <td style="font-size:12px">${r.vd||'<span style="color:#ddd">미기재</span>'}</td>
       <td style="font-size:12px">${r.ad||'-'}</td>
       <td><span class="mst mst-${r.st}">${stLbl}</span>${overdueBadge}</td>
       <td>${clLbl}</td>
       <td class="memo-cell">${memoCell}</td></tr>`;
   });
-  document.getElementById('mem-tbody').innerHTML = h || '<tr><td colspan="12" style="text-align:center;padding:24px;color:#bbb">데이터 없음</td></tr>';
+  document.getElementById('mem-tbody').innerHTML = h || '<tr><td colspan="11" style="text-align:center;padding:24px;color:#bbb">데이터 없음</td></tr>';
 }
 function buildMemFilters(){
   // memCache 기준으로 드롭다운 옵션 자동 생성
