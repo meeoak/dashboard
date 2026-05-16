@@ -2500,11 +2500,12 @@ function renderDBSummary(){
   const mktCnt = records.filter(r=>r.dk==='MKT').length;
   const offPct = Math.round(offCnt/total*100);
   const mktPct = 100 - offPct;
-  // 활동 상태
-  const active = records.filter(r=>['s','d','vc','ls','w'].includes(r.st) || r.cl===1).length;
-  const idleRecs = records.filter(r=>r.st==='none' && r.cl!==1);
+  // 활동 상태 — 부적합 DB(Keterangan DB 입력)는 다른 카테고리에서 제외
+  const isUnfit = (r) => (r.kt && String(r.kt).trim()) || (r.st==='x' && r.cl!==1);
+  const cancelled = records.filter(isUnfit).length;
+  const active = records.filter(r=> !isUnfit(r) && (['s','d','vc','ls','w'].includes(r.st) || r.cl===1)).length;
+  const idleRecs = records.filter(r=> !isUnfit(r) && r.st==='none' && r.cl!==1);
   const idle = idleRecs.length;
-  const cancelled = records.filter(r=>r.st==='x' && r.cl!==1).length;
   // 미진행 내 세부: 메모없음 vs 응답없음 (메모 있음)
   const idleNoMemo = idleRecs.filter(r=> !r.memo || !String(r.memo).trim()).length;
   const idleNoResp = idle - idleNoMemo;
@@ -2635,16 +2636,17 @@ function openMemStatus(kind){
     if(curAgent!=='ALL' && r.a!==curAgent) return false;
     if(r.ad < curFrom || r.ad > curTo) return false;
     if((curDbKind==='OFF' || curDbKind==='MKT') && r.dk!==curDbKind) return false;
+    const isUnfit = (r.kt && String(r.kt).trim()) || (r.st==='x' && r.cl!==1);
     if(kind==='active'){
-      return ['s','d','vc','ls','w'].includes(r.st) || r.cl===1;
+      return !isUnfit && (['s','d','vc','ls','w'].includes(r.st) || r.cl===1);
     } else if(kind==='idle'){
-      return r.st==='none' && r.cl!==1;
+      return !isUnfit && r.st==='none' && r.cl!==1;
     } else if(kind==='idle_noMemo'){
-      return r.st==='none' && r.cl!==1 && (!r.memo || !String(r.memo).trim());
+      return !isUnfit && r.st==='none' && r.cl!==1 && (!r.memo || !String(r.memo).trim());
     } else if(kind==='idle_noResp'){
-      return r.st==='none' && r.cl!==1 && r.memo && String(r.memo).trim();
+      return !isUnfit && r.st==='none' && r.cl!==1 && r.memo && String(r.memo).trim();
     } else if(kind==='cancel'){
-      return r.st==='x' && r.cl!==1;
+      return isUnfit;
     }
     return false;
   });
@@ -5839,6 +5841,23 @@ function detectMemoColumn(headerRow){
   MEMO_COL_DETECTED=true;
 }
 
+// Keterangan DB 컬럼 자동 탐지 (부적합 DB 사유 컬럼)
+let KET_COL_IDX = -1;  // -1 = 못 찾음 (있을 때만 사용)
+let KET_COL_DETECTED = false;
+function detectKetColumn(headerRow){
+  if(KET_COL_DETECTED||!headerRow)return;
+  for(let i=0;i<headerRow.length;i++){
+    const h=(headerRow[i]||'').toLowerCase();
+    // 'keterangan db' 또는 '부적합' 키워드. 단, memo 컬럼과는 다른 인덱스여야 함
+    if((h.includes('keterangan db')||h.includes('keterangan_db')||h.includes('부적합')) && i!==MEMO_COL_IDX){
+      KET_COL_IDX=i;
+      console.log(`⛔ Keterangan DB 컬럼 감지: 인덱스 ${i} ("${headerRow[i]}")`);
+      break;
+    }
+  }
+  KET_COL_DETECTED=true;
+}
+
 // 정적 데이터에서 에이전트→팀 매핑 추출 (라이브 파싱 fallback용)
 const STATIC_AGENT_TEAM={};
 for(const r of (D.records||[])) if(r.a&&r.t) STATIC_AGENT_TEAM[r.a]=r.t;
@@ -5860,6 +5879,7 @@ function rowToRecord(row,today){
   const statusB=(row[18]||'').trim();
   const clType=(row[20]||'').trim();
   const memo=(row[MEMO_COL_IDX]||'').trim();
+  const kt = (KET_COL_IDX>=0 ? (row[KET_COL_IDX]||'') : '').trim();
   // 팀 감지: 전체 열에서 TIM_ 패턴 검색
   let team='';
   for(let i=0;i<row.length;i++){
@@ -5884,7 +5904,7 @@ function rowToRecord(row,today){
   // OFF/MKT 분류 (3-4월 기준): "Homepage" 들어가면 MKT, 나머지는 모두 OFF
   const dk = channel.toLowerCase().includes('homepage') ? 'MKT' : 'OFF';
   const cl=clType?1:0;
-  return{a:agent,t:team,m:ad.slice(0,7),st,cl,cl_type:clType,nm:childName,pa:parentName,ph:phone,pv:province,ch:channel,vd:visitDate,ad,od:0,dk,cancel:'',memo,_sf:s_f,_so:s_o};
+  return{a:agent,t:team,m:ad.slice(0,7),st,cl,cl_type:clType,nm:childName,pa:parentName,ph:phone,pv:province,ch:channel,vd:visitDate,ad,od:0,dk,cancel:'',memo,kt,_sf:s_f,_so:s_o};
 }
 
 function emptyStat(){return{db:0,d:0,ls:0,vc:0,s:0,s_f:0,s_o:0,w:0,x:0,none:0,cl:0,visit:0,sched:0,active:0,score:0,r_ds:0,r_sv:0,r_vc:0,r_dc:0};}
@@ -6083,6 +6103,9 @@ async function loadFromSheet(opts){
     const csv=await resp.text();
     const rows=parseCSV(csv);
     if(rows.length<2)throw new Error('시트가 비어있음');
+    // 헤더 행 기반 컬럼 감지 (한 번만)
+    detectMemoColumn(rows[0]);
+    detectKetColumn(rows[0]);
     const today=new Date().toISOString().slice(0,10);
     const records=rows.slice(1).map(r=>rowToRecord(r,today)).filter(Boolean);
     if(records.length===0)throw new Error('유효 데이터 0건');
