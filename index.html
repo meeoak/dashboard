@@ -1470,8 +1470,8 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .preset-btn{background:#fff;color:var(--c-navy);border:1.5px solid #cbd5e1;font-weight:700}
 .preset-btn:hover{background:var(--c-yellow-bg);border-color:var(--c-yellow)}
 .preset-btn.on{background:var(--c-navy);color:#fff;border-color:var(--c-navy)}
-/* 섹션 헤더 - 흰 배경 + 남색 좌측 띠 */
-.section-hd{background:#fff;border-left:4px solid var(--c-navy);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0 10px}
+/* 섹션 헤더 inner - 흰 배경 + 남색 좌측 띠 (max-width/centering 은 원본 유지) */
+.section-hd-inner{background:#fff;border-left:6px solid var(--c-navy)}
 .section-title{color:var(--c-navy);font-weight:800}
 .section-sub{color:var(--c-gray)}
 /* 4대 KPI 카드 - 남색/노랑/빨강 */
@@ -1489,6 +1489,29 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .gap-c-need.bad{background:var(--c-red-soft);border-color:var(--c-red)}
 .gap-c-need.bad .gap-c-lbl,.gap-c-need.bad .gap-c-val{color:var(--c-red)}
 .gap-c-need.zero{background:var(--c-yellow-soft);border-color:var(--c-yellow)}
+/* DB 관리율 스택바 - 남색/노랑/빨강 (그라데이션 제거, 평탄한 색) */
+.ms-active{background:var(--c-navy)}
+.ms-idle{background:var(--c-yellow);color:var(--c-navy)}
+.ms-no-memo{background:#fde047;color:var(--c-navy)}
+.ms-no-resp{background:var(--c-yellow);color:var(--c-navy)}
+.ms-cancel{background:var(--c-red)}
+/* 관리 상태 상세 행 - 동일 팔레트 */
+.mgmt-detail-row.mgmt-row-active{background:#eff6ff;border-color:#bfdbfe}
+.mgmt-detail-row.mgmt-row-active:hover{background:var(--c-navy-soft);border-color:var(--c-navy)}
+.mgmt-detail-row.mgmt-row-active .mgmt-detail-pct{color:var(--c-navy);background:var(--c-navy-soft)}
+.mgmt-detail-row.mgmt-row-noMemo{background:var(--c-yellow-bg);border-color:#fde68a}
+.mgmt-detail-row.mgmt-row-noMemo:hover{background:var(--c-yellow-soft);border-color:var(--c-yellow)}
+.mgmt-detail-row.mgmt-row-noMemo .mgmt-detail-pct{color:#854d0e;background:var(--c-yellow-soft)}
+.mgmt-detail-row.mgmt-row-noResp{background:var(--c-yellow-bg);border-color:#fde68a}
+.mgmt-detail-row.mgmt-row-noResp:hover{background:var(--c-yellow-soft);border-color:var(--c-yellow)}
+.mgmt-detail-row.mgmt-row-noResp .mgmt-detail-pct{color:#854d0e;background:var(--c-yellow-soft)}
+.mgmt-detail-row.mgmt-row-cancel{background:#fef2f2;border-color:#fecaca}
+.mgmt-detail-row.mgmt-row-cancel:hover{background:var(--c-red-soft);border-color:var(--c-red)}
+.mgmt-detail-row.mgmt-row-cancel .mgmt-detail-pct{color:var(--c-red);background:var(--c-red-soft)}
+/* OFF/MKT DB 도넛 범례 색상 (인라인 스타일 덮어쓰기) */
+.dlg-item[onclick*="OFF"] .dlg-dot{background:var(--c-navy)!important}
+.dlg-item[onclick*="MKT"] .dlg-dot{background:var(--c-yellow)!important}
+.dlg-unfit .dlg-dot{background:var(--c-red)!important}
 </style></head>
 <body>
 
