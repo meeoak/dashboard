@@ -122,9 +122,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .gap-card{background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:18px 20px;border-left-width:8px;border-left-style:solid;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 3px 12px #0000000c;transition:all .15s}
 .gap-card:hover{box-shadow:0 6px 22px #00000018;transform:translateY(-2px)}
 .gap-card.gap-all{background:linear-gradient(135deg,#eff6ff,#fff)}
-.gap-team-header{flex:0 0 195px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gap-team-header{flex:0 0 175px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
 .gap-team-name{font-size:22px;font-weight:900;letter-spacing:-.7px;line-height:1}
-.gap-team-db{font-size:13px;font-weight:900;color:#1e293b;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);border-radius:10px;padding:6px 12px;white-space:nowrap;border:1.5px solid #cbd5e1;letter-spacing:-.3px}
+.gap-team-name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%}
+.gap-team-db{font-size:12px;font-weight:900;color:#1e293b;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);border-radius:8px;padding:4px 10px;white-space:nowrap;border:1.5px solid #cbd5e1;letter-spacing:-.3px}
 .gap-metrics-h{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;min-width:0}
 @media(max-width:1100px){.gap-metrics-h{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.gap-metrics-h{grid-template-columns:repeat(2,1fr)}.gap-team-header{flex:0 0 100%}}
@@ -1096,7 +1097,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 const TC = {TIM_GIAR:'#1a73e8', TIM_TINA:'#16a34a', TIM_LIDIA:'#ea4335'};
 const TK = {TIM_GIAR:'G', TIM_TINA:'T', TIM_LIDIA:'L'};
 const TEAM_EMO  = {TIM_GIAR:'', TIM_TINA:'', TIM_LIDIA:''};  // 마스코트 제거
-const TEAM_NAME = {TIM_GIAR:'GIAR', TIM_TINA:'TINA', TIM_LIDIA:'LIDIA'};
+const TEAM_NAME = {TIM_GIAR:'기아르', TIM_TINA:'티나', TIM_LIDIA:'리디아'};
+// 단축 팀명 헬퍼 — 매핑 없으면 'TIM_' 접두어만 제거
+function teamShortName(team){
+  if(!team) return '';
+  return TEAM_NAME[team] || teamShortName(team);
+}
 
 // 🌍 다국어 사전 (한국어/인도네시아어)
 const LANG = {
@@ -1618,7 +1624,7 @@ function renderMode(){
     detail = curAgent + ' (' + D.agent_meta[curAgent].team + ')';
   } else if(curTeam!=='ALL'){
     mode='👥 팀별';
-    detail = curTeam.replace('TIM_','');
+    detail = teamShortName(curTeam);
   } else {
     detail = T('total_21_agents');
   }
@@ -1694,7 +1700,7 @@ function openMemTeam(team, stypeStr, labelOverride){
   memCache = recs;
   const tEmo = TEAM_EMO[team]||'';
   const tcol = TC[team]||'#888';
-  const teamShort = team.replace('TIM_','');
+  const teamShort = teamShortName(team);
   document.getElementById('mem-header').innerHTML = `
     <div class="mem-av" style="background:${tcol}">${tEmo}</div>
     <div class="mem-info"><h2>${tEmo} ${teamShort} - ${labelOverride}</h2><p>${rangeLbl()} · ${labelOverride}</p>
@@ -1722,9 +1728,9 @@ function renderGaps(){
   const wrap = document.querySelector('.gap-wrap');
   if(wrap) wrap.style.display='';
   const teamMap = {
-    TIM_GIAR:  {name: 'TIM_GIAR', color: TC.TIM_GIAR},
-    TIM_TINA:  {name: 'TIM_TINA', color: TC.TIM_TINA},
-    TIM_LIDIA: {name: 'TIM_LIDIA', color: TC.TIM_LIDIA},
+    TIM_GIAR:  {name: teamShortName('TIM_GIAR'),  color: TC.TIM_GIAR},
+    TIM_TINA:  {name: teamShortName('TIM_TINA'),  color: TC.TIM_TINA},
+    TIM_LIDIA: {name: teamShortName('TIM_LIDIA'), color: TC.TIM_LIDIA},
   };
 
   // 표시할 팀 목록 결정 - 전체 통합시 3개 팀 모두 표시
@@ -1749,7 +1755,10 @@ function renderGaps(){
       const hasActivity = (agSt.db||0)>0 || (agSt.cl||0)>0 || (agSt.vc||0)>0 || (agSt.visit||0)>0 || (agSt.sched||0)>0;
       if(hasActivity) activeAgents.push({agent, st: agSt});
     });
-    const isCollapsedNow = !!(window.__gapAgentsCollapsed && window.__gapAgentsCollapsed[team]);
+    // 에이전트 목록 — 기본은 접힘(collapsed). 사용자가 펼치면 그 상태가 유지됨.
+    window.__gapAgentsCollapsed = window.__gapAgentsCollapsed || {};
+    if(window.__gapAgentsCollapsed[team] === undefined) window.__gapAgentsCollapsed[team] = true;
+    const isCollapsedNow = !!window.__gapAgentsCollapsed[team];
     const agentToggleHtml = activeAgents.length
       ? `<button class="team-chevron-btn gap-agent-toggle" data-team="${team}" data-count="${activeAgents.length}" onclick="event.stopPropagation();toggleGapAgents('${team}')" title="${isCollapsedNow?'펼치기':'접기'}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 10px;font-size:14px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s">${isCollapsedNow?'▶ 펼치기':'▼ 접기'} · ${activeAgents.length}명</button>`
       : '';
@@ -1758,11 +1767,11 @@ function renderGaps(){
       const overTxt = g.cl_db.gap>=0 ? `✅+${f(g.cl_db.gap)}${T('gap_over_short')}` : `🔻+${f(Math.abs(g.cl_db.gap))}${T('gap_need_short')}`;
       h += `<div class="gap-card" style="border-left-color:${color};background:linear-gradient(90deg,#fef2f2,#fff);border:2px dashed #fca5a5;border-left:5px solid ${color}">
         <div class="gap-team-header">
-          <span class="gap-team-name" style="color:${color}">${name}</span>
-          <div class="gap-team-meta" style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
-            <span class="gap-team-db" style="background:#dc2626;color:#fff;font-size:11px;font-weight:900;padding:3px 10px;animation:pulseLidia 2s ease-in-out infinite">${T('lidia_video_team')}</span>
-            ${agentToggleHtml}
+          <div class="gap-team-name-row">
+            <span class="gap-team-name" style="color:${color}">${name}</span>
+            <span class="gap-team-db" style="background:#dc2626;color:#fff;font-size:10.5px;font-weight:900;padding:3px 9px;animation:pulseLidia 2s ease-in-out infinite">${T('lidia_video_team')}</span>
           </div>
+          ${agentToggleHtml}
         </div>
         <div class="gap-metrics-h">
           <div class="gap-metric" onclick="openMemTeam('${team}','vc','📹 ${T('s_vc')}')" style="cursor:pointer;background:#ede9fe;border-color:#c4b5fd">
@@ -1793,11 +1802,11 @@ function renderGaps(){
       // GIAR/TINA: 일반 방문 영업팀
       h += `<div class="gap-card" style="border-left-color:${color}">
         <div class="gap-team-header">
-          <span class="gap-team-name" style="color:${color}">${name}</span>
-          <div class="gap-team-meta" style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+          <div class="gap-team-name-row">
+            <span class="gap-team-name" style="color:${color}">${name}</span>
             <span class="gap-team-db">${T('gap_db')} ${f(st.db||0)}${T('gap_unit')}</span>
-            ${agentToggleHtml}
           </div>
+          ${agentToggleHtml}
         </div>
         <div class="gap-metrics-h">
           ${gapMetric('📅', T('gap_book'), g.sched, TARGETS.ds, false, `onclick="openMemTeam('${team}','s,d,vc,ls,cl','📅 ${T('gap_book')}')"`)}
@@ -2223,7 +2232,7 @@ function renderFunnel(){
   document.getElementById('f-final-detail').textContent = `(${f(s.cl||0)} ÷ ${f(s.db||0)})`;
   document.getElementById('funnel-context').textContent =
     rangeLbl() + ' · ' +
-    (curAgent!=='ALL' ? D.agent_meta[curAgent].short : (curTeam!=='ALL' ? curTeam.replace('TIM_','') : '전체'));
+    (curAgent!=='ALL' ? D.agent_meta[curAgent].short : (curTeam!=='ALL' ? teamShortName(curTeam) : '전체'));
 }
 
 // ── KPI 테이블 (간결한 5행 표) ─────────────────────────
@@ -2262,7 +2271,11 @@ function kpiTblClickAgent(event, stype, agent){
 }
 
 // 팀별 펼치기/접기 상태
+// 팀별 영업 활동 종합 테이블 — 기본은 접힘 (사용자가 펼치면 그 상태 유지)
 window.__teamCollapsed = window.__teamCollapsed || {};
+['TIM_GIAR','TIM_TINA','TIM_LIDIA'].forEach(t=>{
+  if(window.__teamCollapsed[t] === undefined) window.__teamCollapsed[t] = true;
+});
 
 function toggleTeamRows(team){
   window.__teamCollapsed[team] = !window.__teamCollapsed[team];
@@ -2346,7 +2359,7 @@ function renderKPI(){
     if(curAgent==='ALL'){
       D.teams.forEach(t=>{
         const st = statsRange(curFrom, curTo, t, 'ALL');
-        rows += kpiTblRow(TEAM_NAME[t]||t.replace('TIM_',''), TEAM_EMO[t], TC[t], st, false, t);
+        rows += kpiTblRow(TEAM_NAME[t]||teamShortName(t), TEAM_EMO[t], TC[t], st, false, t);
         // 팀 아래 에이전트 세부 행 (활동 있는 에이전트만)
         const agents = (D.team_members[t]||[]).slice();
         agents.forEach(a=>{
@@ -2359,7 +2372,7 @@ function renderKPI(){
   } else {
     // 특정 팀 - 그 팀만 + 그 팀 에이전트들
     const st = statsRange(curFrom, curTo, curTeam, curAgent);
-    rows += kpiTblRow(TEAM_NAME[curTeam]||curTeam.replace('TIM_',''), TEAM_EMO[curTeam], TC[curTeam], st, true, curTeam);
+    rows += kpiTblRow(TEAM_NAME[curTeam]||teamShortName(curTeam), TEAM_EMO[curTeam], TC[curTeam], st, true, curTeam);
     if(curAgent==='ALL'){
       const agents = (D.team_members[curTeam]||[]).slice();
       agents.forEach(a=>{
@@ -2537,7 +2550,7 @@ function renderStats(){
     const dbClick = t.db>0 ? `<span class="clicknum" style="color:#555;font-weight:800" onclick="openMem('${a}','db')">${f(t.db)}</span>` : '<span style="color:#ddd">-</span>';
     h+=`<tr>
       <td class="L" title="${a}">${shortName(a)}</td>
-      <td><span style="font-size:11.5px;font-weight:800;color:#fff;background:${TC[meta.team]};padding:3px 9px;border-radius:5px;letter-spacing:.3px">${meta.team.replace('TIM_','')}</span></td>
+      <td><span style="font-size:11.5px;font-weight:800;color:#fff;background:${TC[meta.team]};padding:3px 9px;border-radius:5px;letter-spacing:.3px">${teamShortName(meta.team)}</span></td>
       <td style="font-weight:700">${dbClick}</td>
       <td>${cn(t.d||0,'d')}</td>
       <td>${cn(t.ls||0,'ls')}</td>
@@ -2586,7 +2599,7 @@ function renderRank(){
     const pct=Math.round((s.score||0)/maxS*100);
     const cls=i===0?'top1':i===1?'top2':'top3';
     bh+=`<div class="bcard ${cls}">
-      <div class="bc-name" style="font-size:14px;letter-spacing:0">${t.replace('TIM_','')}</div>
+      <div class="bc-name" style="font-size:14px;letter-spacing:0">${teamShortName(t)}</div>
       <div class="bc-score" style="color:${TC[t]}">${f(s.score||0)}</div>
       <div class="bc-sub">점수</div>
       <div class="bc-row"><span class="bc-row-l">방문완료</span><span class="bc-row-v" style="color:#16a34a">${s.d||0}건</span></div>
@@ -2664,7 +2677,7 @@ function renderProvOrChan(kind){
   const lblEl = (isProv?'prov':'chan')+'-lbl';
   document.getElementById(lblEl).textContent =
     (curMonth==='ALL'?'전체기간':D.mlabels[curMonth]) +
-    (curTeam!=='ALL'?` · ${curTeam.replace('TIM_','')}`:'') + ' · 상위 ' + data.length + '개';
+    (curTeam!=='ALL'?` · ${teamShortName(curTeam)}`:'') + ' · 상위 ' + data.length + '개';
 }
 
 // ── 일별 활동 추이 차트 ──────────────────────────────────
@@ -2931,7 +2944,7 @@ function openUrgentByType(kind){
     urgent.forEach(u=>{ if(u.urgentIcon === info.icon) recs.push(u); });
   });
   memCache = recs;
-  const teamLabel = curTeam==='ALL' ? '전체' : curTeam.replace('TIM_','');
+  const teamLabel = curTeam==='ALL' ? '전체' : teamShortName(curTeam);
   const tcol = curTeam==='ALL' ? '#dc2626' : (TC[curTeam]||'#dc2626');
   document.getElementById('mem-header').innerHTML = `
     <div class="mem-av" style="background:${tcol}">🚨</div>
@@ -3129,7 +3142,7 @@ function openUrgentReport(lang){
   const t = _reportT(lang);
   const todayStr = D.today;
   const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
-  const teamLabel = curTeam==='ALL' ? t.all_teams : curTeam.replace('TIM_','');
+  const teamLabel = curTeam==='ALL' ? t.all_teams : teamShortName(curTeam);
 
   // 에이전트별 긴급 목록 수집
   const agentUrgent = [];
@@ -3237,7 +3250,7 @@ ${agentUrgent.map(({agent, short, team, urgent})=>{
     <div class="rpt-agent-hd">
       <span class="rpt-agent-dot" style="background:${tcol}"></span>
       <span class="rpt-agent-name">${esc(short)}</span>
-      <span class="rpt-agent-team" style="border-color:${tcol};color:${tcol}">${esc(team.replace('TIM_',''))}</span>
+      <span class="rpt-agent-team" style="border-color:${tcol};color:${tcol}">${esc(teamShortName(team))}</span>
       <span class="rpt-agent-count">${esc(urgentLabel)} ${urgent.length}</span>
     </div>
     <table class="rpt-tbl">
@@ -3402,7 +3415,7 @@ function _buildAgentReportSection(agent, rank, lang){
   const meta = D.agent_meta[agent] || {};
   const x = {a: agent, ...s, meta};
   const tcol = TC[meta.team] || '#888';
-  const tlbl = (meta.team||'').replace('TIM_','');
+  const tlbl = teamShortName(meta.team||'');
   const grade = (x.score||0)>=60?'A':(x.score||0)>=40?'B':(x.score||0)>=20?'C':'D';
   const gradeColor = grade==='A'?'#16a34a':grade==='B'?'#0284c7':grade==='C'?'#d97706':'#dc2626';
   const medals=['🥇','🥈','🥉'];
@@ -3597,7 +3610,7 @@ ${_buildAgentReportSection(agent, null, lang)}
 function openAllAgentsReport(lang){
   lang = lang || 'ko';
   const t = _reportT(lang);
-  const teamLabel = curTeam==='ALL' ? t.all_teams : curTeam.replace('TIM_','');
+  const teamLabel = curTeam==='ALL' ? t.all_teams : teamShortName(curTeam);
   const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
   const list = agents.map(a=>{
     const s = statsRange(curFrom, curTo, null, a);
@@ -3717,7 +3730,7 @@ function renderTeamAgentInsight(){
   // 팀별 카드
   const teamGrid = document.getElementById('ins-team-grid');
   const teamLbl = document.getElementById('insight-team-lbl');
-  if(teamLbl) teamLbl.textContent = rangeLbl() + ' · ' + (curTeam==='ALL'?'전체 통합':curTeam.replace('TIM_',''));
+  if(teamLbl) teamLbl.textContent = rangeLbl() + ' · ' + (curTeam==='ALL'?'전체 통합':teamShortName(curTeam));
 
   const teamsToShow = curTeam==='ALL' ? D.teams : [curTeam];
   let teamHtml = '';
@@ -3725,7 +3738,7 @@ function renderTeamAgentInsight(){
     const st = statsRange(curFrom, curTo, t, 'ALL');
     if(!st.db){
       teamHtml += `<div class="ins-team-card" style="border-left-color:${TC[t]};opacity:.5">
-        <div class="ins-tc-head"><span class="ins-tc-name" style="color:${TC[t]}">${t.replace('TIM_','')}</span>
+        <div class="ins-tc-head"><span class="ins-tc-name" style="color:${TC[t]}">${teamShortName(t)}</span>
         <span class="ins-tc-badge" style="background:#94a3b8">활동 없음</span></div>
         <div style="color:#999;padding:14px;text-align:center;font-size:13px">기간 내 DB 배정 없음</div>
       </div>`;
@@ -3761,7 +3774,7 @@ function renderTeamAgentInsight(){
 
     teamHtml += `<div class="ins-team-card" style="border-left-color:${TC[t]}">
       <div class="ins-tc-head">
-        <span class="ins-tc-name" style="color:${TC[t]}">${TEAM_EMO[t]||''} ${t.replace('TIM_','')}</span>
+        <span class="ins-tc-name" style="color:${TC[t]}">${TEAM_EMO[t]||''} ${teamShortName(t)}</span>
         <span class="ins-tc-badge" style="background:${gradeColor}">${grade} · ${score}점</span>
       </div>
       <div class="ins-tc-stats">
@@ -3798,7 +3811,7 @@ function renderTeamAgentInsight(){
   let agHtml = '<div class="ins-ag-detail-list">';
   list.forEach((x,i)=>{
     const tcol = TC[x.meta.team]||'#888';
-    const tlbl = (x.meta.team||'').replace('TIM_','');
+    const tlbl = teamShortName(x.meta.team||'');
     const grade = x.score>=60?'A':x.score>=40?'B':x.score>=20?'C':'D';
     const gradeColor = grade==='A'?'#16a34a':grade==='B'?'#0284c7':grade==='C'?'#d97706':'#dc2626';
     const medals=['🥇','🥈','🥉'];
@@ -3910,7 +3923,7 @@ function renderTeamAgentInsight(){
       <tbody>
         ${list.map((x,i)=>{
           const tcol = TC[x.meta.team]||'#888';
-          const tlbl = (x.meta.team||'').replace('TIM_','');
+          const tlbl = teamShortName(x.meta.team||'');
           return `<tr onclick="openMem('${x.a}','db')" style="cursor:pointer">
             <td><b>${i+1}</b></td>
             <td><span style="font-size:10px;font-weight:800;color:#fff;background:${tcol};padding:2px 7px;border-radius:4px">${tlbl}</span></td>
@@ -4146,7 +4159,7 @@ function renderMemTable(recs){
     if(r.st==='x' && r.cancel) stLbl = r.cancel;
     const clLbl = r.cl ? `<span class="mst mst-cl">${r.cl_type||'클로징'}</span>` : '<span style="color:#ddd">-</span>';
     const meta = D.agent_meta[r.a]||{};
-    const tm = (r.t||'').replace('TIM_','');
+    const tm = teamShortName(r.t||'');
     const tcol = TC[r.t]||'#888';
     // ⚠️ 확인필요 (방문예약 중 방문일 지난 것)
     const overdueBadge = r.od ? `<span class="overdue-tag" style="margin-left:4px" title="방문일 지났는데 방문완료 처리 안 됨">⚠️확인필요</span>` : '';
