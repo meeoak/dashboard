@@ -5542,15 +5542,24 @@ function renderAgentInsightOnly(){
     }
     if(battleEl) battleEl.style.display = 'none';
     if(bannerEl) bannerEl.style.display = 'none';
-    // 활동지수 섹션 자체 숨김 (랭킹 1줄 의미 없음 — 미션 카드가 대체)
-    if(rankEl) rankEl.style.display = 'none';
-    if(rankSecHd) rankSecHd.style.display = 'none';
+    // 활동지수: 본인 1줄만 표시 (단일 모드도 노출)
+    if(rankEl) rankEl.style.display = '';
+    if(rankSecHd) rankSecHd.style.display = '';
+    // 펀널/미션 상세 섹션 통째로 숨김 (활동지수만 노출)
+    const detailHd = document.getElementById('ai-sec-detail');
+    const detailWrap = document.getElementById('ins-agent-wrap');
+    if(detailHd) detailHd.style.display = 'none';
+    if(detailWrap) detailWrap.style.display = 'none';
   } else {
     if(reportHd){ reportHd.style.display = 'none'; reportHd.innerHTML = ''; }
     if(battleEl) battleEl.style.display = '';
     if(bannerEl) bannerEl.style.display = '';
     if(rankEl) rankEl.style.display = '';
     if(rankSecHd) rankSecHd.style.display = '';
+    const detailHd = document.getElementById('ai-sec-detail');
+    const detailWrap = document.getElementById('ins-agent-wrap');
+    if(detailHd) detailHd.style.display = '';
+    if(detailWrap) detailWrap.style.display = '';
   }
   // 4. 기존 상세 분석 카드
   renderAgentCardsOnly();
