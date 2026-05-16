@@ -5896,7 +5896,7 @@ function rowToRecord(row,today){
   else if(statusB==='Scheduling Selesai (예약완료)')st='s';
   else if(statusB==='Menunggu Jadwal (일정대기)')st='w';
   else if(statusA==='Telepon (전화)'&&(statusB==='Video Call (비디오콜상담)'||statusB==='Visit Selesai (방문완료)'))st='vc';
-  else if(statusB.includes('Pembatalan')||statusB.includes('Rescheduling')||statusB.includes('Penolakan'))st='x';
+  else if(statusB.includes('Pembatalan')||statusB.includes('Rescheduling')||statusB.includes('Penolakan')||statusB.includes('Telepon salah')||statusB.includes('전화번호'))st='x';
   // 미래 날짜로 완료/랑숭/비디오 처리된 건은 실제로는 방문예약(s)로 재분류 (논리적 오류 방지)
   if((st==='d'||st==='ls'||st==='vc')&&visitDate&&visitDate>today)st='s';
   let s_f=0,s_o=0;
