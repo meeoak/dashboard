@@ -3421,7 +3421,13 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 .ins-col-item:last-child{border-bottom:none}
 .ins-col-detail{font-size:10.5px;color:#475569;font-weight:600;margin-top:2px}
 .ins-empty{font-size:11px;color:#94a3b8;font-style:italic;text-align:center;padding:6px}
-/* 📅 일정 월간 캘린더 그리드 */
+/* 📅 일정 월간 캘린더 그리드 — 방문예약 / 방문완료 각각 */
+.cal-section-h{display:flex;align-items:center;gap:8px;padding:7px 14px;font-weight:900;font-size:13px;letter-spacing:-.2px;border-radius:8px 8px 0 0;margin-bottom:0;border:1.5px solid;border-bottom:none}
+.cal-section-h.up{background:linear-gradient(135deg,#dbeafe,#eff6ff);color:#1e3a8a;border-color:#93c5fd}
+.cal-section-h.done{background:linear-gradient(135deg,#dcfce7,#f0fdf4);color:#14532d;border-color:#86efac}
+.cal-section-h .cal-section-cnt{margin-left:auto;background:rgba(255,255,255,.75);font-size:11.5px;padding:2px 9px;border-radius:6px;font-weight:900}
+.cal-section-h.up + .cal-month{border-top-left-radius:0;border-top-right-radius:0;border-top:none}
+.cal-section-h.done + .cal-month{border-top-left-radius:0;border-top-right-radius:0;border-top:none}
 .cal-month{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#cbd5e1;border:1.5px solid #cbd5e1;border-radius:10px;overflow:hidden}
 .cal-dow-cell{background:linear-gradient(180deg,#1e3a8a,#2563eb);color:#fff;padding:7px 0;text-align:center;font-weight:900;font-size:11px;letter-spacing:-.2px}
 .cal-day-cell{background:#fff;padding:5px 6px;min-height:74px;font-size:9px;position:relative;display:flex;flex-direction:column;gap:2px}
@@ -3499,23 +3505,26 @@ function _buildAgentReportSection(agent, rank, lang){
   // 📅 캘린더용 일정 수집 — curFrom 의 월을 캘린더 한 달 그리드로 표시
   const inRange = (vd)=> vd && vd >= curFrom && vd <= curTo;
   const calRecs = (D.cal_recs || []).filter(r => r.a === agent && inRange(r.vd));
-  // 일자별 그룹
-  const eventsByDay = {};
-  calRecs.forEach(r=>{
-    const day = parseInt(r.vd.slice(8,10),10);
-    if(!eventsByDay[day]) eventsByDay[day] = [];
-    eventsByDay[day].push(r);
-  });
+  // 방문예약(s/w) 과 방문완료(d/ls/vc) 두 그룹으로 분리
+  const upcomingRecs = calRecs.filter(r=>['s','w'].includes(r.st));
+  const completedRecs = calRecs.filter(r=>['d','ls','vc'].includes(r.st));
   // 월 정보 (curFrom 기준)
   const fromParts = curFrom.split('-').map(Number);
   const calYear = fromParts[0];
   const calMonth = fromParts[1] - 1; // 0-11
   const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
   const lastDate = new Date(calYear, calMonth+1, 0).getDate();
-  // 이벤트 클래스 매핑
   const evtClass = {s:'scheduled', d:'completed', vc:'video', ls:'langsung', w:'waiting'};
   const evtIcon  = {s:'📅', d:'✅', vc:'📹', ls:'⬜', w:'⏳'};
-  // 한 셀 안에 표시할 이벤트
+  const groupByDay = (recs)=>{
+    const map = {};
+    recs.forEach(r=>{
+      const day = parseInt(r.vd.slice(8,10),10);
+      if(!map[day]) map[day] = [];
+      map[day].push(r);
+    });
+    return map;
+  };
   const renderEventsInCell = (events)=>{
     const max = 3;
     let html = events.slice(0, max).map(e=>{
@@ -3530,34 +3539,37 @@ function _buildAgentReportSection(agent, rank, lang){
     }
     return html;
   };
-  // 그리드 빌드
-  let calCells = t.day_names.map(d=>`<div class="cal-dow-cell">${d}</div>`).join('');
-  for(let i=0;i<firstDay;i++) calCells += '<div class="cal-day-cell empty"></div>';
-  for(let day=1; day<=lastDate; day++){
-    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    const isToday = dateStr === D.today;
-    const dow = (firstDay + day - 1) % 7;
-    const dayCls = dow===0 ? 'sun' : dow===6 ? 'sat' : '';
-    const dayEvents = eventsByDay[day] || [];
-    calCells += `<div class="cal-day-cell${isToday?' today':''}">
-      <div class="cal-day-num ${dayCls}">${day}</div>
-      ${renderEventsInCell(dayEvents)}
-    </div>`;
-  }
-  // 마지막 행 채우기
-  const totalCells = firstDay + lastDate;
-  const remaining = (7 - (totalCells % 7)) % 7;
-  for(let i=0;i<remaining;i++) calCells += '<div class="cal-day-cell empty"></div>';
-  const calendarHtml = calRecs.length
-    ? `<div class="cal-month">${calCells}</div>
-       <div class="cal-legend">
-         <span><i style="background:#dbeafe;border-left:2px solid #2563eb">📅</i> ${esc(t.cal_upcoming)}</span>
-         <span><i style="background:#dcfce7;border-left:2px solid #16a34a">✅</i> ${esc(t.cal_completed)}</span>
-         <span><i style="background:#ede9fe;border-left:2px solid #7c3aed">📹</i> 비디오콜</span>
-         <span><i style="background:#f1f5f9;border-left:2px solid #475569">⬜</i> 랑숭</span>
-         <span><i style="background:#fef3c7;border-left:2px solid #d97706">⏳</i> 대기</span>
-       </div>`
+  const buildCalGrid = (eventsByDay)=>{
+    let cells = t.day_names.map(d=>`<div class="cal-dow-cell">${d}</div>`).join('');
+    for(let i=0;i<firstDay;i++) cells += '<div class="cal-day-cell empty"></div>';
+    for(let day=1; day<=lastDate; day++){
+      const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const isToday = dateStr === D.today;
+      const dow = (firstDay + day - 1) % 7;
+      const dayCls = dow===0 ? 'sun' : dow===6 ? 'sat' : '';
+      const dayEvents = eventsByDay[day] || [];
+      cells += `<div class="cal-day-cell${isToday?' today':''}">
+        <div class="cal-day-num ${dayCls}">${day}</div>
+        ${renderEventsInCell(dayEvents)}
+      </div>`;
+    }
+    const totalCells = firstDay + lastDate;
+    const remaining = (7 - (totalCells % 7)) % 7;
+    for(let i=0;i<remaining;i++) cells += '<div class="cal-day-cell empty"></div>';
+    return `<div class="cal-month">${cells}</div>`;
+  };
+  // 두 개의 캘린더 (방문예약 / 방문완료)
+  const upGrid = upcomingRecs.length
+    ? buildCalGrid(groupByDay(upcomingRecs))
+    : `<div class="cal-empty">${esc(t.cal_empty_up)}</div>`;
+  const doneGrid = completedRecs.length
+    ? buildCalGrid(groupByDay(completedRecs))
     : `<div class="cal-empty">${esc(t.cal_empty_done)}</div>`;
+  const calendarHtml = `
+    <div class="cal-section-h up">${esc(t.cal_upcoming)} <span class="cal-section-cnt">${upcomingRecs.length}</span></div>
+    ${upGrid}
+    <div class="cal-section-h done" style="margin-top:14px">${esc(t.cal_completed)} <span class="cal-section-cnt">${completedRecs.length}</span></div>
+    ${doneGrid}`;
 
   return `<div class="ag-rpt">
   <div class="ag-rpt-hd">
