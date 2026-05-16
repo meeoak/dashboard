@@ -4330,8 +4330,9 @@ function _buildAgentReportSection(agent, rank, lang){
 //    이후 버튼 한 번으로 시트에 일일 보고서 자동 누적
 // ═════════════════════════════════════════════════════════════
 const SHEET_WEBHOOK_KEY = 'dashboard.sheetWebhookUrl.v1';
+const SHEET_WEBHOOK_DEFAULT = 'https://script.google.com/macros/s/AKfycbxjNMdrf7-aJ8he3UWhRku_mTwDH00pE9pOiT2BOlH3zZTHYVQK4Gz-Ygr68cvLjdgBRQ/exec';
 function getSheetWebhookUrl(){
-  try { return localStorage.getItem(SHEET_WEBHOOK_KEY) || ''; } catch(e){ return ''; }
+  try { return localStorage.getItem(SHEET_WEBHOOK_KEY) || SHEET_WEBHOOK_DEFAULT; } catch(e){ return SHEET_WEBHOOK_DEFAULT; }
 }
 function setSheetWebhookUrl(url){
   try { localStorage.setItem(SHEET_WEBHOOK_KEY, url||''); } catch(e){}
