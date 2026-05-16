@@ -1827,7 +1827,18 @@ function buildCalAgentButtons(){
   const isAll = curTeam==='ALL';
   const agents = isAll ? [] : (D.team_members[curTeam]||[]);
   const tcol = isAll ? '#1e293b' : (TC[curTeam] || '#888');
-  let html = `<button class="cal-at-btn ${curAgent==='ALL'?'on':''}" data-agent="ALL" onclick="setCalAgentQuick('ALL')">👥 전체 에이전트</button>`;
+  // 전체 에이전트 + 팀 단추 3개
+  let html = `<button class="cal-at-btn ${curAgent==='ALL' && isAll ?'on':''}" data-agent="ALL" onclick="setCalAgentQuick('ALL')">👥 전체 에이전트</button>`;
+  ['TIM_GIAR','TIM_TINA','TIM_LIDIA'].forEach(t=>{
+    const isOn = curTeam === t;
+    const c = TC[t];
+    const onStyle = isOn ? `background:${c};border-color:${c};color:#fff` : '';
+    const name = teamShortName(t);
+    html += `<button class="cal-at-btn cal-team-btn ${isOn?'on':''}" style="${onStyle}" onclick="selectScope('${t}')">
+      <span class="cal-at-dot" style="background:${c}"></span>${name}
+    </button>`;
+  });
+  // 팀의 에이전트 단추
   agents.forEach(a=>{
     const meta = D.agent_meta[a]||{};
     const short = meta.short || a;
