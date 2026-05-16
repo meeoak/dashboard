@@ -2165,15 +2165,27 @@ function buildCalAgentButtons(){
   });
   teamWrap.innerHTML = teamHtml;
   // ── 하단: 팀의 에이전트 단추 (팀 미선택 시 빈 영역) ──
-  // 인사이트 탭에서는 긴급 관리 대상이 0건인 에이전트는 단추 숨김
-  // (단, 현재 선택된 에이전트는 항상 표시해야 해제 가능)
+  // 인사이트 탭: 긴급 0건 에이전트 숨김 (today 기준)
+  // 그 외 탭: 현재 기간(curFrom~curTo)에 배정/방문 활동 있는 에이전트만 표시
+  // 현재 선택된 에이전트는 활동 없어도 항상 표시 (해제 가능)
   const isInsightTab = curTab === 'team_insight' || curTab === 'agent_insight';
   const todayStr = D.today;
+  const activeInPeriod = new Set();
+  (D.records||[]).forEach(r=>{
+    if(!r.a) return;
+    if((r.ad && r.ad >= curFrom && r.ad <= curTo) || (r.vd && r.vd >= curFrom && r.vd <= curTo)){
+      activeInPeriod.add(r.a);
+    }
+  });
   let agentHtml = '';
   agents.forEach(a=>{
-    if(isInsightTab && curAgent !== a){
-      const urgent = findUrgentForAgent(a, todayStr);
-      if(urgent.length === 0) return;
+    if(curAgent !== a){
+      if(isInsightTab){
+        const urgent = findUrgentForAgent(a, todayStr);
+        if(urgent.length === 0) return;
+      } else if(!activeInPeriod.has(a)){
+        return;
+      }
     }
     const meta = D.agent_meta[a]||{};
     const short = meta.short || a;
