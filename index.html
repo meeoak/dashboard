@@ -3302,40 +3302,46 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 .ag-rpt-body{padding:18px 22px}
 .ag-rpt-section{margin-bottom:18px;page-break-inside:avoid}
 .ag-rpt-section:last-child{margin-bottom:0}
-.ag-rpt-h{font-size:14px;font-weight:900;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #cbd5e1;color:#0f172a;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
-/* 펀널 */
-.ag-funnel{display:flex;align-items:center;gap:4px;background:linear-gradient(180deg,#f1f5f9,#fff);border-radius:10px;padding:14px;border:1.5px solid #cbd5e1}
-.f-stage{flex:1;text-align:center}
-.f-num{font-size:24px;font-weight:900;line-height:1;letter-spacing:-.5px}
-.f-lbl{font-size:11px;font-weight:700;color:#475569;margin-top:4px}
-.f-arrow{flex:0 0 80px;text-align:center}
-.f-rate{display:inline-block;padding:5px 9px;border-radius:7px;font-size:12px;font-weight:900;color:#fff}
-.f-rate.good{background:#16a34a}
-.f-rate.bad{background:#dc2626}
-.f-rate small{display:block;font-size:9px;opacity:.92;font-weight:700;margin-top:2px}
-/* 보조 펀널: 방문예정 / 일정대기 / 확인필요 */
-.ag-sub-funnel{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:6px}
-.ag-sf-stage{background:linear-gradient(135deg,#f8fafc,#fff);border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:11px}
-.ag-sf-stage.urgent{border-color:#fca5a5;background:linear-gradient(135deg,#fef2f2,#fff)}
-.ag-sf-num{font-size:26px;font-weight:900;line-height:1;letter-spacing:-.8px;flex-shrink:0;min-width:38px;text-align:center}
-.ag-sf-lbl{font-size:12px;font-weight:900;color:#0f172a;letter-spacing:-.2px;line-height:1.2}
-.ag-sf-sub{font-size:10px;font-weight:700;color:#64748b;margin-top:2px}
-/* 🎯 목표 대비 실적 KPI 카드 (강조) */
-.ag-kpi-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.ag-kpi-card{border:2.5px solid;border-radius:12px;padding:14px 12px;text-align:center;position:relative}
+.ag-rpt-h{font-size:15px;font-weight:900;margin-bottom:12px;padding-bottom:7px;border-bottom:2.5px solid #1e3a8a;color:#0f172a;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+/* 펀널 — 크게 보이도록 */
+.ag-funnel{display:flex;align-items:center;gap:4px;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:12px;padding:18px 14px;border:2px solid #93c5fd;box-shadow:0 1px 4px rgba(30,58,138,.08)}
+.f-stage{flex:1;text-align:center;padding:6px 4px}
+.f-num{font-size:36px;font-weight:900;line-height:1;letter-spacing:-1.2px;margin-bottom:6px}
+.f-lbl{font-size:13px;font-weight:900;color:#1e293b;margin-top:2px;letter-spacing:-.2px}
+.f-arrow{flex:0 0 88px;text-align:center;position:relative}
+.f-arrow::before{content:'→';position:absolute;top:50%;left:50%;transform:translate(-50%,-130%);font-size:24px;color:#cbd5e1;font-weight:900}
+.f-rate{display:inline-flex;flex-direction:column;align-items:center;padding:8px 12px;border-radius:14px;font-size:16px;font-weight:900;color:#fff;line-height:1;letter-spacing:-.3px;border:2px solid;position:relative;z-index:1;min-width:74px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.f-rate.good{background:linear-gradient(135deg,#16a34a,#22c55e);border-color:#15803d}
+.f-rate.bad{background:linear-gradient(135deg,#dc2626,#ef4444);border-color:#b91c1c}
+.f-rate small{display:block;font-size:10px;opacity:.95;font-weight:800;margin-top:3px}
+/* 보조 펀널: 방문예정(파랑) / 일정대기(노랑) / 확인필요(빨강) - 색상 코딩 + 큰 숫자 */
+.ag-sub-funnel{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:6px}
+.ag-sf-stage{border:2px solid;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ag-sf-stage.up{border-color:#3b82f6;background:linear-gradient(135deg,#dbeafe,#eff6ff)}
+.ag-sf-stage.wait{border-color:#fbbf24;background:linear-gradient(135deg,#fef3c7,#fffbeb)}
+.ag-sf-stage.urgent{border-color:#dc2626;background:linear-gradient(135deg,#fee2e2,#fef2f2)}
+.ag-sf-num{font-size:38px;font-weight:900;line-height:1;letter-spacing:-1.5px;flex-shrink:0;min-width:50px;text-align:center}
+.ag-sf-stage.up .ag-sf-num{color:#1e3a8a}
+.ag-sf-stage.wait .ag-sf-num{color:#854d0e}
+.ag-sf-stage.urgent .ag-sf-num{color:#7f1d1d}
+.ag-sf-lbl{font-size:14px;font-weight:900;color:#0f172a;letter-spacing:-.3px;line-height:1.2}
+.ag-sf-sub{font-size:11px;font-weight:700;color:#475569;margin-top:3px}
+/* 🎯 목표 대비 실적 KPI 카드 (더 크게) */
+.ag-kpi-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:6px}
+.ag-kpi-card{border:3px solid;border-radius:14px;padding:18px 14px 16px;text-align:center;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .ag-kpi-card.good{border-color:#16a34a;background:linear-gradient(135deg,#dcfce7,#f0fdf4)}
 .ag-kpi-card.bad{border-color:#dc2626;background:linear-gradient(135deg,#fee2e2,#fef2f2)}
-.ag-kpi-card.final{box-shadow:0 0 0 3px rgba(252,211,77,.35)}
-.ag-kpi-card.final::before{content:'⭐ 최종 KPI';position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#fbbf24;color:#7c2d12;font-size:9.5px;font-weight:900;padding:2px 9px;border-radius:6px;letter-spacing:-.2px}
-.ag-kpi-emo{font-size:24px;line-height:1;margin-bottom:5px}
-.ag-kpi-lbl{font-size:11.5px;font-weight:900;color:#1e293b;margin-bottom:6px;letter-spacing:-.2px}
-.ag-kpi-val{font-size:30px;font-weight:900;line-height:1;letter-spacing:-1px;margin-bottom:4px}
+.ag-kpi-card.final{box-shadow:0 0 0 4px rgba(252,211,77,.45),0 3px 10px rgba(0,0,0,.08)}
+.ag-kpi-card.final::before{content:'⭐ 최종 KPI';position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#7c2d12;font-size:10.5px;font-weight:900;padding:3px 12px;border-radius:8px;letter-spacing:-.2px;box-shadow:0 2px 4px rgba(0,0,0,.12)}
+.ag-kpi-emo{font-size:28px;line-height:1;margin-bottom:6px}
+.ag-kpi-lbl{font-size:13px;font-weight:900;color:#0f172a;margin-bottom:8px;letter-spacing:-.2px}
+.ag-kpi-val{font-size:42px;font-weight:900;line-height:1;letter-spacing:-1.5px;margin-bottom:6px}
 .ag-kpi-card.good .ag-kpi-val{color:#14532d}
 .ag-kpi-card.bad .ag-kpi-val{color:#7f1d1d}
-.ag-kpi-tgt{font-size:10.5px;color:#64748b;font-weight:700;margin-bottom:6px}
-.ag-kpi-diff{font-size:12px;font-weight:900;padding:4px 11px;border-radius:7px;display:inline-block;color:#fff;letter-spacing:-.2px}
-.ag-kpi-card.good .ag-kpi-diff{background:#16a34a}
-.ag-kpi-card.bad .ag-kpi-diff{background:#dc2626}
+.ag-kpi-tgt{font-size:11.5px;color:#475569;font-weight:800;margin-bottom:8px;letter-spacing:-.1px}
+.ag-kpi-diff{font-size:13px;font-weight:900;padding:5px 13px;border-radius:8px;display:inline-block;color:#fff;letter-spacing:-.2px;box-shadow:0 2px 4px rgba(0,0,0,.12)}
+.ag-kpi-card.good .ag-kpi-diff{background:linear-gradient(135deg,#16a34a,#22c55e)}
+.ag-kpi-card.bad .ag-kpi-diff{background:linear-gradient(135deg,#dc2626,#ef4444)}
 /* 긴급 관리 */
 .urg-tbl{width:100%;border-collapse:collapse;font-size:11px;border:1.5px solid #fca5a5;border-radius:8px;overflow:hidden}
 .urg-tbl th{background:#fef2f2;padding:7px 9px;text-align:left;font-size:10.5px;font-weight:800;color:#7f1d1d;border-bottom:1.5px solid #fca5a5;white-space:nowrap}
@@ -3383,7 +3389,7 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 @media print{
   .rpt-print-btn{display:none}
   body{padding:0;background:#fff;font-size:10.5px}
-  .ag-rpt,.ag-rpt-hd,.f-rate,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip,.ag-kpi-card.good,.ag-kpi-card.bad,.ag-kpi-diff,.ag-kpi-card.final::before,.cal-block-h.cal-up,.cal-block-h.cal-done,.cal-cl-pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ag-rpt,.ag-rpt-hd,.ag-funnel,.f-rate,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip,.ag-kpi-card.good,.ag-kpi-card.bad,.ag-kpi-card.final,.ag-kpi-diff,.ag-kpi-card.final::before,.ag-sf-stage.up,.ag-sf-stage.wait,.ag-sf-stage.urgent,.cal-block-h.cal-up,.cal-block-h.cal-done,.cal-cl-pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 `;
 }
@@ -3484,18 +3490,18 @@ function _buildAgentReportSection(agent, rank, lang){
         <div class="f-arrow"><div class="f-rate ${r_vc_ok?'good':'bad'}">${r_vc}%<small>${esc(t.rate_vc)}</small></div></div>
         <div class="f-stage"><div class="f-num" style="color:#dc2626">${cl}</div><div class="f-lbl">${esc(t.stage_close)}</div></div>
       </div>
-      <!-- 보조 펀널: 방문예정 / 일정대기 / 확인필요 -->
-      <div class="ag-sub-funnel" style="margin-top:10px">
-        <div class="ag-sf-stage">
-          <div class="ag-sf-num" style="color:#2563eb">${x.s_f||0}</div>
+      <!-- 보조 펀널: 방문예정(파랑) / 일정대기(노랑) / 확인필요(빨강) -->
+      <div class="ag-sub-funnel" style="margin-top:12px">
+        <div class="ag-sf-stage up">
+          <div class="ag-sf-num">${x.s_f||0}</div>
           <div><div class="ag-sf-lbl">${esc(t.sub_upcoming_lbl)}</div><div class="ag-sf-sub">${esc(t.sub_upcoming_hint)}</div></div>
         </div>
-        <div class="ag-sf-stage">
-          <div class="ag-sf-num" style="color:#d97706">${x.w||0}</div>
+        <div class="ag-sf-stage wait">
+          <div class="ag-sf-num">${x.w||0}</div>
           <div><div class="ag-sf-lbl">${esc(t.sub_wait_lbl)}</div><div class="ag-sf-sub">${esc(t.sub_wait_hint)}</div></div>
         </div>
         ${x.s_o>0?`<div class="ag-sf-stage urgent">
-          <div class="ag-sf-num" style="color:#dc2626">${x.s_o}</div>
+          <div class="ag-sf-num">${x.s_o}</div>
           <div><div class="ag-sf-lbl">${esc(t.sub_overdue_lbl)}</div><div class="ag-sf-sub">${esc(t.sub_overdue_hint)}</div></div>
         </div>`:''}
       </div>
