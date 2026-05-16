@@ -1438,7 +1438,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats">에이전트 현황</button>
   <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank">에이전트 활동지수</button>
   <button class="quick-nav-btn" onclick="jumpToTab('team_insight')" data-qnav="team_insight">긴급관리</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight">에이전트 인사이트</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight">에이전트별 토탈관리</button>
 </div></div>
 
 <!-- 3개월 트렌드는 KPI 카드 안에 sparkbars로 통합됨 (별도 섹션 제거) -->
@@ -1521,7 +1521,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <button class="tab"     id="tab-stats"   onclick="switchTab('stats')"   data-t="tab_stats">에이전트 현황</button>
   <button class="tab"     id="tab-rank"    onclick="switchTab('rank')"    data-t="tab_rank">에이전트 활동지수</button>
   <button class="tab"     id="tab-team_insight"  onclick="switchTab('team_insight')">긴급관리</button>
-  <button class="tab"     id="tab-agent_insight" onclick="switchTab('agent_insight')">에이전트 인사이트</button>
+  <button class="tab"     id="tab-agent_insight" onclick="switchTab('agent_insight')">에이전트별 토탈관리</button>
 </div></div>
 
 <div class="tab-content">
@@ -1596,11 +1596,36 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     </div>
     <div class="ins-team-grid" id="ins-team-grid"></div>
   </div>
-  <!-- 👤 에이전트 인사이트 (에이전트 배포용) -->
+  <!-- 👤 에이전트별 토탈관리 (대시보드 + 활동지수 + 긴급관리 + 상세분석) -->
   <div id="content-agent_insight" style="display:none">
-    <div class="sec-hd" style="background:linear-gradient(180deg,#fef3c7 0%,#fff 100%)">
+    <!-- 섹션 1: 📊 DB 배정 분석 (선택 에이전트) -->
+    <div class="sec-hd" style="background:linear-gradient(180deg,#eff6ff 0%,#fff 100%)">
+      <div><div class="sec-title">📊 DB 배정 분석</div>
+      <div class="sec-sub">선택한 에이전트의 DB 종류 · 활동 상태 분포</div></div>
+    </div>
+    <div class="db-grid" id="ai-db-grid"></div>
+
+    <!-- 섹션 2: 🏆 활동지수 -->
+    <div class="sec-hd" style="background:linear-gradient(180deg,#fefce8 0%,#fff 100%);margin-top:14px">
+      <div><div class="sec-title">🏆 활동지수</div>
+      <div class="sec-sub">팀 배틀 + 에이전트 랭킹 · 한달 KPI 목표 100점 · 📍 오늘 기준 페이스</div></div>
+      <div id="ai-rank-lbl" style="font-size:11px;color:#bbb"></div>
+    </div>
+    <div class="battle-wrap" id="ai-battle-wrap"></div>
+    <div class="rank-wrap" id="ai-rank-wrap"></div>
+
+    <!-- 섹션 3: 🚨 긴급 회원 관리 -->
+    <div class="sec-hd" style="background:linear-gradient(180deg,#fef2f2 0%,#fff 100%);margin-top:14px">
+      <div><div class="sec-title">🚨 긴급 회원 관리</div>
+      <div class="sec-sub">배정 후 2주 이내 · 즉시 액션 필요</div></div>
+    </div>
+    <div id="ai-urgent-banner"></div>
+    <div class="r3d-grid" id="ai-urgent-grid"></div>
+
+    <!-- 섹션 4: 👤 에이전트별 상세 분석 (기존) -->
+    <div class="sec-hd" style="background:linear-gradient(180deg,#fef3c7 0%,#fff 100%);margin-top:14px">
       <div><div class="sec-title">👤 에이전트별 상세 분석</div>
-      <div class="sec-sub">에이전트 배포용 · 📊 펀널 + ✅ 강점 + ⚠️ 약점/병목 + 💡 코칭 액션 (활동 있는 에이전트만)</div></div>
+      <div class="sec-sub">🎯 미션 + 📊 펀널 + ✅ 강점 + ⚠️ 약점 + 💡 코칭 액션 + 📄 보고서 출력</div></div>
       <div style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap">
         <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
         <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('ko')" title="전체 에이전트 한국어 일괄 PDF" style="padding:8px 14px;font-size:12px">📄 전체 · KR</button>
@@ -2201,7 +2226,9 @@ function buildCalAgentButtons(){
   // 인사이트 탭: 긴급 0건 에이전트 숨김 (today 기준)
   // 그 외 탭: 현재 기간(curFrom~curTo)에 배정/방문 활동 있는 에이전트만 표시
   // 현재 선택된 에이전트는 활동 없어도 항상 표시 (해제 가능)
-  const isInsightTab = curTab === 'team_insight' || curTab === 'agent_insight';
+  // 긴급관리 탭만 'urgent>0' 필터 사용 (오늘 기준)
+  // 에이전트별 토탈관리는 기간 내 활동 있는 에이전트 모두 표시
+  const isInsightTab = curTab === 'team_insight';
   const todayStr = D.today;
   const activeInPeriod = new Set();
   (D.records||[]).forEach(r=>{
@@ -5417,6 +5444,24 @@ function openRecent7DMember(tr){
 
 // 에이전트 인사이트 탭 — 에이전트별 상세 카드만
 function renderAgentInsightOnly(){
+  // 1. 각 섹션을 원본 위치에 렌더 (다른 탭에 있는 DOM이지만 innerHTML 설정 가능)
+  renderDBSummary();
+  renderRank();
+  renderUrgentBanner();
+  renderRecent7DaysByTeam();
+  // 2. ai-* 컨테이너로 HTML 복사
+  const copyHtml = (from, to)=>{
+    const f = document.getElementById(from);
+    const t = document.getElementById(to);
+    if(f && t) t.innerHTML = f.innerHTML;
+  };
+  copyHtml('db-grid',          'ai-db-grid');
+  copyHtml('battle-wrap',      'ai-battle-wrap');
+  copyHtml('rank-wrap',        'ai-rank-wrap');
+  copyHtml('urgent-banner',    'ai-urgent-banner');
+  copyHtml('ins-recent-3d-grid','ai-urgent-grid');
+  copyHtml('rank-lbl',         'ai-rank-lbl');
+  // 3. 기존 상세 분석 카드
   renderAgentCardsOnly();
 }
 // 하위호환: 기존 호출 (renderInsight 등에서 사용)
