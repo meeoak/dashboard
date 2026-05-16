@@ -1654,13 +1654,20 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     </div>
     <div class="ins-agent-wrap" id="ins-agent-wrap"></div>
 
-    <!-- 섹션 4: 🚨 긴급 회원 관리 (맨 아래로) -->
+    <!-- 섹션 4: 🚨 긴급 회원 관리 -->
     <div class="sec-hd" style="background:linear-gradient(180deg,#fef2f2 0%,#fff 100%);margin-top:14px">
       <div><div class="sec-title">🚨 긴급 회원 관리</div>
       <div class="sec-sub">배정 후 2주 이내 · 즉시 액션 필요</div></div>
     </div>
     <div id="ai-urgent-banner"></div>
     <div class="r3d-grid" id="ai-urgent-grid"></div>
+
+    <!-- 섹션 5: 📅 방문 캘린더 (맨 아래) -->
+    <div class="sec-hd" style="background:linear-gradient(180deg,#f0fdf4 0%,#fff 100%);margin-top:14px">
+      <div><div class="sec-title">📅 방문 캘린더</div>
+      <div class="sec-sub">기간 내 일별 방문 일정 (예약/완료/비디오/랑숭)</div></div>
+    </div>
+    <div class="cal-wrap" id="ai-cal-wrap"></div>
   </div>
 </div>
 </div><!-- /page-main -->
@@ -5480,6 +5487,7 @@ function renderAgentInsightOnly(){
   renderRank();
   renderUrgentBanner();
   renderRecent7DaysByTeam();
+  renderCal();
   // 2. ai-* 컨테이너로 HTML 복사
   const copyHtml = (from, to)=>{
     const f = document.getElementById(from);
@@ -5492,6 +5500,10 @@ function renderAgentInsightOnly(){
   copyHtml('urgent-banner',    'ai-urgent-banner');
   copyHtml('ins-recent-3d-grid','ai-urgent-grid');
   copyHtml('rank-lbl',         'ai-rank-lbl');
+  // 캘린더는 content-cal의 .cal-wrap 전체 복사
+  const calSrc = document.querySelector('#content-cal .cal-wrap');
+  const calDst = document.getElementById('ai-cal-wrap');
+  if(calSrc && calDst) calDst.innerHTML = calSrc.innerHTML;
   // 3. 단일 에이전트 선택 시: 보고서 헤더 + 중복 섹션 숨김
   const singleAgent = curAgent !== 'ALL';
   const reportHd = document.getElementById('ai-report-header');
