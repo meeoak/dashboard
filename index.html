@@ -1054,6 +1054,30 @@ body.focus-mode #detail-section-hd{display:none!important}
 .ins-ag-detail:hover{border-color:#cbd5e1;box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px)}
 .ins-ag-d-head{display:flex;align-items:center;gap:18px;padding-bottom:18px;border-bottom:2px dashed #e2e8f0;margin-bottom:18px}
 /* 🎯 에이전트 미션 카드 — 명확한 목표 표시 */
+/* 📑 단일 에이전트 보고서 헤더 */
+.ai-rpt-hd{background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 50%,#3b82f6 100%);color:#fff;padding:22px 26px;border-radius:14px;margin-bottom:18px;box-shadow:0 4px 16px rgba(30,58,138,.25);position:relative;overflow:hidden}
+.ai-rpt-hd::before{content:'';position:absolute;top:-40%;right:-20%;width:300px;height:300px;background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 60%);pointer-events:none}
+.ai-rpt-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap;position:relative}
+.ai-rpt-title{font-size:24px;font-weight:900;letter-spacing:-.5px;margin:0;line-height:1.2;color:#fff}
+.ai-rpt-name{color:#fde68a}
+.ai-rpt-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ai-rpt-btn{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-size:12.5px;font-weight:800;padding:7px 14px;border-radius:8px;cursor:pointer;letter-spacing:-.2px;transition:all .12s;white-space:nowrap}
+.ai-rpt-btn:hover{background:rgba(255,255,255,.25);transform:translateY(-1px)}
+.ai-rpt-btn-print{background:#fbbf24;color:#0f172a;border-color:#fbbf24}
+.ai-rpt-btn-print:hover{background:#facc15;border-color:#facc15}
+.ai-rpt-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:relative;font-size:12.5px;font-weight:700}
+.ai-rpt-meta span{background:rgba(255,255,255,.15);padding:5px 11px;border-radius:7px;letter-spacing:-.2px}
+.ai-rpt-meta .ai-rpt-team{background:#fff;color:#0f172a;font-weight:900}
+@media(max-width:640px){
+  .ai-rpt-hd{padding:16px 18px}
+  .ai-rpt-title{font-size:18px}
+  .ai-rpt-meta{font-size:11px}
+}
+@media print{
+  .ai-rpt-btn{display:none}
+  .ai-rpt-hd{background:#1e3a8a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
 .ag-mission{background:linear-gradient(135deg,#fef3c7 0%,#fffbeb 50%,#fff 100%);border:2px solid #fbbf24;border-radius:14px;padding:14px 16px;margin-bottom:18px;box-shadow:0 2px 8px rgba(251,191,36,.18)}
 .ag-mission-hd{font-size:13px;font-weight:900;color:#854d0e;margin-bottom:10px;letter-spacing:-.3px;display:flex;align-items:center;gap:6px}
 .ag-mission-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -1598,17 +1622,19 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   </div>
   <!-- 👤 에이전트별 토탈관리 (대시보드 + 활동지수 + 긴급관리 + 상세분석) -->
   <div id="content-agent_insight" style="display:none">
+    <!-- 📑 보고서 헤더 (단일 에이전트 선택 시만 표시) -->
+    <div id="ai-report-header" style="display:none"></div>
     <!-- 섹션 1: 📊 DB 배정 분석 (선택 에이전트) -->
-    <div class="sec-hd" style="background:linear-gradient(180deg,#eff6ff 0%,#fff 100%)">
+    <div class="sec-hd" id="ai-sec-db" style="background:linear-gradient(180deg,#eff6ff 0%,#fff 100%)">
       <div><div class="sec-title">📊 DB 배정 분석</div>
       <div class="sec-sub">선택한 에이전트의 DB 종류 · 활동 상태 분포</div></div>
     </div>
     <div class="db-grid" id="ai-db-grid"></div>
 
     <!-- 섹션 2: 🏆 활동지수 -->
-    <div class="sec-hd" style="background:linear-gradient(180deg,#fefce8 0%,#fff 100%);margin-top:14px">
+    <div class="sec-hd" id="ai-sec-rank" style="background:linear-gradient(180deg,#fefce8 0%,#fff 100%);margin-top:14px">
       <div><div class="sec-title">🏆 활동지수</div>
-      <div class="sec-sub">팀 배틀 + 에이전트 랭킹 · 한달 KPI 목표 100점 · 📍 오늘 기준 페이스</div></div>
+      <div class="sec-sub">한달 KPI 목표 100점 · 📍 오늘 기준 페이스</div></div>
       <div id="ai-rank-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="battle-wrap" id="ai-battle-wrap"></div>
@@ -1623,10 +1649,10 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     <div class="r3d-grid" id="ai-urgent-grid"></div>
 
     <!-- 섹션 4: 👤 에이전트별 상세 분석 (기존) -->
-    <div class="sec-hd" style="background:linear-gradient(180deg,#fef3c7 0%,#fff 100%);margin-top:14px">
-      <div><div class="sec-title">👤 에이전트별 상세 분석</div>
-      <div class="sec-sub">🎯 미션 + 📊 펀널 + ✅ 강점 + ⚠️ 약점 + 💡 코칭 액션 + 📄 보고서 출력</div></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap">
+    <div class="sec-hd" id="ai-sec-detail" style="background:linear-gradient(180deg,#fef3c7 0%,#fff 100%);margin-top:14px">
+      <div><div class="sec-title">📊 펀널 분석 + 🎯 목표</div>
+      <div class="sec-sub">미션 카드 + 펀널 + 보조지표</div></div>
+      <div id="ai-sec-detail-actions" style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap">
         <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
         <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('ko')" title="전체 에이전트 한국어 일괄 PDF" style="padding:8px 14px;font-size:12px">📄 전체 · KR</button>
         <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('id')" title="Semua agen Laporan Bahasa PDF" style="padding:8px 14px;font-size:12px">📄 전체 · ID</button>
@@ -5464,12 +5490,55 @@ function renderAgentInsightOnly(){
   copyHtml('urgent-banner',    'ai-urgent-banner');
   copyHtml('ins-recent-3d-grid','ai-urgent-grid');
   copyHtml('rank-lbl',         'ai-rank-lbl');
-  // 3. 단일 에이전트 선택 시: 중복 섹션 숨김 (팀 배틀 + 메인 긴급 배너)
+  // 3. 단일 에이전트 선택 시: 보고서 헤더 + 중복 섹션 숨김
   const singleAgent = curAgent !== 'ALL';
-  const battleEl  = document.getElementById('ai-battle-wrap');
-  const bannerEl  = document.getElementById('ai-urgent-banner');
-  if(battleEl) battleEl.style.display = singleAgent ? 'none' : '';
-  if(bannerEl) bannerEl.style.display = singleAgent ? 'none' : '';
+  const reportHd = document.getElementById('ai-report-header');
+  const battleEl = document.getElementById('ai-battle-wrap');
+  const bannerEl = document.getElementById('ai-urgent-banner');
+  const rankEl   = document.getElementById('ai-rank-wrap');
+  const rankSecHd= document.getElementById('ai-sec-rank');
+  const detailActions = document.getElementById('ai-sec-detail-actions');
+  if(detailActions) detailActions.style.display = singleAgent ? 'none' : '';
+  if(singleAgent){
+    // 보고서 헤더 렌더
+    const meta = D.agent_meta[curAgent] || {};
+    const tcol = TC[meta.team] || '#888';
+    const teamLbl = teamShortName(meta.team || '');
+    const stats = statsRange(curFrom, curTo, null, curAgent);
+    const idx = calcActivityIndex(stats);
+    const dbCount = stats.db || 0;
+    if(reportHd){
+      const safeName = (meta.short || curAgent || '').replace(/[<>"']/g, c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      reportHd.style.display = '';
+      reportHd.innerHTML = `<div class="ai-rpt-hd">
+        <div class="ai-rpt-title-row">
+          <h1 class="ai-rpt-title">📑 <span class="ai-rpt-name">${safeName}</span>의 회원관리 보고서</h1>
+          <div class="ai-rpt-actions">
+            <button class="ai-rpt-btn" onclick="openAgentReport('${curAgent}','ko')" title="한국어 PDF">📄 KR 보고서</button>
+            <button class="ai-rpt-btn" onclick="openAgentReport('${curAgent}','id')" title="Bahasa PDF">📄 ID 보고서</button>
+            <button class="ai-rpt-btn ai-rpt-btn-print" onclick="window.print()" title="인쇄">🖨️ 인쇄</button>
+          </div>
+        </div>
+        <div class="ai-rpt-meta">
+          <span class="ai-rpt-team" style="background:${tcol}">${teamLbl}</span>
+          <span class="ai-rpt-period">📅 ${curFrom} ~ ${curTo}</span>
+          <span class="ai-rpt-db">📋 DB ${dbCount}건</span>
+          <span class="ai-rpt-idx">🏆 활동지수 ${idx}/100</span>
+        </div>
+      </div>`;
+    }
+    if(battleEl) battleEl.style.display = 'none';
+    if(bannerEl) bannerEl.style.display = 'none';
+    // 활동지수 섹션 자체 숨김 (랭킹 1줄 의미 없음 — 미션 카드가 대체)
+    if(rankEl) rankEl.style.display = 'none';
+    if(rankSecHd) rankSecHd.style.display = 'none';
+  } else {
+    if(reportHd){ reportHd.style.display = 'none'; reportHd.innerHTML = ''; }
+    if(battleEl) battleEl.style.display = '';
+    if(bannerEl) bannerEl.style.display = '';
+    if(rankEl) rankEl.style.display = '';
+    if(rankSecHd) rankSecHd.style.display = '';
+  }
   // 4. 기존 상세 분석 카드
   renderAgentCardsOnly();
 }
@@ -5595,8 +5664,9 @@ function renderAgentCardsOnly(){
     const r_sv_ok = (x.r_sv||0) >= TARGETS.sv;
     const r_vc_ok = (x.r_vc||0) >= TARGETS.vc;
 
+    const singleAgentView = curAgent !== 'ALL';
     agHtml += `<div class="ins-ag-detail" data-agent="${x.a}">
-      <div class="ins-ag-d-head">
+      ${singleAgentView ? '' : `<div class="ins-ag-d-head">
         <div class="ins-ag-d-rank">${rankIcon}</div>
         <div class="ins-ag-d-info">
           <div class="ins-ag-d-name">${x.meta.short||x.a}</div>
@@ -5611,7 +5681,7 @@ function renderAgentCardsOnly(){
           <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}','id')" title="Laporan Harian PDF (Bahasa)">📄 ID</button>
           <button class="ins-ag-d-btn" onclick="openMem('${x.a}','db')" title="회원 목록 보기">📋 회원 목록</button>
         </div>
-      </div>
+      </div>`}
 
       ${(()=>{
         // 🎯 이번 달 미션 — 명확한 목표 + 현재 진행도
