@@ -1772,9 +1772,9 @@ function renderGaps(){
       const hasActivity = (agSt.db||0)>0 || (agSt.cl||0)>0 || (agSt.vc||0)>0 || (agSt.visit||0)>0 || (agSt.sched||0)>0;
       if(hasActivity) activeAgents.push({agent, st: agSt});
     });
-    // 에이전트 목록 — 기본은 펼침. 사용자가 접으면 그 상태가 유지됨.
+    // 에이전트 목록 — 기본은 접힘 (▶ 펼치기). 사용자가 펼치면 그 상태가 유지됨.
     window.__gapAgentsCollapsed = window.__gapAgentsCollapsed || {};
-    if(window.__gapAgentsCollapsed[team] === undefined) window.__gapAgentsCollapsed[team] = false;
+    if(window.__gapAgentsCollapsed[team] === undefined) window.__gapAgentsCollapsed[team] = true;
     const isCollapsedNow = !!window.__gapAgentsCollapsed[team];
     const agentToggleHtml = activeAgents.length
       ? `<button class="team-chevron-btn gap-agent-toggle" data-team="${team}" data-count="${activeAgents.length}" onclick="event.stopPropagation();toggleGapAgents('${team}')" title="${isCollapsedNow?'펼치기':'접기'}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 10px;font-size:14px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s">${isCollapsedNow?'▶ 펼치기':'▼ 접기'} · ${activeAgents.length}명</button>`
@@ -2300,10 +2300,10 @@ function kpiTblClickAgent(event, stype, agent){
 }
 
 // 팀별 펼치기/접기 상태
-// 팀별 영업 활동 종합 테이블 — 기본은 펼침 (사용자가 접으면 그 상태 유지)
+// 팀별 영업 활동 종합 테이블 — 기본은 접힘 (▶ 펼치기). 사용자가 펼치면 그 상태 유지.
 window.__teamCollapsed = window.__teamCollapsed || {};
 ['TIM_GIAR','TIM_TINA','TIM_LIDIA'].forEach(t=>{
-  if(window.__teamCollapsed[t] === undefined) window.__teamCollapsed[t] = false;
+  if(window.__teamCollapsed[t] === undefined) window.__teamCollapsed[t] = true;
 });
 
 function toggleTeamRows(team){
