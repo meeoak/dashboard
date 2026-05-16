@@ -144,6 +144,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .quick-nav-btn{background:#fff;border:1.5px solid #fcd34d;color:#854d0e;font-size:12.5px;font-weight:900;padding:7px 14px;border-radius:9px;cursor:pointer;transition:all .15s;letter-spacing:-.3px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
 .quick-nav-btn:hover{background:#fef3c7;border-color:#d97706;color:#713f12;transform:translateY(-1px);box-shadow:0 3px 8px rgba(217,119,6,.2)}
 .quick-nav-btn.on{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-color:#1e3a8a;box-shadow:0 2px 8px rgba(30,58,138,.3)}
+.quick-nav-back{margin-left:auto;background:#1e3a8a;color:#fff;border:1.5px solid #1e3a8a;font-size:12px;font-weight:900;padding:7px 14px;border-radius:9px;cursor:pointer;transition:all .15s;letter-spacing:-.3px;white-space:nowrap;display:none}
+.quick-nav-back:hover{background:#2563eb;transform:translateY(-1px);box-shadow:0 3px 8px rgba(30,58,138,.3)}
+body.focus-mode .quick-nav-back{display:inline-flex}
+/* 포커스 모드 — 상단 요약 섹션들 숨김, 상세 분석 탭만 표시 */
+body.focus-mode .mode-banner,
+body.focus-mode .m-trend-section,
+body.focus-mode .db-section,
+body.focus-mode .def-box-wrap,
+body.focus-mode .kpi-targets,
+body.focus-mode #gap-section-wrap,
+body.focus-mode .kpi-banner,
+body.focus-mode #detail-section-hd{display:none!important}
 @media(max-width:640px){
   .quick-nav-bar{padding:0 10px}
   .quick-nav-in{padding:6px 0;gap:5px;flex-wrap:nowrap}
@@ -931,13 +943,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
   <button class="scope-btn" data-scope="TIM_LIDIA" onclick="selectScope('TIM_LIDIA')"><span class="scope-dot" style="background:#ea4335"></span>TIM_LIDIA</button>
 </div></div>
 
-<!-- 빠른 이동 탭 (상단 quick-nav) — 클릭 시 상세 분석으로 바로 점프 -->
+<!-- 빠른 이동 탭 (상단 quick-nav) — 클릭 시 그 화면만 보임 -->
 <div class="quick-nav-bar"><div class="quick-nav-in">
   <span class="quick-nav-lbl">📂 빠른 이동:</span>
   <button class="quick-nav-btn" onclick="jumpToTab('cal')" data-qnav="cal">📅 방문 캘린더</button>
   <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats">👥 에이전트 현황</button>
   <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank">🏆 랭킹 & 배틀</button>
   <button class="quick-nav-btn" onclick="jumpToTab('insight')" data-qnav="insight">🔥 팀·에이전트 인사이트</button>
+  <button class="quick-nav-back" onclick="exitFocusMode()">↑ 전체 대시보드</button>
 </div></div>
 
 <!-- 모드 표시 -->
@@ -1042,8 +1055,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 <!-- KPI 배너 -->
 <div class="kpi-banner" id="kpi-banner"></div>
 
-<!-- 섹션 제목: 상세 분석 -->
-<div class="section-hd"><div class="section-hd-inner">
+<!-- 섹션 제목: 상세 분석 (포커스 모드 전환 시에도 보임) -->
+<div class="section-hd" id="detail-section-hd"><div class="section-hd-inner">
   <span class="section-title">📂 <span data-t="sec_detail">상세 분석</span></span>
   <span class="section-sub" data-t="sec_detail_sub">탭을 선택하세요 · 캘린더 / 에이전트 / 랭킹 / 지역 / 채널 / 인사이트</span>
 </div></div>
@@ -2964,15 +2977,19 @@ function switchTab(tab){
   renderTab();
 }
 
-// 상단 빠른 이동: 탭 전환 + 해당 콘텐츠로 스크롤
+// 상단 빠른 이동: 포커스 모드로 전환 (상단 요약 섹션 숨김 + 해당 탭만 표시)
 function jumpToTab(tab){
   switchTab(tab);
-  // 탭 콘텐츠 영역으로 부드럽게 스크롤
-  const tabsBar = document.querySelector('.tabs-bar');
-  if(tabsBar){
-    const top = tabsBar.getBoundingClientRect().top + window.pageYOffset - 8;
-    window.scrollTo({top, behavior:'smooth'});
-  }
+  document.body.classList.add('focus-mode');
+  // 페이지 맨 위로 (부드러운 스크롤 없이 즉시)
+  window.scrollTo(0, 0);
+}
+// 포커스 모드 해제 — 모든 섹션 다시 보임
+function exitFocusMode(){
+  document.body.classList.remove('focus-mode');
+  // quick-nav 활성 상태 해제 (현재 탭은 그대로 유지)
+  document.querySelectorAll('.quick-nav-btn[data-qnav]').forEach(b=>b.classList.remove('on'));
+  window.scrollTo(0, 0);
 }
 function renderTab(){
   if(curTab==='cal'){ renderCal('sched'); renderCal('done'); }
