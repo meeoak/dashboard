@@ -361,9 +361,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .mgmt-target-badge{padding:5px 10px;border-radius:8px;font-size:12px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
 .mgmt-target-badge.mt-good{background:#fef9c3;color:#1e3a8a;border:1.5px solid #fcd34d}
 .mgmt-target-badge.mt-bad{background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5}
-.mgmt-target-line{position:relative;height:6px;background:#f1f5f9;border-radius:3px;margin-bottom:10px;overflow:visible}
-.mtl-bar{height:100%;background:linear-gradient(90deg,#1e3a8a,#3b82f6);border-radius:3px;transition:width .3s}
-.mtl-target{position:absolute;top:-3px;width:3px;height:12px;background:#dc2626;border-radius:2px;box-shadow:0 0 0 2px #fff;transform:translateX(-50%)}
+.mgmt-target-line{position:relative;height:14px;background:#f1f5f9;border-radius:7px;margin-bottom:12px;overflow:visible;border:1px solid #e2e8f0}
+.mtl-bar{height:100%;background:linear-gradient(90deg,#1e3a8a,#3b82f6);border-radius:7px;transition:width .3s}
+.mtl-target{position:absolute;top:-4px;width:4px;height:22px;background:#dc2626;border-radius:2px;box-shadow:0 0 0 2px #fff;transform:translateX(-50%)}
 .mgmt-stack-bar{display:flex;height:30px;border-radius:8px;overflow:hidden;margin-bottom:10px;box-shadow:inset 0 1px 3px #00000015}
 .ms-seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;cursor:pointer;transition:all .2s;letter-spacing:-.3px;white-space:nowrap;overflow:hidden}
 .ms-seg:hover{filter:brightness(1.1)}
@@ -2912,7 +2912,6 @@ function renderDBSummary(){
           <div class="mgmt-rate-frac">${f(active)} <span style="color:#999">/ ${f(total)}</span></div>
           <div class="mgmt-rate-lbl">${curLang==='ko'?'관리 진행':'Diproses'} · ${T('tg_target')} ${TARGETS.db_mgmt}%</div>
         </div>
-        <div class="mgmt-target-badge ${pct(active)>=TARGETS.db_mgmt?'mt-good':'mt-bad'}">${pct(active)>=TARGETS.db_mgmt?'✅':'🔻'} ${Math.round(pct(active)/TARGETS.db_mgmt*100)}%</div>
       </div>
       <div class="mgmt-target-line" style="--pct:${Math.min(pct(active),100)}%;--target:${TARGETS.db_mgmt}%">
         <div class="mtl-bar" style="width:${Math.min(pct(active),100)}%"></div>
