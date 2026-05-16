@@ -994,10 +994,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 .scope-lang .lang-btn.on{background:#1e3a8a;color:#fff;box-shadow:none}
 .scope-refresh-btn{background:#16a34a;color:#fff;border:1.5px solid #15803d;padding:5px 11px;font-size:12px;font-weight:800;border-radius:8px;cursor:pointer;letter-spacing:-.2px;white-space:nowrap;transition:all .12s}
 .scope-refresh-btn:hover{background:#15803d;border-color:#14532d}
-.scope-home-btn{background:#1e3a8a;color:#fff;border:1.5px solid #1e3a8a;padding:5px 11px;font-size:12px;font-weight:800;border-radius:8px;cursor:pointer;letter-spacing:-.2px;white-space:nowrap;transition:all .12s}
+.scope-home-btn{background:#1e3a8a;color:#fff;border:1.5px solid #1e3a8a;padding:5px 11px;font-size:12px;font-weight:800;border-radius:8px;cursor:pointer;letter-spacing:-.2px;white-space:nowrap;transition:all .12s;margin-right:6px}
 .scope-home-btn:hover{background:#2563eb;border-color:#2563eb}
-.scope-team-dash-btn{background:#0891b2;border-color:#0891b2}
-.scope-team-dash-btn:hover{background:#06b6d4;border-color:#06b6d4}
 
 /* 2-b) 팀 바 (2행): scope-bar 바로 아래 */
 .team-bar{background:#f8fafc;border-bottom:1.5px solid #e5e7eb;padding:0 22px;box-shadow:0 1px 4px rgba(0,0,0,.03);position:sticky;top:46px;z-index:49}
@@ -1081,13 +1079,10 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 
 <!-- 스코프 탭 (2행): 팀별 -->
 <div class="team-bar"><div class="scope-in" id="team-bar">
-  <button class="scope-home-btn" onclick="exitFocusMode()" title="전체 대시보드로 돌아가기">🏠 전체 대시보드</button>
-  <button class="scope-home-btn scope-team-dash-btn" onclick="goTeamDashboard()" title="팀별 대시보드 보기">👥 팀별 대시보드</button>
-  <div style="flex:1"></div>
-  <button class="scope-btn" data-scope="TEAM_ALL" onclick="selectScope('TEAM_ALL')">🌐 전체팀</button>
-  <button class="scope-btn" data-scope="TIM_GIAR"  onclick="selectScope('TIM_GIAR')"><span class="scope-dot" style="background:#1a73e8"></span>TIM_GIAR</button>
-  <button class="scope-btn" data-scope="TIM_TINA"  onclick="selectScope('TIM_TINA')"><span class="scope-dot" style="background:#16a34a"></span>TIM_TINA</button>
-  <button class="scope-btn" data-scope="TIM_LIDIA" onclick="selectScope('TIM_LIDIA')"><span class="scope-dot" style="background:#ea4335"></span>TIM_LIDIA</button>
+  <button class="scope-home-btn" onclick="goAllDashboard()" title="전체 대시보드로 돌아가기">🏠 전체 대시보드</button>
+  <button class="scope-btn team-dash-btn" data-scope="TIM_GIAR"  onclick="selectScope('TIM_GIAR')"><span class="scope-dot" style="background:#1a73e8"></span>GIAR 대시보드</button>
+  <button class="scope-btn team-dash-btn" data-scope="TIM_TINA"  onclick="selectScope('TIM_TINA')"><span class="scope-dot" style="background:#16a34a"></span>TINA 대시보드</button>
+  <button class="scope-btn team-dash-btn" data-scope="TIM_LIDIA" onclick="selectScope('TIM_LIDIA')"><span class="scope-dot" style="background:#ea4335"></span>LIDIA 대시보드</button>
 </div></div>
 
 <!-- 빠른 이동 탭 (상단 quick-nav) — 클릭 시 그 화면만 보임 -->
@@ -3158,19 +3153,12 @@ function exitFocusMode(){
   document.querySelectorAll('.quick-nav-btn[data-qnav]').forEach(b=>b.classList.remove('on'));
   window.scrollTo(0, 0);
 }
-// 팀별 대시보드 보기 — 포커스 해제 후 팀별 격차 섹션으로 스크롤
-function goTeamDashboard(){
+// 전체 대시보드 — 포커스 해제 + 팀 필터 ALL로 리셋
+function goAllDashboard(){
   document.body.classList.remove('focus-mode');
   document.querySelectorAll('.quick-nav-btn[data-qnav]').forEach(b=>b.classList.remove('on'));
-  setTimeout(()=>{
-    const el = document.getElementById('gap-section-wrap');
-    if(el){
-      const y = el.getBoundingClientRect().top + window.pageYOffset - 110;
-      window.scrollTo({top: y, behavior: 'smooth'});
-    } else {
-      window.scrollTo(0, 0);
-    }
-  }, 50);
+  if(typeof selectScope === 'function') selectScope('ALL');
+  window.scrollTo(0, 0);
 }
 function renderTab(){
   if(curTab==='cal'){ renderCal('sched'); renderCal('done'); }
