@@ -725,36 +725,84 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cn-s{color:#1d4ed8}.cn-w{color:#92400e}.cn-cl{color:#1e3a8a}
 
 /* ─ 랭킹 & 배틀 ─ */
-.rank-wrap{padding:8px 16px 16px}
-.rank-row{display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid #fafafa;cursor:pointer;border-radius:8px}
-.rank-row:hover{background:#eff6ff}
-.rnum{font-size:14px;min-width:28px;text-align:center}
-.rav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.rank-wrap{padding:10px 16px 18px}
+.rank-row{display:flex;align-items:center;gap:11px;padding:11px 10px;border-bottom:1px solid #f1f5f9;cursor:pointer;border-radius:10px;transition:background .12s,transform .12s}
+.rank-row:hover{background:#fffbeb;transform:translateX(2px)}
+.rank-row.top3-row{background:linear-gradient(90deg,#fefce8 0%,#fff 50%);border:1px solid #fde68a;margin-bottom:5px;padding:13px 11px}
+.rank-row.top3-row:hover{background:linear-gradient(90deg,#fef9c3 0%,#fffbeb 50%)}
+.rnum{font-size:22px;min-width:36px;text-align:center;font-weight:900}
+.rnum-medal{font-size:28px;line-height:1}
+.rnum-plain{font-size:13px;color:#94a3b8;font-weight:900}
+.rav{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.1)}
 .ravG{background:#1a73e8}.ravT{background:#16a34a}.ravL{background:#ea4335}
 .rinfo{flex:1;min-width:0}
-.rname{font-size:13px;font-weight:700}
-.rteam{font-size:10px;color:#bbb;margin-top:1px}
-.rbar-bg{height:4px;background:#f0f0f0;border-radius:2px;margin-top:5px;overflow:hidden}
-.rbar{height:100%;border-radius:2px;transition:width .5s}
-.rstats{display:flex;gap:6px;flex-shrink:0;align-items:center}
-.rstat{text-align:center;min-width:34px}
-.rstat-v{font-size:13px;font-weight:800}
-.rstat-l{font-size:9px;color:#bbb}
-.score-badge{background:#fefce8;color:#1e3a8a;font-size:14px;font-weight:900;border-radius:8px;padding:3px 12px;min-width:46px;text-align:center}
-.fire-tag{display:inline-flex;background:#1e3a8a;color:#fff;font-size:9px;font-weight:800;border-radius:8px;padding:1px 6px;margin-left:4px}
-.battle-wrap{padding:14px 16px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.bcard{border-radius:12px;padding:16px;text-align:center;border:2px solid #eee;position:relative;background:#fff}
-.bcard.top1{border-color:#1e3a8a;background:linear-gradient(135deg,#eff6ff,#fff)}
-.bcard.top1::before{content:'🥇 1위';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#1e3a8a;color:#fff;font-size:10px;font-weight:800;border-radius:12px;padding:3px 12px;white-space:nowrap}
-.bcard.top2::before{content:'🥈 2위';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#777;color:#fff;font-size:10px;font-weight:800;border-radius:12px;padding:3px 12px;white-space:nowrap}
-.bcard.top3::before{content:'🥉 3위';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#b45309;color:#fff;font-size:10px;font-weight:800;border-radius:12px;padding:3px 12px;white-space:nowrap}
-.bc-name{font-size:11px;font-weight:900;color:#888;letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase}
-.bc-score{font-size:32px;font-weight:900;line-height:1.1;margin-bottom:2px}
-.bc-sub{font-size:9px;color:#bbb;margin-bottom:10px}
-.bc-row{display:flex;justify-content:space-between;font-size:11px;margin:3px 0;padding:3px 0}
-.bc-row-l{color:#aaa}.bc-row-v{font-weight:700}
-.bc-bar{height:4px;background:#f0f0f0;border-radius:2px;margin-top:10px;overflow:hidden}
-.bc-bar-fill{height:100%;border-radius:2px}
+.rname-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.rname{font-size:14px;font-weight:900;letter-spacing:-.3px;color:#0f172a}
+.rteam{font-size:11px;color:#64748b;font-weight:700}
+.rteam b{color:#0f172a;font-weight:900}
+.rbar-bg{height:5px;background:#f1f5f9;border-radius:3px;margin-top:6px;overflow:hidden}
+.rbar{height:100%;border-radius:3px;transition:width .5s}
+.rstats{display:flex;gap:5px;flex-shrink:0;align-items:center}
+.rstat{text-align:center;min-width:36px;padding:3px 5px;border-radius:6px;transition:background .12s}
+.rstat:hover{background:#f1f5f9}
+.rstat-v{font-size:14px;font-weight:900;letter-spacing:-.3px}
+.rstat-l{font-size:9.5px;color:#94a3b8;font-weight:800;letter-spacing:-.2px}
+.score-badge{background:linear-gradient(135deg,#fef3c7,#fefce8);color:#1e3a8a;font-size:16px;font-weight:900;border-radius:9px;padding:6px 12px;min-width:54px;text-align:center;border:1.5px solid #fbbf24;letter-spacing:-.4px;line-height:1}
+.score-badge small{font-size:10px;font-weight:800;color:#92400e;letter-spacing:-.2px;margin-left:1px}
+.top3-row .score-badge{background:linear-gradient(135deg,#fde68a,#fef3c7);border-color:#f59e0b;font-size:17px;padding:7px 14px}
+.fire-tag{display:inline-flex;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;font-size:10px;font-weight:900;border-radius:9px;padding:2px 8px;letter-spacing:-.2px;box-shadow:0 1px 3px rgba(220,38,38,.3);animation:firePulse 1.8s ease-in-out infinite}
+@keyframes firePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.rk-motivate{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:7px;letter-spacing:-.2px;white-space:nowrap}
+.rk-motivate.top{background:#fef3c7;color:#854d0e;border:1.5px solid #fbbf24}
+.rk-motivate.climb{background:#eff6ff;color:#1e3a8a;border:1.5px solid #bfdbfe}
+.rk-motivate.climb b{font-weight:900;color:#0f172a}
+.rk-motivate.tied{background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1}
+.rk-empty{text-align:center;padding:30px;color:#94a3b8;font-weight:700}
+@media(max-width:640px){
+  .rank-row{flex-wrap:wrap;gap:8px;padding:10px 8px}
+  .rstats{width:100%;justify-content:space-around;margin-top:6px}
+  .rstat{flex:1;min-width:0}
+  .score-badge{font-size:14px;padding:5px 10px;min-width:48px}
+  .rname{font-size:13px}
+  .rname-row{gap:5px}
+}
+.battle-wrap{padding:18px 16px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.bcard{border-radius:14px;padding:18px 16px 14px;border:2px solid #eee;position:relative;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.bcard.top1{border-color:#1e3a8a;background:linear-gradient(180deg,#eff6ff 0%,#fff 60%);box-shadow:0 4px 14px rgba(30,58,138,.14)}
+.bcard.top1::before{content:'🥇 1위';position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;font-size:11.5px;font-weight:900;border-radius:14px;padding:4px 14px;white-space:nowrap;box-shadow:0 2px 6px rgba(30,58,138,.4);letter-spacing:-.2px}
+.bcard.top2::before{content:'🥈 2위';position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#475569,#94a3b8);color:#fff;font-size:11.5px;font-weight:900;border-radius:14px;padding:4px 14px;white-space:nowrap;box-shadow:0 2px 6px rgba(71,85,105,.3);letter-spacing:-.2px}
+.bcard.top3::before{content:'🥉 3위';position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#b45309,#f59e0b);color:#fff;font-size:11.5px;font-weight:900;border-radius:14px;padding:4px 14px;white-space:nowrap;box-shadow:0 2px 6px rgba(180,83,9,.3);letter-spacing:-.2px}
+.bc-name{font-size:16px;font-weight:900;letter-spacing:-.3px;text-align:center;margin-bottom:4px}
+.bc-fair-badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 9px;border-radius:10px;letter-spacing:-.2px;margin:0 auto 12px;text-align:center}
+.bc-fair-badge.top{background:#fef3c7;color:#854d0e;border:1.5px solid #fbbf24}
+.bc-fair-badge.mid{background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1}
+.bc-fair-badge.low{background:#fef3c7;color:#92400e;border:1.5px solid #fde68a}
+.bc-scores{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px;padding-bottom:11px;border-bottom:1px dashed #e5e7eb}
+.bc-score-block{text-align:center}
+.bc-score-num{font-size:30px;font-weight:900;line-height:1;letter-spacing:-1.5px;margin-bottom:3px}
+.bc-score-lbl{font-size:10.5px;font-weight:800;color:#64748b;letter-spacing:-.2px}
+.bc-score-lbl small{font-weight:700;color:#94a3b8;font-size:9.5px}
+.bc-avg .bc-score-num{font-size:26px}
+.bc-bars{margin-bottom:11px;display:flex;flex-direction:column;gap:5px}
+.bc-bar-row{display:flex;align-items:center;gap:7px}
+.bc-bar-lbl{font-size:9.5px;font-weight:800;color:#94a3b8;width:24px;letter-spacing:-.2px}
+.bc-bar{flex:1;height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden}
+.bc-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.bc-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px}
+.bc-kpi{text-align:center;padding:5px 2px;background:#fafbfc;border-radius:6px;border:1px solid #f1f5f9}
+.bc-kpi b{display:block;font-size:15px;font-weight:900;line-height:1;letter-spacing:-.4px}
+.bc-kpi span{display:block;font-size:9.5px;font-weight:800;color:#64748b;margin-top:2px;letter-spacing:-.2px;white-space:nowrap}
+.bc-mvp{display:flex;align-items:center;gap:7px;padding:7px 10px;background:linear-gradient(135deg,#fef3c7,#fffbeb);border:1.5px solid #fbbf24;border-radius:8px;cursor:pointer;transition:transform .12s}
+.bc-mvp:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(251,191,36,.25)}
+.bc-mvp-lbl{font-size:10px;font-weight:900;color:#854d0e;letter-spacing:-.2px;white-space:nowrap}
+.bc-mvp-name{font-size:12px;font-weight:900;color:#0f172a;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bc-mvp-score{font-size:13px;font-weight:900;letter-spacing:-.3px}
+/* 모바일 */
+@media(max-width:640px){
+  .battle-wrap{grid-template-columns:1fr;gap:18px;padding:16px 12px}
+  .bc-score-num{font-size:26px}
+  .bc-avg .bc-score-num{font-size:22px}
+}
 
 /* ─ 분석 테이블 (지역/채널) ─ */
 .ana-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -1415,13 +1463,14 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <!-- 랭킹 -->
   <div id="content-rank" style="display:none">
     <div class="sec-hd" style="padding-bottom:8px">
-      <div><div class="sec-title">⚔️ 팀 배틀</div></div>
+      <div><div class="sec-title">⚔️ 팀 배틀</div>
+      <div class="sec-sub">전체점수 = 팀 합계 · 평균점수 = 인원수로 나눈 공정 지표 (인원 격차 보정)</div></div>
       <div id="rank-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="battle-wrap" id="battle-wrap"></div>
     <div class="sec-hd" style="border-top:2px solid #f5f5f5">
       <div><div class="sec-title">🏆 에이전트 랭킹</div>
-      <div class="sec-sub">점수 = 클로징×5 + 방문완료/랑숭/비디오콜×1</div></div>
+      <div class="sec-sub">점수 = 클로징 ×5 + 방문완료/랑숭/비디오콜 ×1 · 클릭 → 회원 목록</div></div>
     </div>
     <div class="rank-wrap" id="rank-wrap"></div>
   </div>
@@ -3167,45 +3216,123 @@ function renderStats(){
 
 // ── 랭킹 & 배틀 ─────────────────────────────────────────
 function renderRank(){
-  const teams = D.teams.map(t=>{
+  // 에이전트별 점수 사전 계산 — 팀 MVP / 평균 계산에 사용
+  const allAgents = Object.keys(D.agent_total);
+  const agentStats = {};
+  allAgents.forEach(a=>{
+    const s = statsRange(curFrom, curTo, null, a);
+    const meta = D.agent_meta[a]||{};
+    agentStats[a] = {a, db:s.db||0, score:s.score||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0, dc:s.r_dc||0, team:meta.team, ini:meta.initials};
+  });
+
+  // ── 팀 배틀 ──
+  const teamCards = D.teams.map(t=>{
     const s = statsRange(curFrom, curTo, t, null);
-    return {t, s};
-  }).sort((a,b)=>(b.s.score||0)-(a.s.score||0));
-  const maxS = Math.max(1,...teams.map(x=>x.s.score||0));
+    const members = (D.team_members[t]||[]);
+    const activeMembers = members.filter(a => (agentStats[a]?.db||0) > 0);
+    const headcount = activeMembers.length || members.length;
+    const total = s.score||0;
+    const avg = headcount ? total/headcount : 0;
+    // 팀 MVP (해당 팀 내 점수 1위, 활동 있는 에이전트만)
+    let mvp = null;
+    members.forEach(a=>{
+      const st = agentStats[a];
+      if(!st || st.db===0) return;
+      if(!mvp || st.score > mvp.score) mvp = st;
+    });
+    return {t, s, headcount, total, avg, mvp};
+  });
+  // 총점 랭킹과 평균 랭킹 모두 계산 (공정성 표시용)
+  const totalRank = [...teamCards].sort((a,b)=>b.total-a.total);
+  const avgRank   = [...teamCards].sort((a,b)=>b.avg-a.avg);
+  const totalRankOf = (t)=> totalRank.findIndex(x=>x.t===t);
+  const avgRankOf   = (t)=> avgRank.findIndex(x=>x.t===t);
+  const sorted = totalRank; // 카드 표시 순서는 총점 기준
+  const maxTotal = Math.max(1, ...teamCards.map(x=>x.total));
+  const maxAvg   = Math.max(1, ...teamCards.map(x=>x.avg));
   let bh='';
-  teams.forEach(({t,s},i)=>{
-    const pct=Math.round((s.score||0)/maxS*100);
-    const cls=i===0?'top1':i===1?'top2':'top3';
-    bh+=`<div class="bcard ${cls}">
-      <div class="bc-name" style="font-size:14px;letter-spacing:0">${teamShortName(t)}</div>
-      <div class="bc-score" style="color:${TC[t]}">${f(s.score||0)}</div>
-      <div class="bc-sub">점수</div>
-      <div class="bc-row"><span class="bc-row-l">방문완료</span><span class="bc-row-v" style="color:#16a34a">${s.d||0}건</span></div>
-      <div class="bc-row"><span class="bc-row-l">랑숭+비디오</span><span class="bc-row-v" style="color:#6d28d9">${(s.ls||0)+(s.vc||0)}건</span></div>
-      <div class="bc-row"><span class="bc-row-l">클로징🏆</span><span class="bc-row-v" style="color:#dc2626">${s.cl||0}건</span></div>
-      <div class="bc-row"><span class="bc-row-l">DB→클로징</span><span class="bc-row-v" style="color:#1e3a8a">${s.r_dc||0}%</span></div>
-      <div class="bc-bar"><div class="bc-bar-fill" style="width:${pct}%;background:${TC[t]}"></div></div>
+  sorted.forEach(({t,s,headcount,total,avg,mvp},i)=>{
+    const totalPct = Math.round(total/maxTotal*100);
+    const avgPct = Math.round(avg/maxAvg*100);
+    const cls = i===0?'top1':i===1?'top2':'top3';
+    const avgPos = avgRankOf(t);
+    const avgBadge = avgPos===0
+      ? '<span class="bc-fair-badge top">🏅 평균 1위</span>'
+      : (avgPos===1 ? '<span class="bc-fair-badge mid">평균 2위</span>'
+        : '<span class="bc-fair-badge low">평균 3위</span>');
+    const mvpHtml = mvp
+      ? `<div class="bc-mvp" onclick="openMem('${mvp.a}','d')" title="팀 MVP 회원 목록"><span class="bc-mvp-lbl">🔥 팀 MVP</span><span class="bc-mvp-name">${(D.agent_meta[mvp.a]||{}).short||mvp.a}</span><span class="bc-mvp-score" style="color:${TC[t]}">${mvp.score}점</span></div>`
+      : '';
+    bh+=`<div class="bcard ${cls}" style="border-top:4px solid ${TC[t]}">
+      <div class="bc-name" style="color:${TC[t]}">${teamShortName(t)}</div>
+      ${avgBadge}
+      <div class="bc-scores">
+        <div class="bc-score-block bc-total">
+          <div class="bc-score-num" style="color:${TC[t]}">${f(total)}</div>
+          <div class="bc-score-lbl">전체점수</div>
+        </div>
+        <div class="bc-score-block bc-avg">
+          <div class="bc-score-num" style="color:${TC[t]}">${avg.toFixed(1)}</div>
+          <div class="bc-score-lbl">평균점수 <small>(${headcount}명)</small></div>
+        </div>
+      </div>
+      <div class="bc-bars">
+        <div class="bc-bar-row">
+          <span class="bc-bar-lbl">전체</span>
+          <div class="bc-bar"><div class="bc-bar-fill" style="width:${totalPct}%;background:${TC[t]}"></div></div>
+        </div>
+        <div class="bc-bar-row">
+          <span class="bc-bar-lbl">평균</span>
+          <div class="bc-bar"><div class="bc-bar-fill" style="width:${avgPct}%;background:${TC[t]};opacity:.7"></div></div>
+        </div>
+      </div>
+      <div class="bc-kpis">
+        <div class="bc-kpi"><b style="color:#16a34a">${s.d||0}</b><span>방문완료</span></div>
+        <div class="bc-kpi"><b style="color:#6d28d9">${(s.ls||0)+(s.vc||0)}</b><span>랑숭+비디오</span></div>
+        <div class="bc-kpi"><b style="color:#dc2626">${s.cl||0}</b><span>🏆 클로징</span></div>
+        <div class="bc-kpi"><b style="color:#1e3a8a">${s.r_dc||0}%</b><span>DB→클로징</span></div>
+      </div>
+      ${mvpHtml}
     </div>`;
   });
   document.getElementById('battle-wrap').innerHTML = bh;
 
-  const agents = curTeam==='ALL' ? Object.keys(D.agent_total) : D.team_members[curTeam];
-  const list = agents.map(a=>{
-    const s = statsRange(curFrom, curTo, null, a);
-    const meta = D.agent_meta[a];
-    return {a, db:s.db||0, score:s.score||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0, dc:s.r_dc||0, team:meta.team, ini:meta.initials};
-  }).filter(x=>x.db>0).sort((a,b)=>b.score-a.score);
+  // ── 에이전트 랭킹 ──
+  const agents = curTeam==='ALL' ? allAgents : (D.team_members[curTeam]||[]);
+  const list = agents.map(a=>agentStats[a]).filter(x=>x && x.db>0).sort((a,b)=>b.score-a.score);
   const maxAS = Math.max(1,...list.map(x=>x.score));
   const medals=['🥇','🥈','🥉'];
+  const totalAgents = list.length;
   let rh='';
-  list.forEach(({a,score,d,ls,vc,cl,dc,team,ini},i)=>{
+  list.forEach((x,i)=>{
+    const {a,score,d,ls,vc,cl,dc,team,ini} = x;
     const pct = Math.round(score/maxAS*100);
-    rh+=`<div class="rank-row" onclick="openMem('${a}','d')">
-      <div class="rnum">${i<3?medals[i]:`<span style="font-size:12px;color:#ccc;font-weight:700">${i+1}</span>`}</div>
+    const meta = D.agent_meta[a]||{};
+    const short = meta.short || a;
+    const isTop3 = i<3;
+    const nextGap = i>0 ? (list[i-1].score - score) : 0;
+    // 다음 순위까지 동기 멘트
+    let motivate = '';
+    if(i===0){
+      motivate = `<span class="rk-motivate top">👑 1위 — 자리 지키기!</span>`;
+    } else if(nextGap > 0){
+      motivate = `<span class="rk-motivate climb">⬆️ ${i}위까지 <b>${nextGap}점</b></span>`;
+    } else {
+      motivate = `<span class="rk-motivate tied">= ${i}위와 동점</span>`;
+    }
+    const rankBadge = isTop3
+      ? `<div class="rnum rnum-medal rnum-${i+1}">${medals[i]}</div>`
+      : `<div class="rnum"><span class="rnum-plain">${i+1}</span></div>`;
+    rh+=`<div class="rank-row ${isTop3?'top3-row':''}" onclick="openMem('${a}','d')">
+      ${rankBadge}
       <div class="rav rav${TK[team]}">${ini}</div>
       <div class="rinfo">
-        <div class="rname">${a}${i===0?'<span class="fire-tag">🔥TOP</span>':''}</div>
-        <div class="rteam">${team} · DB→클로징 ${dc}%</div>
+        <div class="rname-row">
+          <span class="rname">${short}</span>
+          ${i===0?'<span class="fire-tag">🔥 TOP</span>':''}
+          ${motivate}
+        </div>
+        <div class="rteam">${team} · DB→클로징 <b>${dc}%</b></div>
         <div class="rbar-bg"><div class="rbar" style="width:${pct}%;background:${TC[team]}"></div></div>
       </div>
       <div class="rstats">
@@ -3213,11 +3340,12 @@ function renderRank(){
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','vc')"><div class="rstat-v" style="color:#6d28d9">${vc}</div><div class="rstat-l">비디오</div></div>
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','ls')"><div class="rstat-v" style="color:#1e293b">${ls}</div><div class="rstat-l">랑숭</div></div>
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','cl')"><div class="rstat-v" style="color:#dc2626">${cl}</div><div class="rstat-l">클로징</div></div>
-        <div class="score-badge">${score}점</div>
+        <div class="score-badge">${score}<small>점</small></div>
       </div></div>`;
   });
+  if(!rh) rh = '<div class="rk-empty">활동한 에이전트가 없습니다</div>';
   document.getElementById('rank-wrap').innerHTML = rh;
-  document.getElementById('rank-lbl').textContent = rangeLbl();
+  document.getElementById('rank-lbl').textContent = rangeLbl() + ` · 총 ${totalAgents}명 활동`;
 }
 
 function rangeLbl(){
