@@ -1815,7 +1815,7 @@ const TEAM_NAME = {TIM_GIAR:'GIAR', TIM_TINA:'TINA', TIM_LIDIA:'LIDIA'};
 // 단축 팀명 헬퍼 — 매핑 없으면 'TIM_' 접두어만 제거
 function teamShortName(team){
   if(!team) return '';
-  return TEAM_NAME[team] || teamShortName(team);
+  return TEAM_NAME[team] || team.replace(/^TIM_/,'');
 }
 
 // 🌍 다국어 사전 (한국어/인도네시아어)
