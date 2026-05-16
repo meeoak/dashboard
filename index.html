@@ -26,6 +26,101 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
   .hdr-flame{font-size:28px}
   .hdr-lang{position:static;margin:10px auto 0;justify-content:center}
 }
+/* ─────────── 모바일 (≤640px) 종합 대응 ─────────── */
+@media(max-width:640px){
+  body{font-size:13px}
+  /* 헤더: 더 콤팩트 */
+  .hdr-in{padding:14px 12px 12px}
+  .hdr-title{font-size:22px;letter-spacing:-.7px}
+  .hdr-flame{font-size:24px}
+  .hdr-sub{font-size:11px}
+  .live-badge{font-size:9.5px;padding:2px 8px}
+  .hdr-lang{padding:2px}
+  .lang-btn{font-size:11px!important;padding:5px 9px!important}
+  /* 스코프 버튼 */
+  .scope-bar{padding:0 12px}
+  .scope-btn{padding:9px 12px;font-size:12.5px;min-width:auto;height:38px;gap:6px}
+  .scope-btn .scope-dot{width:10px;height:10px}
+  .scope-in{padding:6px 0;gap:5px}
+  /* 필터/날짜 행 */
+  .filter-bar{padding:8px 12px;gap:6px}
+  .fsel{font-size:11.5px;padding:5px 8px;min-width:auto}
+  #fsel-agent{font-size:11.5px;padding:5px 10px;min-width:auto}
+  .preset-btn{font-size:11px;padding:4px 9px}
+  /* 섹션 헤더 / 콘텐츠 폭 */
+  .section-hd,.section-hd-inner,.gap-wrap,.db-section,.kpi-targets,.def-box-wrap,.kpi-banner,.tabs-bar,.tab-content,.m-trend-section{padding-left:10px;padding-right:10px}
+  .section-hd-inner{border-radius:0 6px 6px 0;padding:6px 10px;gap:6px}
+  .section-title{font-size:14px}
+  .section-sub{font-size:10.5px}
+  /* DB 배정 분석 */
+  .db-grid{grid-template-columns:1fr!important;gap:10px}
+  .db-total .db-card-val{font-size:48px}
+  .db-card{padding:14px 14px}
+  /* KPI 목표 카드 */
+  .kpi-targets{grid-template-columns:1fr 1fr;gap:8px}
+  .tcard{padding:12px 10px}
+  /* 팀별 격차 */
+  .gap-card{padding:12px 12px;gap:10px}
+  .gap-team-header{flex:0 0 100%;flex-direction:row;align-items:center;justify-content:space-between}
+  .gap-team-name{font-size:18px}
+  .gap-metrics-h{grid-template-columns:1fr 1fr!important;gap:6px}
+  .gap-metric{padding:8px 10px}
+  .gap-m-vals{font-size:16px}
+  .gap-m-status{font-size:10.5px;padding:3px 7px}
+  /* 격차 에이전트 행 */
+  .gap-agent-row{padding:6px 12px;gap:8px}
+  .gap-agent-name{flex:0 0 90px;font-size:12px}
+  .gap-agent-metrics{grid-template-columns:1fr 1fr!important;gap:5px}
+  /* 영업 활동 종합 — 모바일에서 카드 스타일 행 */
+  .kpi-tbl{font-size:12px}
+  .kpi-tbl thead th{padding:7px 5px;font-size:9.5px}
+  .kpi-tbl tbody td{padding:8px 5px}
+  .kpi-tbl .team-cell{min-width:auto;padding-left:10px}
+  .kpi-row-agent{padding:7px 10px 7px 18px;gap:7px}
+  .kpi-row-agent .ka-name{flex:0 0 80px;font-size:11.5px}
+  .kpi-row-agent .ka-db{font-size:10px;padding:1px 6px}
+  .kpi-row-agent .ka-metrics{grid-template-columns:repeat(2,1fr)!important;gap:4px}
+  .kpi-row-agent .ka-metric{padding:3px 6px}
+  /* 탭 */
+  .tab{padding:12px 8px;font-size:13px;min-width:auto}
+  .tab.on{font-size:14px}
+  /* 캘린더 */
+  .cal-wrap{padding:10px 8px 14px}
+  .cal-grid{gap:3px}
+  /* 긴급 배너 */
+  #urgent-banner{padding:10px 12px 4px}
+  .urgent-banner-alert{padding:14px 14px}
+  .urgent-banner-alert .ub-title{font-size:17px}
+  .urgent-banner-alert .ub-sub{font-size:11px}
+  .ub-actions{margin-left:0;width:100%;justify-content:flex-end;flex-wrap:wrap}
+  .ub-pdf-btn{font-size:11.5px;padding:7px 12px}
+  .ub-stats{gap:6px;grid-template-columns:1fr 1fr;display:grid}
+  .ub-stat{padding:6px 10px}
+  .ub-stat b{font-size:20px}
+  .ub-stat span{font-size:10.5px}
+  /* 인사이트 펀널 */
+  .ins-funnel{padding:12px 8px}
+  .ins-f-stage{padding:6px 4px}
+  .ins-f-num{font-size:28px;letter-spacing:-1px}
+  .ins-f-lbl{font-size:10.5px}
+  .ins-f-arrow{flex:0 0 60px}
+  .ins-f-rate{font-size:13px;padding:5px 8px;min-width:auto}
+  .ins-f-rate small{font-size:9px}
+  .ins-sub-funnel{grid-template-columns:1fr!important}
+  .ins-sf-num{font-size:30px}
+  .ins-ag-d-head{flex-direction:column;align-items:flex-start;gap:10px;padding-bottom:12px;margin-bottom:12px}
+  .ins-ag-d-rank{font-size:28px;width:auto}
+  .ins-ag-d-name{font-size:18px}
+  .ins-ag-d-btns{width:100%;justify-content:flex-end}
+  .ins-ag-d-btn{padding:9px 14px;font-size:12.5px}
+  .ins-urg-cats{grid-template-columns:1fr 1fr!important;gap:6px}
+  .ins-urg-cat{padding:6px 9px}
+  .ins-urg-cat b{font-size:18px}
+  .ins-urgent-item{grid-template-columns:50px 22px 1fr;gap:6px;font-size:11.5px}
+  .ins-urgent-item .urg-pa,.ins-urgent-item .urg-reason,.ins-urgent-item .urg-ad{grid-column:3;font-size:10.5px;color:#64748b}
+  /* 회원 목록 페이지 */
+  .mem-table th,.mem-table td{padding:6px 4px;font-size:11px}
+}
 .live-badge{display:inline-flex;align-items:center;gap:5px;background:#1e3a8a;color:#fff;font-size:10px;font-weight:800;border-radius:18px;padding:3px 10px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.85;transform:scale(1.04)}}
 .hdr-row2{display:flex;gap:5px;flex-wrap:wrap}
@@ -356,7 +451,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 
 /* ─ KPI 테이블 (간결한 5행 표) ─ */
 .kpi-banner{max-width:1180px;margin:0 auto;padding:8px 20px 18px;border-bottom:8px solid #f0ede8}
-.kpi-tbl-wrap{background:#fff;border:1px solid #e5e5e5;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px #0001}
+.kpi-tbl-wrap{background:#fff;border:1px solid #e5e5e5;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px #0001;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .kpi-tbl{width:100%;border-collapse:collapse}
 .kpi-tbl thead th{background:#fafafa;padding:10px 8px;font-size:10.5px;font-weight:800;color:#888;text-align:center;border-bottom:1px solid #eee;white-space:nowrap;letter-spacing:.3px}
 .kpi-tbl thead th.team-col{text-align:left;padding-left:18px;width:140px}
