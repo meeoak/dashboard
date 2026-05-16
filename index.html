@@ -6139,8 +6139,7 @@ async function loadFromSheet(opts){
     const csv=await resp.text();
     const rows=parseCSV(csv);
     if(rows.length<2)throw new Error('시트가 비어있음');
-    // 헤더 행 기반 컬럼 감지 (한 번만)
-    detectMemoColumn(rows[0]);
+    // 헤더 행 기반 Keterangan DB 컬럼만 감지 (메모 컬럼은 기본 인덱스 16 고정 유지)
     detectKetColumn(rows[0]);
     const today=new Date().toISOString().slice(0,10);
     const records=rows.slice(1).map(r=>rowToRecord(r,today)).filter(Boolean);
