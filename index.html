@@ -3014,6 +3014,11 @@ function _reportT(lang){
       sub_wait_hint: 'Perlu follow-up',
       sub_overdue_lbl: '⚠️ Perlu Konfirmasi',
       sub_overdue_hint: 'Lewat tanggal kunjungan',
+      db_status_title: '📋 Status DB Saya',
+      db_status_total: 'Total DB',
+      db_status_active: 'Diproses',
+      db_status_idle: 'Belum Diproses',
+      db_status_cancel: 'Batal/Tolak',
       rate_ds: 'Rate Konsultasi',
       rate_sv: 'Rate Kunjungan',
       rate_vc: 'Rate Closing',
@@ -3092,6 +3097,11 @@ function _reportT(lang){
     sub_wait_hint: '후속 필요',
     sub_overdue_lbl: '⚠️ 확인필요',
     sub_overdue_hint: '방문일 지남',
+    db_status_title: '📋 내 DB 현황',
+    db_status_total: '전체 DB',
+    db_status_active: '진행됨',
+    db_status_idle: '미진행',
+    db_status_cancel: '취소·거절',
     rate_ds: '예약율',
     rate_sv: '방문율',
     rate_vc: '클로율',
@@ -3324,8 +3334,10 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 .ag-rpt-hd{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:18px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .ag-rpt-rank{font-size:34px;width:48px;text-align:center;line-height:1;flex-shrink:0}
 .ag-rpt-info{flex:1;min-width:0}
-.ag-rpt-name{font-size:22px;font-weight:900;letter-spacing:-.4px;margin-bottom:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.ag-rpt-sub{font-size:12px;opacity:.92;font-weight:600}
+.ag-rpt-name{font-size:22px;font-weight:900;letter-spacing:-.4px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ag-rpt-sub{font-size:12px;opacity:.92;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ag-rpt-range{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);padding:5px 12px;border-radius:8px;font-size:13px;font-weight:800;letter-spacing:-.2px;border:1.5px solid rgba(255,255,255,.3)}
+.ag-rpt-range b{font-weight:900;letter-spacing:-.3px}
 .ag-rpt-pill{display:inline-block;background:rgba(255,255,255,.2);padding:3px 11px;border-radius:6px;font-size:12px;font-weight:800}
 .ag-rpt-grade{padding:3px 12px;border-radius:6px;font-size:13px;font-weight:900;color:#fff}
 .ag-rpt-body{padding:18px 22px}
@@ -3343,6 +3355,21 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 .f-rate.good{background:linear-gradient(135deg,#16a34a,#22c55e);border-color:#15803d}
 .f-rate.bad{background:linear-gradient(135deg,#dc2626,#ef4444);border-color:#b91c1c}
 .f-rate small{display:block;font-size:9.5px;opacity:.95;font-weight:800;margin-top:2px}
+/* 📋 DB 현황 카드 (전체/진행/미진행/취소) */
+.ag-db-status{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ag-db-card{border:1.5px solid;border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ag-db-card.total{border-color:#1e3a8a;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff}
+.ag-db-card.active{border-color:#22c55e;background:linear-gradient(135deg,#dcfce7,#f0fdf4)}
+.ag-db-card.idle{border-color:#fbbf24;background:linear-gradient(135deg,#fef3c7,#fffbeb)}
+.ag-db-card.cancel{border-color:#dc2626;background:linear-gradient(135deg,#fee2e2,#fef2f2)}
+.ag-db-num{font-size:26px;font-weight:900;line-height:1;letter-spacing:-1px;min-width:38px;text-align:center}
+.ag-db-card.active .ag-db-num{color:#15803d}
+.ag-db-card.idle .ag-db-num{color:#854d0e}
+.ag-db-card.cancel .ag-db-num{color:#7f1d1d}
+.ag-db-lbl{font-size:11.5px;font-weight:900;color:#0f172a;letter-spacing:-.2px;line-height:1.2}
+.ag-db-card.total .ag-db-lbl{color:#fff}
+.ag-db-pct{font-size:10.5px;font-weight:800;color:#64748b;margin-top:2px}
+.ag-db-card.total .ag-db-pct{color:rgba(255,255,255,.85)}
 /* 보조 펀널 - 색상 코딩 (조금 더 작게) */
 .ag-sub-funnel{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:4px}
 .ag-sf-stage{border:1.5px solid;border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
@@ -3418,7 +3445,7 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 @media print{
   .rpt-print-btn{display:none}
   body{padding:0;background:#fff;font-size:10.5px}
-  .ag-rpt,.ag-rpt-hd,.ag-funnel,.f-rate,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip,.ag-kpi-card.good,.ag-kpi-card.bad,.ag-kpi-card.final,.ag-kpi-diff,.ag-kpi-card.final::before,.ag-sf-stage.up,.ag-sf-stage.wait,.ag-sf-stage.urgent,.cal-block-h.cal-up,.cal-block-h.cal-done,.cal-cl-pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ag-rpt,.ag-rpt-hd,.ag-rpt-range,.ag-funnel,.f-rate,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip,.ag-kpi-card.good,.ag-kpi-card.bad,.ag-kpi-card.final,.ag-kpi-diff,.ag-kpi-card.final::before,.ag-sf-stage.up,.ag-sf-stage.wait,.ag-sf-stage.urgent,.ag-db-card.total,.ag-db-card.active,.ag-db-card.idle,.ag-db-card.cancel,.cal-block-h.cal-up,.cal-block-h.cal-done,.cal-cl-pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 `;
 }
@@ -3458,6 +3485,14 @@ function _buildAgentReportSection(agent, rank, lang){
       <div class="ag-kpi-diff">${esc(diffTxt(val, tgt))}</div>
     </div>`;
   };
+
+  // 📋 DB 현황 — 진행/미진행/취소 카운트 (현재 필터 범위 내, 이 에이전트만)
+  const agentRecs = (D.records||[]).filter(r=> r.a===agent && r.ad>=curFrom && r.ad<=curTo
+    && (curDbKind==='ALL' || r.dk===curDbKind));
+  const dbActive = agentRecs.filter(r=> ['s','d','vc','ls','w'].includes(r.st) || r.cl===1).length;
+  const dbIdle = agentRecs.filter(r=> r.st==='none' && r.cl!==1).length;
+  const dbCancel = agentRecs.filter(r=> r.st==='x' && r.cl!==1).length;
+  const dbPct = (n)=> db ? Math.round(n/db*100) : 0;
 
   // 📅 캘린더용 일정 수집 — 현재 필터 범위(해당월)만
   const dayName = (dateStr)=>{
@@ -3503,7 +3538,10 @@ function _buildAgentReportSection(agent, rank, lang){
         <span class="ag-rpt-pill">${esc(t.db_count(db))}</span>
         <span class="ag-rpt-pill" style="background:${achievedCount>=3?'#16a34a':achievedCount>=2?'#fbbf24':'#dc2626'}">${esc(t.target_achieved_count(achievedCount))}</span>
       </div>
-      <div class="ag-rpt-sub">${esc(D.today)} ${esc(t.agent_data_range)} · ${esc(t.agent_data_range_label)}: ${esc(curFrom)} ~ ${esc(curTo)}</div>
+      <div class="ag-rpt-sub">
+        <span class="ag-rpt-range">📆 <b>${esc(curFrom)} ~ ${esc(curTo)}</b></span>
+        <span>${esc(t.agent_data_range)} ${esc(D.today)}</span>
+      </div>
     </div>
   </div>
   <div class="ag-rpt-body">
@@ -3515,6 +3553,28 @@ function _buildAgentReportSection(agent, rank, lang){
         ${kpiCard('✅', t.kpi_sv_lbl, r_sv, TARGETS.sv, false)}
         ${kpiCard('🏆', t.kpi_vc_lbl, r_vc, TARGETS.vc, false)}
         ${kpiCard('💰', t.kpi_dc_lbl, r_dc, TARGETS.dc, true)}
+      </div>
+    </div>
+    <!-- 📋 DB 현황 (전체 / 진행 / 미진행 / 취소) -->
+    <div class="ag-rpt-section">
+      <div class="ag-rpt-h">${esc(t.db_status_title)}</div>
+      <div class="ag-db-status">
+        <div class="ag-db-card total">
+          <div class="ag-db-num">${db}</div>
+          <div><div class="ag-db-lbl">${esc(t.db_status_total)}</div><div class="ag-db-pct">${esc(curFrom)} ~ ${esc(curTo)}</div></div>
+        </div>
+        <div class="ag-db-card active">
+          <div class="ag-db-num">${dbActive}</div>
+          <div><div class="ag-db-lbl">✅ ${esc(t.db_status_active)}</div><div class="ag-db-pct">${dbPct(dbActive)}%</div></div>
+        </div>
+        <div class="ag-db-card idle">
+          <div class="ag-db-num">${dbIdle}</div>
+          <div><div class="ag-db-lbl">⏳ ${esc(t.db_status_idle)}</div><div class="ag-db-pct">${dbPct(dbIdle)}%</div></div>
+        </div>
+        <div class="ag-db-card cancel">
+          <div class="ag-db-num">${dbCancel}</div>
+          <div><div class="ag-db-lbl">❌ ${esc(t.db_status_cancel)}</div><div class="ag-db-pct">${dbPct(dbCancel)}%</div></div>
+        </div>
       </div>
     </div>
     <!-- 📊 관리 펀널 -->
