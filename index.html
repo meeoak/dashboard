@@ -760,6 +760,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 .rinfo{flex:1;min-width:0}
 .rname-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
 .rname{font-size:14px;font-weight:900;letter-spacing:-.3px;color:#0f172a}
+.rname-clickable{cursor:pointer;border-bottom:1.5px dashed transparent;transition:all .12s}
+.rname-clickable:hover{color:#1e3a8a;border-bottom-color:#1e3a8a}
 .rteam{font-size:11px;color:#64748b;font-weight:700}
 .rteam b{color:#0f172a;font-weight:900}
 .rbar-bg{height:9px;background:#f1f5f9;border-radius:5px;margin-top:8px;overflow:visible;position:relative}
@@ -3551,7 +3553,7 @@ function renderRank(){
       <div class="rav rav${TK[team]}">${ini}</div>
       <div class="rinfo">
         <div class="rname-row">
-          <span class="rname">${short}</span>
+          <span class="rname rname-clickable" onclick="event.stopPropagation();openMem('${a}','db')" title="${short} — 기간 내 배정 회원 전체">${short}</span>
           ${i===0?'<span class="fire-tag">🔥 TOP</span>':''}
           ${motivate}
           ${prevDiffLbl}
