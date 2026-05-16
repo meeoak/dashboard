@@ -900,6 +900,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-urg-chip.c-idle{color:#7c2d12;border-color:#fb923c;background:#fff7ed}
 .r3d-urg-chip.c-wait{color:#1e3a8a;border-color:#60a5fa;background:#eff6ff}
 .r3d-urg-chip.c-soon{color:#1e3a8a;border-color:#60a5fa;background:#eff6ff}
+.r3d-urg-chip.r3d-urg-chip-zero{opacity:.4;border-style:dashed;background:#fafafa;color:#94a3b8;border-color:#e5e7eb}
+.r3d-urg-chip.r3d-urg-chip-zero:hover{opacity:.55;box-shadow:none;transform:none}
 .r3d-urg-toggle{cursor:pointer;background:#fff;border:2px solid #cbd5e1;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:900;color:#475569;margin-left:auto;display:flex;align-items:center;gap:5px;transition:all .12s}
 .r3d-urg-toggle:hover{background:#1e3a8a;border-color:#1e3a8a;color:#fff}
 .r3d-urg-list-wrap{display:none}
@@ -1086,6 +1088,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .ub-stat-blue{border-color:#2563eb}.ub-stat-blue b{color:#2563eb}.ub-stat-blue span{color:#1e3a8a}
 .ub-stat-amber{border-color:#d97706}.ub-stat-amber b{color:#d97706}.ub-stat-amber span{color:#92400e}
 .ub-stat-coral{border-color:#ea580c}.ub-stat-coral b{color:#ea580c}.ub-stat-coral span{color:#7c2d12}
+.ub-stat.ub-stat-zero{opacity:.4;border-style:dashed;background:#fafafa}
+.ub-stat.ub-stat-zero b,.ub-stat.ub-stat-zero span{color:#94a3b8}
+.ub-stat.ub-stat-zero:hover{transform:none;box-shadow:0 2px 4px rgba(0,0,0,.04)}
 .ub-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
 .ub-pdf-btn{background:#1e3a8a;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 6px rgba(30,58,138,.3);transition:all .12s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;letter-spacing:-.2px}
 .ub-pdf-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(30,58,138,.4);background:#1d4ed8}
@@ -3743,11 +3748,11 @@ function renderUrgentBanner(){
       </div>
     </div>
     <div class="ub-stats">
-      ${totals.noMemo>0?`<div class="ub-stat ub-stat-amber" onclick="openUrgentByType('noMemo')" title="상담기록도 없고 옵션도 선택 안된 회원 목록 (아무 액션도 기록 안 됨)"><b>${totals.noMemo}</b><span>📝 상담기록없음</span></div>`:''}
-      ${totals.overdue>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('overdue')" title="방문일 지남 회원 목록"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>`:''}
-      ${totals.idle>0?`<div class="ub-stat ub-stat-coral" onclick="openUrgentByType('idle')" title="옵션 미선택 + 메모 있음 — 응답없음"><b>${totals.idle}</b><span>🚨 응답없음</span></div>`:''}
-      ${totals.wait>0?`<div class="ub-stat ub-stat-orange" onclick="openUrgentByType('wait')" title="일정대기 누적 회원 목록"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>`:''}
-      ${totals.soon>0?`<div class="ub-stat ub-stat-blue" onclick="openUrgentByType('soon')" title="방문 임박 회원 목록"><b>${totals.soon}</b><span>📅 방문 임박</span></div>`:''}
+      <div class="ub-stat ub-stat-amber ${totals.noMemo===0?'ub-stat-zero':''}" onclick="openUrgentByType('noMemo')" title="상담기록도 없고 옵션도 선택 안된 회원 목록"><b>${totals.noMemo}</b><span>📝 상담기록없음</span></div>
+      <div class="ub-stat ub-stat-red ${totals.overdue===0?'ub-stat-zero':''}" onclick="openUrgentByType('overdue')" title="방문일 지남 회원 목록"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>
+      <div class="ub-stat ub-stat-coral ${totals.idle===0?'ub-stat-zero':''}" onclick="openUrgentByType('idle')" title="메모 있음 + 옵션 있음 — 회원 무응답"><b>${totals.idle}</b><span>🚨 응답없음</span></div>
+      <div class="ub-stat ub-stat-orange ${totals.wait===0?'ub-stat-zero':''}" onclick="openUrgentByType('wait')" title="일정대기 누적 회원 목록"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>
+      <div class="ub-stat ub-stat-blue ${totals.soon===0?'ub-stat-zero':''}" onclick="openUrgentByType('soon')" title="방문 임박 회원 목록"><b>${totals.soon}</b><span>📅 방문 임박</span></div>
     </div>
     ${curAgent==='ALL' && topAgents.length ? `<div class="ub-agents">
       <div class="ub-agents-lbl">긴급 건수 TOP 에이전트:</div>
@@ -5061,8 +5066,8 @@ function renderRecent7DaysByTeam(){
     const sev = sevClass(d.urgentTotal);
     const sevCardCls = (idx===0 && d.urgentTotal>=15) ? 'rank-top' : (sev==='sev-red' ? 'sev-red-card' : '');
     const chip = (cls, icon, lbl, n, kind)=>{
-      if(n === 0) return '';
-      return `<span class="r3d-urg-chip ${cls}" title="${lbl} — 클릭 → 회원 목록" onclick="event.stopPropagation();openUrgentByType('${kind}','${a}')"><b>${n}</b><span>${icon} ${lbl}</span></span>`;
+      const zeroCls = n===0 ? 'r3d-urg-chip-zero' : '';
+      return `<span class="r3d-urg-chip ${cls} ${zeroCls}" title="${lbl} — 클릭 → 회원 목록" onclick="event.stopPropagation();openUrgentByType('${kind}','${a}')"><b>${n}</b><span>${icon} ${lbl}</span></span>`;
     };
     const chips = [
       chip('c-noMemo','📝','상담기록없음',d.cNoMemo,'noMemo'),
@@ -5070,7 +5075,7 @@ function renderRecent7DaysByTeam(){
       chip('c-idle','🚨','응답없음',d.cIdle,'idle'),
       chip('c-wait','⏳','일정대기',d.cWait,'wait'),
       chip('c-soon','📅','방문 임박',d.cSoon,'soon'),
-    ].filter(Boolean).join('');
+    ].join('');
     html += `
     <div class="r3d-agent-card ${sevCardCls}" style="border-left-color:${color}">
       <div class="r3d-agent-hd">
