@@ -1084,8 +1084,28 @@ body.focus-mode #detail-section-hd{display:none!important}
   .ai-rpt-meta{font-size:11px}
 }
 @media print{
+  /* 보고서 모드 (단일 에이전트): 보고서 영역만 노출 */
+  body.printing-report .top-tabs,
+  body.printing-report .scope-bar,
+  body.printing-report .team-bar,
+  body.printing-report .cal-controls,
+  body.printing-report .ai-rpt-actions,
+  body.printing-report .floating-side,
+  body.printing-report .header{display:none !important}
+  body.printing-report .ai-rpt-hd{background:#1e3a8a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.printing-report{background:#fff !important}
+  /* 색상 카드/배지 등 인쇄 시 배경 보존 */
+  body.printing-report .db-total,
+  body.printing-report .db-card,
+  body.printing-report .rank-row,
+  body.printing-report .r3d-agent-card,
+  body.printing-report .r3d-urg-chip,
+  body.printing-report .mgmt-detail-row,
+  body.printing-report .mgmt-stack-bar,
+  body.printing-report .ms-seg,
+  body.printing-report .rbar,
+  body.printing-report .bc-idx-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .ai-rpt-btn{display:none}
-  .ai-rpt-hd{background:#1e3a8a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 
 .ag-mission{background:linear-gradient(135deg,#fef3c7 0%,#fffbeb 50%,#fff 100%);border:2px solid #fbbf24;border-radius:14px;padding:14px 16px;margin-bottom:18px;box-shadow:0 2px 8px rgba(251,191,36,.18)}
@@ -5496,6 +5516,22 @@ function openRecent7DMember(tr){
 }
 
 // 에이전트 인사이트 탭 — 에이전트별 상세 카드만
+// 📑 보고서 인쇄 — 화면 그대로 출력 (단일 에이전트 모드)
+function printAgentReport(lang){
+  // 언어 전환 (지정된 경우만)
+  if(lang && lang !== curLang && typeof setLang === 'function'){
+    setLang(lang);
+  }
+  // 인쇄 모드 클래스 부여 → CSS로 보고서 영역만 노출
+  document.body.classList.add('printing-report');
+  // 인쇄 다이얼로그 열기 (브라우저에서 PDF 저장 가능)
+  setTimeout(()=>{
+    window.print();
+    // 인쇄 후 클래스 제거
+    setTimeout(()=>document.body.classList.remove('printing-report'), 300);
+  }, 150);
+}
+
 function renderAgentInsightOnly(){
   // 1. 각 섹션을 원본 위치에 렌더 (다른 탭에 있는 DOM이지만 innerHTML 설정 가능)
   renderDBSummary();
@@ -5556,9 +5592,9 @@ function renderAgentInsightOnly(){
         <div class="ai-rpt-title-row">
           <h1 class="ai-rpt-title">📑 <span class="ai-rpt-name">${safeName}</span>의 회원관리 보고서</h1>
           <div class="ai-rpt-actions">
-            <button class="ai-rpt-btn" onclick="openAgentReport('${curAgent}','ko')" title="한국어 PDF">📄 KR 보고서</button>
-            <button class="ai-rpt-btn" onclick="openAgentReport('${curAgent}','id')" title="Bahasa PDF">📄 ID 보고서</button>
-            <button class="ai-rpt-btn ai-rpt-btn-print" onclick="window.print()" title="인쇄">🖨️ 인쇄</button>
+            <button class="ai-rpt-btn" onclick="printAgentReport('ko')" title="한국어 인쇄/PDF">📄 KR 보고서</button>
+            <button class="ai-rpt-btn" onclick="printAgentReport('id')" title="Bahasa Print/PDF">📄 ID 보고서</button>
+            <button class="ai-rpt-btn ai-rpt-btn-print" onclick="printAgentReport()" title="현재 언어 그대로 인쇄">🖨️ 인쇄</button>
           </div>
         </div>
         <div class="ai-rpt-meta">
