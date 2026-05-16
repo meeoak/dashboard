@@ -54,7 +54,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
   .section-sub{font-size:10.5px}
   /* DB 배정 분석 */
   .db-grid{grid-template-columns:1fr!important;gap:10px}
-  .db-total .db-card-val{font-size:36px}
+  .db-total .db-card-val{font-size:48px}
   .db-card{padding:14px 14px}
   /* KPI 목표 카드 */
   .kpi-targets{grid-template-columns:1fr 1fr;gap:8px}
@@ -312,21 +312,21 @@ body.focus-mode #detail-section-hd{display:none!important}
 
 /* 📋 DB 배정 분석 섹션 - Refined */
 .db-section{max-width:1180px;margin:0 auto;padding:8px 20px 20px;border-bottom:8px solid #f0ede8}
-.db-grid{display:grid;grid-template-columns:1fr 1.1fr 1.3fr;gap:14px;align-items:stretch}
+.db-grid{display:grid;grid-template-columns:0.7fr 1.1fr 1.4fr;gap:14px;align-items:stretch}
 @media(max-width:900px){.db-grid{grid-template-columns:1fr 1fr}}
 .db-card{background:#fff;border:1px solid #ececec;border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px #0000000a;transition:all .2s;display:flex;flex-direction:column}
 .db-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px #00000010;border-color:#e5d8c7}
 .db-card-lbl{font-size:11px;font-weight:800;color:#999;letter-spacing:.5px;margin-bottom:12px;text-transform:uppercase}
 /* 전체 DB 카드 - HERO (찐한 남색 + 흰색) */
-.db-total{background:linear-gradient(135deg,#0a1845 0%,#0f2a5e 50%,#1a3a7a 100%);color:#fff;border:none;position:relative;overflow:hidden;justify-content:center;transition:all .25s;padding:14px 16px}
+.db-total{background:linear-gradient(135deg,#0a1845 0%,#0f2a5e 50%,#1a3a7a 100%);color:#fff;border:none;position:relative;overflow:hidden;justify-content:center;transition:all .25s}
 .db-total:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(10,24,69,.35)}
 .db-total::before{content:'';position:absolute;top:-50%;right:-30%;width:200%;height:200%;background:radial-gradient(circle,rgba(96,165,250,.18) 0%,transparent 50%);pointer-events:none;animation:dbPulse 4s ease-in-out infinite}
 @keyframes dbPulse{0%,100%{opacity:.6}50%{opacity:1}}
-.db-total .db-card-lbl{color:#93c5fd;position:relative;font-size:11.5px;letter-spacing:.5px;font-weight:800;margin-bottom:4px}
-.db-total .db-card-val{font-size:44px;font-weight:900;letter-spacing:-2px;line-height:1;color:#fff;position:relative;cursor:pointer;transition:all .2s;text-shadow:0 2px 12px rgba(96,165,250,.4);display:inline-block}
+.db-total .db-card-lbl{color:#93c5fd;position:relative;font-size:12px;letter-spacing:.8px;font-weight:800;margin-bottom:6px}
+.db-total .db-card-val{font-size:64px;font-weight:900;letter-spacing:-3px;line-height:1;color:#fff;position:relative;cursor:pointer;transition:all .2s;text-shadow:0 2px 16px rgba(96,165,250,.4);display:inline-block}
 .db-total .db-card-val:hover{transform:scale(1.03);text-shadow:0 4px 20px rgba(255,255,255,.5)}
-.db-total .db-card-val::after{content:'👆';font-size:12px;margin-left:6px;opacity:.5;text-shadow:none;-webkit-text-fill-color:initial;vertical-align:middle}
-.db-total .db-card-sub{font-size:11px;color:#cbd5e1;margin-top:6px;font-weight:600;position:relative;letter-spacing:.3px}
+.db-total .db-card-val::after{content:'👆';font-size:14px;margin-left:8px;opacity:.5;text-shadow:none;-webkit-text-fill-color:initial;vertical-align:middle}
+.db-total .db-card-sub{font-size:11.5px;color:#cbd5e1;margin-top:10px;font-weight:600;position:relative;letter-spacing:.3px}
 /* OFF vs MKT 도넛 차트 */
 .db-donut-wrap{display:flex;align-items:center;gap:14px;flex:1}
 .db-donut{flex-shrink:0;filter:drop-shadow(0 2px 6px #0001a)}
@@ -378,21 +378,24 @@ body.focus-mode #detail-section-hd{display:none!important}
 .dlg-item.dlg-unfit:hover{background:#fee2e2;border-color:#dc2626}
 .dlg-item.dlg-unfit .dlg-lbl{color:#b91c1c}
 /* 미진행 세부 분류 */
-.mgmt-sub{margin-top:10px;padding-top:10px;border-top:1px dashed #e5e7eb}
-.mgmt-sub-lbl{font-size:10.5px;font-weight:800;color:#a16207;margin-bottom:7px;letter-spacing:-.2px}
-.mgmt-sub-lbl small{font-weight:700;color:#94a3b8;font-size:9.5px}
-.mgmt-sub-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.mgmt-sub-item{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:7px;cursor:pointer;transition:all .12s;font-size:11px;border:1.5px solid}
-.mgmt-sub-item.mgmt-sub-noMemo{background:#fffbeb;border-color:#fde68a}
-.mgmt-sub-item.mgmt-sub-noMemo:hover{background:#fef3c7;border-color:#fbbf24;transform:translateY(-1px)}
-.mgmt-sub-item.mgmt-sub-noMemo .mgmt-sub-pct{color:#92400e;background:#fef3c7}
-.mgmt-sub-item.mgmt-sub-noResp{background:#fff7ed;border-color:#fed7aa}
-.mgmt-sub-item.mgmt-sub-noResp:hover{background:#ffedd5;border-color:#fb923c;transform:translateY(-1px)}
-.mgmt-sub-item.mgmt-sub-noResp .mgmt-sub-pct{color:#7c2d12;background:#ffedd5}
-.mgmt-sub-icon{font-size:13px}
-.mgmt-sub-name{font-weight:800;color:#0f172a;flex:1;letter-spacing:-.2px}
-.mgmt-sub-item b{font-size:15px;font-weight:900;color:#0f172a;letter-spacing:-.3px;line-height:1}
-.mgmt-sub-pct{font-size:10.5px;font-weight:800;letter-spacing:-.2px;padding:1px 6px;border-radius:5px}
+.mgmt-detail{margin-top:10px;padding-top:10px;border-top:1px dashed #e5e7eb;display:flex;flex-direction:column;gap:5px}
+.mgmt-detail-row{display:flex;align-items:center;gap:8px;padding:7px 11px;border-radius:7px;cursor:pointer;transition:all .12s;font-size:11.5px;border:1.5px solid}
+.mgmt-detail-row.mgmt-row-active{background:#f0fdf4;border-color:#bbf7d0}
+.mgmt-detail-row.mgmt-row-active:hover{background:#dcfce7;border-color:#22c55e}
+.mgmt-detail-row.mgmt-row-active .mgmt-detail-pct{color:#15803d;background:#dcfce7}
+.mgmt-detail-row.mgmt-row-noMemo{background:#fef2f2;border-color:#fecaca}
+.mgmt-detail-row.mgmt-row-noMemo:hover{background:#fee2e2;border-color:#dc2626}
+.mgmt-detail-row.mgmt-row-noMemo .mgmt-detail-pct{color:#7f1d1d;background:#fee2e2}
+.mgmt-detail-row.mgmt-row-noResp{background:#fff7ed;border-color:#fed7aa}
+.mgmt-detail-row.mgmt-row-noResp:hover{background:#ffedd5;border-color:#fb923c}
+.mgmt-detail-row.mgmt-row-noResp .mgmt-detail-pct{color:#7c2d12;background:#ffedd5}
+.mgmt-detail-row.mgmt-row-cancel{background:#fef2f2;border-color:#fecaca}
+.mgmt-detail-row.mgmt-row-cancel:hover{background:#fee2e2;border-color:#dc2626}
+.mgmt-detail-row.mgmt-row-cancel .mgmt-detail-pct{color:#b91c1c;background:#fee2e2}
+.mgmt-detail-icon{font-size:14px}
+.mgmt-detail-name{font-weight:800;color:#0f172a;flex:1;letter-spacing:-.2px}
+.mgmt-detail-row b{font-size:16px;font-weight:900;color:#0f172a;letter-spacing:-.3px;line-height:1;min-width:36px;text-align:right}
+.mgmt-detail-pct{font-size:11px;font-weight:800;letter-spacing:-.2px;padding:2px 7px;border-radius:5px;min-width:42px;text-align:center}
 .db-status-row.s-active{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
 .db-status-row.s-idle{background:#fffbeb;color:#a16207;border-color:#fde68a}
 .db-status-row.s-cancel{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
@@ -2660,33 +2663,32 @@ function renderDBSummary(){
         ${idleNoResp>0?`<div class="ms-seg ms-no-resp" style="width:${pct(idleNoResp)}%" onclick="openMemStatus('idle_noResp')" title="응답없음 ${idleNoResp}건">${pct(idleNoResp)>=8?'🚨 '+pct(idleNoResp)+'%':pct(idleNoResp)+'%'}</div>`:''}
         ${cancelled>0?`<div class="ms-seg ms-cancel" style="width:${pct(cancelled)}%" onclick="openMemStatus('cancel')" title="부적합 ${cancelled}건">${pct(cancelled)>=8?'⛔ '+pct(cancelled)+'%':pct(cancelled)+'%'}</div>`:''}
       </div>
-      <div class="mgmt-legend">
-        <div class="mgmt-leg ml-active" onclick="openMemStatus('active')">
-          <div class="ml-row"><span class="ml-dot"></span><span class="ml-lbl">${T('db_active')||'진행'}</span></div>
+      <div class="mgmt-detail">
+        <div class="mgmt-detail-row mgmt-row-active" onclick="openMemStatus('active')" title="진행됨 — 예약/방문/클로 진행">
+          <span class="mgmt-detail-icon">✅</span>
+          <span class="mgmt-detail-name">진행됨</span>
           <b>${f(active)}</b>
+          <span class="mgmt-detail-pct">${pct(active)}%</span>
         </div>
-        <div class="mgmt-leg ml-cancel" onclick="openMemStatus('cancel')">
-          <div class="ml-row"><span class="ml-dot"></span><span class="ml-lbl">⛔ 부적합</span></div>
+        <div class="mgmt-detail-row mgmt-row-noMemo" onclick="openMemStatus('idle_noMemo')" title="상담기록 없음 — 즉시 관리 필요">
+          <span class="mgmt-detail-icon">📝</span>
+          <span class="mgmt-detail-name">상담기록없음</span>
+          <b>${f(idleNoMemo)}</b>
+          <span class="mgmt-detail-pct">${pct(idleNoMemo)}%</span>
+        </div>
+        <div class="mgmt-detail-row mgmt-row-noResp" onclick="openMemStatus('idle_noResp')" title="상담기록 있지만 옵션 미선택 — 응답없음">
+          <span class="mgmt-detail-icon">🚨</span>
+          <span class="mgmt-detail-name">응답없음</span>
+          <b>${f(idleNoResp)}</b>
+          <span class="mgmt-detail-pct">${pct(idleNoResp)}%</span>
+        </div>
+        <div class="mgmt-detail-row mgmt-row-cancel" onclick="openMemStatus('cancel')" title="부적합 DB">
+          <span class="mgmt-detail-icon">⛔</span>
+          <span class="mgmt-detail-name">부적합</span>
           <b>${f(cancelled)}</b>
+          <span class="mgmt-detail-pct">${pct(cancelled)}%</span>
         </div>
       </div>
-      ${idle>0?`<div class="mgmt-sub">
-        <div class="mgmt-sub-lbl">⏳ 미진행 ${f(idle)}건 세부 <small>(전체 ${f(total)} 대비)</small></div>
-        <div class="mgmt-sub-row">
-          <div class="mgmt-sub-item mgmt-sub-noMemo" onclick="openMemStatus('idle_noMemo')" title="상담기록 없음 — 즉시 관리 필요">
-            <span class="mgmt-sub-icon">📝</span>
-            <span class="mgmt-sub-name">상담기록없음</span>
-            <b>${f(idleNoMemo)}</b>
-            <span class="mgmt-sub-pct">${pct(idleNoMemo)}%</span>
-          </div>
-          <div class="mgmt-sub-item mgmt-sub-noResp" onclick="openMemStatus('idle_noResp')" title="상담기록은 있지만 옵션 미선택 — 응답없음">
-            <span class="mgmt-sub-icon">🚨</span>
-            <span class="mgmt-sub-name">응답없음</span>
-            <b>${f(idleNoResp)}</b>
-            <span class="mgmt-sub-pct">${pct(idleNoResp)}%</span>
-          </div>
-        </div>
-      </div>`:''}
     </div>
     `;
   document.getElementById('db-grid').innerHTML = html;
