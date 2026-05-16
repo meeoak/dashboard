@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UI 정리 미리보기</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;margin:0;background:#f0ede8;color:#0f172a;font-size:14px}
+.intro{max-width:1100px;margin:0 auto;padding:24px 20px}
+.intro h1{font-size:24px;font-weight:900;margin:0 0 8px;letter-spacing:-.5px}
+.intro p{font-size:13px;color:#475569;font-weight:600;margin:0 0 16px}
+.opt-label{display:inline-block;background:#1e3a8a;color:#fff;font-size:11px;font-weight:900;padding:4px 12px;border-radius:6px;margin:24px 0 10px;letter-spacing:.3px}
+.note{font-size:12.5px;color:#64748b;background:#fef9c3;border:1.5px solid #fcd34d;border-radius:8px;padding:10px 14px;margin:0 0 16px;font-weight:600;line-height:1.6}
+.note b{color:#7c2d12}
+
+/* ====== 미리보기 mockup 공통 스타일 ====== */
+.preview{background:#f0ede8;border:1.5px solid #cbd5e1;border-radius:12px;overflow:hidden;margin-bottom:8px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+
+/* 옵션 A — 정리된 포커스 모드 */
+.a-hdr{background:linear-gradient(135deg,#0a0a1a,#1a1a2e,#2d1b4e,#0f3460);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.a-hdr-title{font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px}
+.a-hdr-flame{font-size:18px;filter:drop-shadow(0 0 8px #fbbf24)}
+.a-hdr-meta{font-size:11px;color:#cbd5e1;font-weight:600}
+.a-hdr-actions{display:flex;gap:6px;font-size:11px}
+.a-hdr-actions button{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer}
+
+/* 통합 상단 컨트롤 바: 스코프 + 빠른 이동을 한 줄로 */
+.a-ctrl{background:#fff;border-bottom:1.5px solid #e5e7eb;padding:10px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.a-ctrl-group{display:flex;gap:4px;align-items:center}
+.a-ctrl-lbl{font-size:11px;font-weight:800;color:#64748b;margin-right:4px;letter-spacing:-.2px}
+.a-pill{background:#f1f5f9;border:1.5px solid #cbd5e1;color:#475569;font-size:12px;font-weight:800;padding:5px 12px;border-radius:7px;cursor:pointer;white-space:nowrap;letter-spacing:-.2px}
+.a-pill.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
+.a-pill.team-g{border-color:#bfdbfe}
+.a-pill.team-g.on{background:#1a73e8;border-color:#1a73e8}
+.a-pill.team-t.on{background:#16a34a;border-color:#16a34a}
+.a-pill.team-l.on{background:#ea4335;border-color:#ea4335}
+.a-pill .a-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+/* 빠른 이동: 메인 탭으로 승격 */
+.a-tabs{background:#fff;border-bottom:2px solid #fcd34d;padding:0 20px;display:flex;gap:0}
+.a-tab{background:transparent;border:none;padding:13px 18px;font-size:13px;font-weight:900;color:#64748b;cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:center;gap:5px;letter-spacing:-.3px;position:relative;top:2px}
+.a-tab:hover{color:#1e3a8a;background:#fef9c3}
+.a-tab.on{color:#1e3a8a;border-bottom-color:#1e3a8a}
+.a-tab-restore{margin-left:auto;font-size:11px;font-weight:800;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;padding:5px 11px;border-radius:6px;cursor:pointer;align-self:center}
+
+/* 필터: 콤팩트 한 줄 */
+.a-filter{background:#fafbfc;border-bottom:1px solid #e5e7eb;padding:9px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.a-filter input,.a-filter select{font-size:12px;padding:5px 9px;border:1.5px solid #cbd5e1;border-radius:7px;background:#fff;font-weight:700;color:#1e293b}
+.a-presets{display:flex;gap:3px}
+.a-presets button{font-size:11px;padding:4px 9px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;font-weight:700;color:#475569}
+.a-presets button:hover{background:#eff6ff;border-color:#1e3a8a;color:#1e3a8a}
+.a-filter .a-spacer{flex:1}
+
+/* 콘텐츠 영역 */
+.a-content{background:#fff;padding:18px 20px;min-height:200px}
+.a-content-h{font-size:15px;font-weight:900;margin-bottom:12px;color:#1e3a8a;letter-spacing:-.3px;display:flex;align-items:center;gap:6px}
+.a-card-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.a-mini-card{background:linear-gradient(135deg,#fafbfc,#fff);border:1.5px solid #cbd5e1;border-radius:10px;padding:14px;text-align:center}
+.a-mini-card .num{font-size:28px;font-weight:900;color:#1e3a8a;letter-spacing:-1px;line-height:1}
+.a-mini-card .lbl{font-size:11px;color:#64748b;font-weight:700;margin-top:6px}
+
+/* 옵션 B 비교용 (현재 상태) */
+.b-scope{background:linear-gradient(180deg,#0f0f1f,#16162a);padding:8px 20px;display:flex;gap:6px;align-items:center;border-bottom:2px solid #1e3a8a}
+.b-scope button{background:rgba(255,255,255,.05);color:#aaa;border:2px solid rgba(255,255,255,.1);padding:9px 18px;border-radius:10px;font-size:12.5px;font-weight:900;cursor:pointer}
+.b-scope button.on{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-color:#1e3a8a}
+.b-qnav{background:linear-gradient(180deg,#fef9c3,#fffbeb);border-bottom:1.5px solid #fcd34d;padding:7px 20px;display:flex;gap:6px;align-items:center}
+.b-qnav-lbl{font-size:11px;font-weight:900;color:#854d0e;margin-right:4px}
+.b-qnav button{background:#fff;border:1.5px solid #fcd34d;color:#854d0e;font-size:12px;font-weight:900;padding:6px 12px;border-radius:8px;cursor:pointer}
+.b-qnav button.on{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-color:#1e3a8a}
+.b-filter{background:#fff;border-bottom:1px solid #e5e7eb;padding:9px 20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px}
+.b-secthd{background:#fff;border-bottom:8px solid #f0ede8;padding:8px 20px}
+.b-secthd-inner{border-left:6px solid #1e3a8a;padding:7px 13px;background:linear-gradient(90deg,#eff6ff,#fff);border-radius:0 6px 6px 0;font-weight:900;font-size:13px;color:#1e293b}
+.b-secthd-sub{font-size:11px;color:#aaa;margin-left:8px;font-weight:600}
+.b-tabs{background:#fffbeb;border:2px solid #fcd34d;border-bottom:none;border-radius:12px 12px 0 0;display:flex;margin:8px 16px 0}
+.b-tab{flex:1;padding:13px 10px;font-size:12.5px;font-weight:800;text-align:center;color:#78502d;border-right:1px dashed #fde68a;cursor:pointer}
+.b-tab:last-child{border-right:none}
+.b-tab.on{background:#fff;color:#1e3a8a;border-bottom:4px solid #1e3a8a}
+.b-tab-content{background:#fff;border:2px solid #fcd34d;border-top:none;border-radius:0 0 12px 12px;margin:0 16px 16px;padding:16px 20px;min-height:80px;color:#94a3b8;font-style:italic;font-size:12px;text-align:center}
+
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.diff h3{font-size:13px;font-weight:900;margin:0 0 8px;color:#1e3a8a}
+.diff-card{background:#fff;border:1.5px solid #e5e7eb;border-radius:9px;padding:14px}
+.diff-card ul{margin:0;padding-left:18px;font-size:12px;line-height:1.7;color:#334155}
+.diff-card.before{border-color:#fca5a5;background:linear-gradient(180deg,#fef2f2,#fff)}
+.diff-card.after{border-color:#86efac;background:linear-gradient(180deg,#f0fdf4,#fff)}
+.diff-card.before h3{color:#7f1d1d}
+.diff-card.after h3{color:#15803d}
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>🎨 UI 정리안 미리보기</h1>
+  <p>현재 화면의 정돈 안 된 부분을 진단하고, 깔끔한 안을 비교합니다.</p>
+
+  <!-- ============================================ -->
+  <div class="opt-label">🔻 현재 (Before)</div>
+  <div class="note">
+    <b>문제:</b> 1) 헤더 4단 스택(상단 dark · 스코프 · 빠른이동 · 필터) → 콘텐츠 시작이 멀어짐.
+    2) 빠른 이동 바와 콘텐츠 위 탭 바가 같은 4개 탭을 <b>중복</b> 표시.
+    3) 포커스 모드에서 섹션 헤더(📋 DB 배정 분석 / 🎯 4대 KPI / 📊 영업 활동)는 보이지만 <b>내용은 비어있음</b> → 빈 줄.
+  </div>
+  <div class="preview">
+    <div class="b-scope">
+      <button>전체 통합</button>
+      <button class="on">● MKT DB</button>
+      <button>● OFF DB</button>
+      <div style="flex:1"></div>
+      <button>● TIM_GIAR</button>
+      <button>● TIM_TINA</button>
+      <button>● TIM_LIDIA</button>
+    </div>
+    <div class="b-qnav">
+      <span class="b-qnav-lbl">📂 빠른 이동:</span>
+      <button>📅 방문 캘린더</button>
+      <button>👥 에이전트 현황</button>
+      <button class="on">🏆 랭킹 & 배틀</button>
+      <button>🔥 팀·에이전트 인사이트</button>
+    </div>
+    <div class="b-filter">
+      <select><option>5월</option></select>
+      <input type="date" value="2026-05-01">~<input type="date" value="2026-05-31">
+      <button style="padding:4px 9px;font-size:11px;border:1px solid #ccc;border-radius:5px;background:#fafafa">오늘</button>
+      <button style="padding:4px 9px;font-size:11px;border:1px solid #ccc;border-radius:5px;background:#fafafa">최근 7일</button>
+      <button style="padding:4px 9px;font-size:11px;border:1px solid #ccc;border-radius:5px;background:#fafafa">이번달</button>
+      <select><option>Lastiar Manalu</option></select>
+    </div>
+    <div class="b-secthd"><div class="b-secthd-inner">📋 DB 배정 분석 <span class="b-secthd-sub">DB 종류·활동상태 분포</span></div></div>
+    <div class="b-secthd"><div class="b-secthd-inner">🎯 4대 핵심 KPI 목표 달성 현황 <span class="b-secthd-sub">회사 KPI 기준</span></div></div>
+    <div class="b-secthd"><div class="b-secthd-inner">📊 팀별 영업 활동 종합 <span class="b-secthd-sub">전체 통합</span></div></div>
+    <div class="b-tabs">
+      <div class="b-tab">📅 방문 캘린더</div>
+      <div class="b-tab">👥 에이전트 현황</div>
+      <div class="b-tab on">🏆 랭킹 & 배틀</div>
+      <div class="b-tab">🔥 인사이트</div>
+    </div>
+    <div class="b-tab-content">··· 랭킹 콘텐츠 ···</div>
+  </div>
+
+  <!-- ============================================ -->
+  <div class="opt-label" style="background:#16a34a">✅ 정리안 (After)</div>
+  <div class="note" style="background:#dcfce7;border-color:#86efac">
+    <b>변경:</b>
+    ① 헤더는 1줄로 압축 (제목 · 메타 · 언어/새로고침 우측 정렬).
+    ② 스코프 + 빠른 이동을 <b>한 줄 컨트롤 바</b>로 합침.
+    ③ 빠른 이동 탭을 <b>메인 탭</b>으로 승격, 콘텐츠 위 탭 바는 제거 (중복 제거).
+    ④ 포커스 모드에서 섹션 헤더 빈 줄 모두 <b>완전 숨김</b>.
+    ⑤ 필터 한 줄로 콤팩트 (프리셋 작은 알약).
+  </div>
+  <div class="preview">
+    <div class="a-hdr">
+      <div>
+        <div class="a-hdr-title"><span class="a-hdr-flame">🔥</span>영업팀 통합 대시보드</div>
+        <div class="a-hdr-meta">MKT DB · Lastiar Manalu · 2026-05-01 ~ 2026-05-31</div>
+      </div>
+      <div class="a-hdr-actions">
+        <button>🇰🇷 한국어</button>
+        <button>🇮🇩 Bahasa</button>
+        <button>🔄 새로고침</button>
+      </div>
+    </div>
+    <div class="a-ctrl">
+      <div class="a-ctrl-group">
+        <span class="a-ctrl-lbl">DB</span>
+        <button class="a-pill">전체</button>
+        <button class="a-pill on">MKT</button>
+        <button class="a-pill">OFF</button>
+      </div>
+      <div class="a-ctrl-group">
+        <span class="a-ctrl-lbl">팀</span>
+        <button class="a-pill team-g"><span class="a-dot" style="background:#1a73e8"></span>GIAR</button>
+        <button class="a-pill team-t"><span class="a-dot" style="background:#16a34a"></span>TINA</button>
+        <button class="a-pill team-l on"><span class="a-dot" style="background:#fff"></span>LIDIA</button>
+      </div>
+      <div style="flex:1"></div>
+      <div class="a-ctrl-group">
+        <select style="font-size:12px;padding:5px 9px;border:1.5px solid #cbd5e1;border-radius:7px"><option>Lastiar Manalu</option></select>
+      </div>
+    </div>
+    <div class="a-tabs">
+      <button class="a-tab">📅 방문 캘린더</button>
+      <button class="a-tab">👥 에이전트 현황</button>
+      <button class="a-tab on">🏆 랭킹 & 배틀</button>
+      <button class="a-tab">🔥 인사이트</button>
+      <button class="a-tab-restore">↑ 대시보드 요약</button>
+    </div>
+    <div class="a-filter">
+      <select><option>5월</option></select>
+      <input type="date" value="2026-05-01">~<input type="date" value="2026-05-31">
+      <div class="a-presets">
+        <button>오늘</button><button>7일</button><button>14일</button><button>21일</button>
+        <button>이번달</button><button>지난달</button><button>전체</button>
+      </div>
+    </div>
+    <div class="a-content">
+      <div class="a-content-h">🏆 팀 배틀 — May (LIDIA 필터 적용)</div>
+      <div class="a-card-row">
+        <div class="a-mini-card"><div class="num" style="color:#1a73e8">32</div><div class="lbl">🥇 GIAR (7건 방문)</div></div>
+        <div class="a-mini-card"><div class="num" style="color:#16a34a">20</div><div class="lbl">🥈 TINA (5건)</div></div>
+        <div class="a-mini-card"><div class="num" style="color:#ea4335">20</div><div class="lbl">🥉 LIDIA (0건)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="diff">
+    <div class="diff-card before">
+      <h3>Before</h3>
+      <ul>
+        <li>헤더 4단 스택</li>
+        <li>스코프(어두운 바) · 빠른 이동(노랑 바) · 필터(흰 바) 3줄</li>
+        <li>탭 메뉴가 2번 (빠른 이동 + 콘텐츠 위)</li>
+        <li>포커스 모드에서 비어있는 섹션 헤더 3개 잔존</li>
+        <li>총 헤더 영역 약 230px → 콘텐츠 시작 위치 늦음</li>
+      </ul>
+    </div>
+    <div class="diff-card after">
+      <h3>After</h3>
+      <ul>
+        <li>헤더 1줄 (메타·언어 우측 정렬)</li>
+        <li>스코프 + 팀을 <b>한 줄 컨트롤 바</b>로 통합</li>
+        <li>탭 1세트 (메인 탭, 중복 제거)</li>
+        <li>섹션 헤더 완전 숨김 (탭 콘텐츠만 노출)</li>
+        <li>총 헤더 영역 약 160px → 콘텐츠 시작 ~70px ↑</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="opt-label" style="background:#7c3aed;margin-top:32px">💡 추천</div>
+  <div class="note" style="background:#ede9fe;border-color:#a78bfa">
+    <b>After 안</b>으로 적용하면 좋을 듯합니다. 핵심 변경:<br>
+    1) <b>컨트롤 바 통합</b>: 스코프(DB/팀) + 에이전트를 한 줄에 (DB 라벨 · 팀 라벨 알약 그룹).<br>
+    2) <b>탭 중복 제거</b>: 빠른 이동을 메인 탭으로 승격, 콘텐츠 위 탭 바 제거.<br>
+    3) <b>포커스 모드 완전 정리</b>: 섹션 헤더도 함께 숨김.<br>
+    4) <b>필터 줄임</b>: 프리셋을 더 작은 알약으로.
+  </div>
+  <p style="font-size:13px;color:#475569;font-weight:600">이 안으로 적용해도 될까요? 다른 방향 원하시면 알려주세요.</p>
+</div>
+</body>
+</html>
