@@ -1003,7 +1003,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 .team-bar .scope-in{padding:7px 0;gap:6px}
 
 /* 3) 빠른 이동 = 메인 탭 (sticky로 상단 고정) — team-bar 아래 */
-.quick-nav-bar{background:#fff;border-bottom:2px solid #fcd34d;padding:0 22px;box-shadow:0 1px 0 #fcd34d;position:sticky;top:88px;z-index:48}
+.quick-nav-bar{background:#fff;border-bottom:2px solid #fcd34d;padding:0 22px;box-shadow:0 1px 0 #fcd34d}
 .quick-nav-in{padding:0;gap:0;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-end}
 .quick-nav-lbl{display:none}
 .quick-nav-btn{background:transparent;border:none;color:#64748b;font-size:13px;padding:12px 16px;border-radius:0;border-bottom:3px solid transparent;letter-spacing:-.3px;position:relative;top:2px}
@@ -1040,7 +1040,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   .scope-lang .lang-btn{font-size:10.5px;padding:3px 7px}
   .scope-refresh-btn{font-size:11px;padding:4px 9px}
   .team-bar{padding:0 12px;top:42px}
-  .quick-nav-bar{padding:0 12px;top:80px}
+  .quick-nav-bar{padding:0 12px}
   .quick-nav-btn{padding:10px 12px;font-size:12px}
   .filter-bar{padding:7px 12px}
 }
@@ -1086,16 +1086,6 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <button class="scope-btn team-dash-btn" data-scope="TIM_LIDIA" onclick="selectScope('TIM_LIDIA')"><span class="scope-dot" style="background:#ea4335"></span>LIDIA 대시보드</button>
 </div></div>
 
-<!-- 빠른 이동 탭 (상단 quick-nav) — 클릭 시 그 화면만 보임 -->
-<div class="quick-nav-bar"><div class="quick-nav-in">
-  <span class="quick-nav-lbl">📂 빠른 이동:</span>
-  <button class="quick-nav-btn" onclick="jumpToTab('cal')" data-qnav="cal">📅 방문 캘린더</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats">👥 에이전트 현황</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank">🏆 랭킹 & 배틀</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('team_insight')" data-qnav="team_insight">🏆 팀 인사이트</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight">👤 에이전트 인사이트</button>
-</div></div>
-
 <!-- 모드 표시 -->
 <div class="mode-banner">
   <span class="mode-pill" id="mode-pill">🌐 전체</span>
@@ -1122,6 +1112,16 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <div class="fsep"></div>
   <select class="fsel" id="fsel-agent" onchange="onFilter()"></select>
   <span class="today-lbl" id="today-lbl"></span>
+</div></div>
+
+<!-- 빠른 이동 탭 (필터 바 아래로 이동) — 클릭 시 그 화면만 보임 -->
+<div class="quick-nav-bar"><div class="quick-nav-in">
+  <span class="quick-nav-lbl">📂 빠른 이동:</span>
+  <button class="quick-nav-btn" onclick="jumpToTab('cal')" data-qnav="cal">📅 방문 캘린더</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats">👥 에이전트 현황</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank">🏆 랭킹 & 배틀</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('team_insight')" data-qnav="team_insight">🏆 팀 인사이트</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight">👤 에이전트 인사이트</button>
 </div></div>
 
 <!-- 3개월 트렌드는 KPI 카드 안에 sparkbars로 통합됨 (별도 섹션 제거) -->
