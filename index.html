@@ -2724,7 +2724,8 @@ function renderCal(kind){
   const month = curFrom ? curFrom.slice(0,7) : (curMonth==='ALL' ? D.months[D.months.length-1] : curMonth);
   const calData = D.cal_summary[month];
   if(!calData) return;
-  const types = kind==='done' ? ['d','ls','vc'] : ['s','w'];
+  // 방문예약 달력: 완료된 방문(d/ls/vc)도 포함해서 '완료' 상태로 표시 (사용자 추적용)
+  const types = kind==='done' ? ['d','ls','vc'] : ['s','w','d','ls','vc'];
 
   const recs = D.cal_recs.filter(r=>{
     if(!r.vd.startsWith(month)) return false;
@@ -2757,7 +2758,7 @@ function renderCal(kind){
   const u = T('cal_unit');
   document.getElementById(subEl).textContent = kind==='done'
     ? `${T('cal_label_done')} ${totals.d} · ${T('cal_label_langsung')} ${totals.ls} · ${T('cal_label_video')} ${totals.vc} (${T('cal_total')} ${totals.d+totals.ls+totals.vc}${u})`
-    : `${T('cal_label_book')} ${totals.s} · ${T('cal_label_wait')} ${totals.w} (${T('cal_total')} ${totals.s+totals.w}${u})`;
+    : `${T('cal_label_book')} ${totals.s} · ${T('cal_label_wait')} ${totals.w} · ${T('cal_label_done')} ${totals.d+totals.ls+totals.vc} (${T('cal_total')} ${totals.s+totals.w+totals.d+totals.ls+totals.vc}${u})`;
 
   const dows = [T('dow_mon'),T('dow_tue'),T('dow_wed'),T('dow_thu'),T('dow_fri'),T('dow_sat'),T('dow_sun')];
   let h = dows.map((d,i)=>`<div class="cal-dow ${i===5?'sat':i===6?'sun':''}">${d}</div>`).join('');
@@ -2779,6 +2780,9 @@ function renderCal(kind){
     } else {
       if(info.s.length)  badges+=`<div class="cal-badge cb-s" onclick="event.stopPropagation();openDayType('${ds}','s')">📅 ${T('cal_label_book')} ${info.s.length}</div>`;
       if(info.w.length)  badges+=`<div class="cal-badge cb-w" onclick="event.stopPropagation();openDayType('${ds}','w')">⏳ ${T('cal_label_wait')} ${info.w.length}</div>`;
+      // 예약 달력에서도 완료된 건은 ✅ 완료 배지로 표시
+      const doneN = info.d.length + info.ls.length + info.vc.length;
+      if(doneN) badges+=`<div class="cal-badge cb-d" onclick="event.stopPropagation();openDayDone('${ds}')">✅ ${T('cal_label_done')} ${doneN}</div>`;
     }
 
     // 각 건별 개별 chip (×3이면 3개 chip 따로 표시)
@@ -4669,6 +4673,11 @@ function openMem(agent, stype, month, labelOverride){
 function openDayType(date, stype){
   const recs = D.cal_recs.filter(r=>r.vd===date && r.st===stype && (curTeam==='ALL'||r.t===curTeam) && (curAgent==='ALL'||r.a===curAgent));
   showMem(recs, null, stype, date.slice(0,7), date);
+}
+function openDayDone(date){
+  const done = new Set(['d','ls','vc']);
+  const recs = D.cal_recs.filter(r=>r.vd===date && done.has(r.st) && (curTeam==='ALL'||r.t===curTeam) && (curAgent==='ALL'||r.a===curAgent));
+  showMem(recs, null, null, date.slice(0,7), date);
 }
 function openDayAll(date){
   const recs = D.cal_recs.filter(r=>r.vd===date && (curTeam==='ALL'||r.t===curTeam) && (curAgent==='ALL'||r.a===curAgent));
