@@ -3417,13 +3417,14 @@ function renderUrgentBanner(){
       const isNoMemo = memoEmpty && noOption;
       if(isNoMemo) totals.noMemo++;
       // 응답없음(3) NEW: 메모 있음 AND 옵션 선택됨 → 에이전트는 했는데 회원 무응답
-      if(!memoEmpty && !noOption) totals.idle++;
-      // 긴급 = 상담기록없음(1) + 방문일 지남(2) 만
-      if(isNoMemo || u.urgentIcon==='⚠️') agentUrgentCount++;
+      const isIdle = !memoEmpty && !noOption;
+      if(isIdle) totals.idle++;
+      // 긴급 = 상담기록없음(1) + 방문일 지남(2) + 응답없음(3)
+      if(isNoMemo || u.urgentIcon==='⚠️' || isIdle) agentUrgentCount++;
     });
     if(agentUrgentCount>0) totals.byAgent[a] = agentUrgentCount;
   });
-  totals.total = totals.noMemo + totals.overdue;
+  totals.total = totals.noMemo + totals.overdue + totals.idle;
   const anyItems = totals.noMemo + totals.overdue + totals.idle + totals.wait + totals.soon;
 
   if(anyItems===0){
