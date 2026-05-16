@@ -357,6 +357,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 .ms-seg:hover{filter:brightness(1.1)}
 .ms-active{background:linear-gradient(135deg,#16a34a,#22c55e)}
 .ms-idle{background:linear-gradient(135deg,#d97706,#f59e0b)}
+.ms-no-memo{background:linear-gradient(135deg,#d97706,#fbbf24)}
+.ms-no-resp{background:linear-gradient(135deg,#ea580c,#fb923c)}
 .ms-cancel{background:linear-gradient(135deg,#dc2626,#ef4444)}
 .mgmt-legend{display:flex;gap:6px;margin-top:auto}
 .mgmt-leg{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border-radius:8px;background:#fafafa;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s;border:1px solid transparent;text-align:center}
@@ -380,12 +382,17 @@ body.focus-mode #detail-section-hd{display:none!important}
 .mgmt-sub-lbl{font-size:10.5px;font-weight:800;color:#a16207;margin-bottom:7px;letter-spacing:-.2px}
 .mgmt-sub-lbl small{font-weight:700;color:#94a3b8;font-size:9.5px}
 .mgmt-sub-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.mgmt-sub-item{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:7px;background:#fffbeb;border:1.5px solid #fde68a;cursor:pointer;transition:all .12s;font-size:11px}
-.mgmt-sub-item:hover{background:#fef3c7;border-color:#fbbf24;transform:translateY(-1px)}
+.mgmt-sub-item{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:7px;cursor:pointer;transition:all .12s;font-size:11px;border:1.5px solid}
+.mgmt-sub-item.mgmt-sub-noMemo{background:#fffbeb;border-color:#fde68a}
+.mgmt-sub-item.mgmt-sub-noMemo:hover{background:#fef3c7;border-color:#fbbf24;transform:translateY(-1px)}
+.mgmt-sub-item.mgmt-sub-noMemo .mgmt-sub-pct{color:#92400e;background:#fef3c7}
+.mgmt-sub-item.mgmt-sub-noResp{background:#fff7ed;border-color:#fed7aa}
+.mgmt-sub-item.mgmt-sub-noResp:hover{background:#ffedd5;border-color:#fb923c;transform:translateY(-1px)}
+.mgmt-sub-item.mgmt-sub-noResp .mgmt-sub-pct{color:#7c2d12;background:#ffedd5}
 .mgmt-sub-icon{font-size:13px}
 .mgmt-sub-name{font-weight:800;color:#0f172a;flex:1;letter-spacing:-.2px}
 .mgmt-sub-item b{font-size:15px;font-weight:900;color:#0f172a;letter-spacing:-.3px;line-height:1}
-.mgmt-sub-pct{font-size:10.5px;font-weight:800;color:#92400e;letter-spacing:-.2px;background:#fef3c7;padding:1px 6px;border-radius:5px}
+.mgmt-sub-pct{font-size:10.5px;font-weight:800;letter-spacing:-.2px;padding:1px 6px;border-radius:5px}
 .db-status-row.s-active{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
 .db-status-row.s-idle{background:#fffbeb;color:#a16207;border-color:#fde68a}
 .db-status-row.s-cancel{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
@@ -2566,10 +2573,11 @@ function renderDBSummary(){
           <div class="mgmt-rate-lbl">${curLang==='ko'?'관리 진행':'Diproses'}</div>
         </div>
       </div>
-      <div class="mgmt-stack-bar" title="진행됨 / 미진행 / 취소">
+      <div class="mgmt-stack-bar" title="진행됨 / 상담기록없음 / 응답없음 / 부적합">
         ${active>0?`<div class="ms-seg ms-active" style="width:${pct(active)}%" onclick="openMemStatus('active')" title="진행됨 ${active}건">${pct(active)>=8?'✅ '+pct(active)+'%':pct(active)+'%'}</div>`:''}
-        ${idle>0?`<div class="ms-seg ms-idle" style="width:${pct(idle)}%" onclick="openMemStatus('idle')" title="미진행 ${idle}건">${pct(idle)>=8?'⏳ '+pct(idle)+'%':pct(idle)+'%'}</div>`:''}
-        ${cancelled>0?`<div class="ms-seg ms-cancel" style="width:${pct(cancelled)}%" onclick="openMemStatus('cancel')" title="취소 ${cancelled}건">${pct(cancelled)>=8?'❌ '+pct(cancelled)+'%':pct(cancelled)+'%'}</div>`:''}
+        ${idleNoMemo>0?`<div class="ms-seg ms-no-memo" style="width:${pct(idleNoMemo)}%" onclick="openMemStatus('idle_noMemo')" title="상담기록없음 ${idleNoMemo}건">${pct(idleNoMemo)>=8?'📝 '+pct(idleNoMemo)+'%':pct(idleNoMemo)+'%'}</div>`:''}
+        ${idleNoResp>0?`<div class="ms-seg ms-no-resp" style="width:${pct(idleNoResp)}%" onclick="openMemStatus('idle_noResp')" title="응답없음 ${idleNoResp}건">${pct(idleNoResp)>=8?'🚨 '+pct(idleNoResp)+'%':pct(idleNoResp)+'%'}</div>`:''}
+        ${cancelled>0?`<div class="ms-seg ms-cancel" style="width:${pct(cancelled)}%" onclick="openMemStatus('cancel')" title="부적합 ${cancelled}건">${pct(cancelled)>=8?'⛔ '+pct(cancelled)+'%':pct(cancelled)+'%'}</div>`:''}
       </div>
       <div class="mgmt-legend">
         <div class="mgmt-leg ml-active" onclick="openMemStatus('active')">
@@ -2588,13 +2596,13 @@ function renderDBSummary(){
       ${idle>0?`<div class="mgmt-sub">
         <div class="mgmt-sub-lbl">⏳ 미진행 ${f(idle)}건 세부 <small>(전체 ${f(total)} 대비)</small></div>
         <div class="mgmt-sub-row">
-          <div class="mgmt-sub-item" onclick="openMemStatus('idle_noMemo')" title="메모도 없는 미진행 — 즉시 관리 필요">
+          <div class="mgmt-sub-item mgmt-sub-noMemo" onclick="openMemStatus('idle_noMemo')" title="상담기록 없음 — 즉시 관리 필요">
             <span class="mgmt-sub-icon">📝</span>
-            <span class="mgmt-sub-name">메모없음</span>
+            <span class="mgmt-sub-name">상담기록없음</span>
             <b>${f(idleNoMemo)}</b>
             <span class="mgmt-sub-pct">${pct(idleNoMemo)}%</span>
           </div>
-          <div class="mgmt-sub-item" onclick="openMemStatus('idle_noResp')" title="메모는 있지만 옵션 미선택 — 응답없음">
+          <div class="mgmt-sub-item mgmt-sub-noResp" onclick="openMemStatus('idle_noResp')" title="상담기록은 있지만 옵션 미선택 — 응답없음">
             <span class="mgmt-sub-icon">🚨</span>
             <span class="mgmt-sub-name">응답없음</span>
             <b>${f(idleNoResp)}</b>
