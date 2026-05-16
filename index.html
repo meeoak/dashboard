@@ -629,22 +629,36 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cal-ag-chip.done > span:not(.cal-ag-chip-icon){text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:#dc2626;text-underline-offset:1px}
 .cal-ag-chip.done .cal-ag-chip-icon{opacity:.7}
 .cal-ag-chip.done:hover{filter:grayscale(0);background:#f3f4f6 !important}
-/* 통합 캘린더 레이아웃: 그리드(좌) + 정보 사이드 패널(우) */
-.cal-layout{display:flex;gap:14px;align-items:flex-start}
-.cal-main{flex:1;min-width:0}
-.cal-side{flex:0 0 180px;padding:14px 12px;background:#fafafa;border:1px solid #eee;border-radius:10px;position:sticky;top:12px}
-.cal-side-title{font-size:15px;font-weight:900;color:#1a1a1a;margin-bottom:6px;line-height:1.3}
-.cal-side-sub{font-size:11px;color:#666;line-height:1.6;font-weight:600}
-.cal-side-hr{border:none;border-top:1px solid #ececec;margin:14px 0 10px}
-.cal-side-sec{font-size:10px;font-weight:800;color:#999;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
-.cal-side-list{display:flex;flex-direction:column;gap:7px}
-.cal-side-list > div{display:flex;align-items:center;gap:8px;font-size:11.5px;color:#444;font-weight:700}
-.cal-side-list .ldot{display:inline-block;width:11px;height:11px;border-radius:3px;flex-shrink:0}
-.cal-side-note{font-size:11px;color:#666;line-height:1.7;font-weight:600}
+/* 통합 캘린더 보고서 헤더: 제목 + 카운트 카드 + 범례 */
+.cal-report-header{padding:14px 18px 16px;background:linear-gradient(180deg,#f8fafc 0%,#fafafa 100%);border:1px solid #eaeaea;border-radius:12px;margin-bottom:14px}
+.cal-report-title-row{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.cal-report-title{font-size:20px;font-weight:900;color:#1a1a1a;margin:0;line-height:1.2}
+.cal-report-total{font-size:12px;color:#666;font-weight:700}
+.cal-stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.cstat{background:#fff;border:1px solid #eee;border-left:4px solid;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.cstat .cs-lbl{font-size:11px;font-weight:700;color:#666;display:flex;align-items:center;gap:5px}
+.cstat .cs-num{font-size:26px;font-weight:900;line-height:1.1}
+.cstat.cs-s{border-left-color:#1d4ed8;background:#f5f9ff}.cstat.cs-s .cs-num{color:#1d4ed8}
+.cstat.cs-w{border-left-color:#d97706;background:#fffbeb}.cstat.cs-w .cs-num{color:#92400e}
+.cstat.cs-d{border-left-color:#16a34a;background:#f0fdf4}.cstat.cs-d .cs-num{color:#16a34a}
+.cstat.cs-vc{border-left-color:#7c3aed;background:#faf5ff}.cstat.cs-vc .cs-num{color:#6d28d9}
+.cstat.cs-ls{border-left-color:#ea580c;background:#fff7ed}.cstat.cs-ls .cs-num{color:#9a3412}
+.cal-report-legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11.5px;font-weight:700;color:#555;padding-top:2px}
+.cleg-item{display:inline-flex;align-items:center;gap:5px}
+.cleg-item .ldot{width:11px;height:11px;border-radius:3px;display:inline-block}
+.cleg-divider{width:1px;height:14px;background:#ddd}
 .strike-red{text-decoration:line-through;text-decoration-color:#dc2626;text-decoration-thickness:2px;color:#6b7280;font-weight:800}
 @media(max-width:900px){
-  .cal-layout{flex-direction:column-reverse;gap:10px}
-  .cal-side{flex:0 0 auto;width:auto;position:static}
+  .cal-stat-cards{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:640px){
+  .cal-report-header{padding:10px 12px 12px}
+  .cal-report-title{font-size:16px}
+  .cal-stat-cards{grid-template-columns:repeat(2,1fr);gap:6px}
+  .cstat{padding:8px 10px}
+  .cstat .cs-num{font-size:20px}
+  .cstat .cs-lbl{font-size:10.5px}
+  .cal-report-legend{font-size:10.5px;gap:8px}
 }
 
 /* ─ 통계 테이블 ─ */
@@ -1250,38 +1264,24 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     <div class="cal-team-tabs" id="cal-team-tabs"></div>
     <div class="cal-agent-tabs" id="cal-agent-tabs"></div>
   </div>
-  <!-- 캘린더 (예약 + 완료 통합) -->
+  <!-- 캘린더 (예약 + 완료 통합) - 보고서 스타일 -->
   <div id="content-cal">
     <div class="cal-wrap">
-      <div class="cal-layout">
-        <div class="cal-main">
-          <div class="cal-grid" id="cal-s-grid"></div>
+      <div class="cal-report-header">
+        <div class="cal-report-title-row">
+          <h2 class="cal-report-title" id="cal-s-title">📅 방문 캘린더</h2>
+          <div class="cal-report-total" id="cal-s-sub"></div>
         </div>
-        <aside class="cal-side">
-          <div class="cal-side-title" id="cal-s-title">📅 방문 캘린더</div>
-          <div class="cal-side-sub" id="cal-s-sub"></div>
-          <hr class="cal-side-hr">
-          <div class="cal-side-sec">상태</div>
-          <div class="cal-side-list">
-            <div>📅<span>방문예약</span></div>
-            <div>⏳<span>일정대기</span></div>
-            <div>✅<span>방문완료</span></div>
-            <div>📹<span>비디오콜</span></div>
-            <div>⬜<span>랑숭</span></div>
-          </div>
-          <hr class="cal-side-hr">
-          <div class="cal-side-sec">팀</div>
-          <div class="cal-side-list">
-            <div><span class="ldot" style="background:#1a73e8"></span><span>GIAR</span></div>
-            <div><span class="ldot" style="background:#16a34a"></span><span>TINA</span></div>
-            <div><span class="ldot" style="background:#ea4335"></span><span>LIDIA</span></div>
-          </div>
-          <hr class="cal-side-hr">
-          <div class="cal-side-note">
-            <span class="strike-red">완료된 방문</span>은<br>취소선으로 표시됩니다
-          </div>
-        </aside>
+        <div class="cal-stat-cards" id="cal-stat-cards"></div>
+        <div class="cal-report-legend">
+          <span class="cleg-item"><span class="ldot" style="background:#1a73e8"></span>GIAR</span>
+          <span class="cleg-item"><span class="ldot" style="background:#16a34a"></span>TINA</span>
+          <span class="cleg-item"><span class="ldot" style="background:#ea4335"></span>LIDIA</span>
+          <span class="cleg-divider"></span>
+          <span class="cleg-item"><span class="strike-red">완료된 방문</span>은 취소선으로 표시</span>
+        </div>
       </div>
+      <div class="cal-grid" id="cal-s-grid"></div>
     </div>
   </div>
   <!-- 통계 -->
@@ -2808,7 +2808,21 @@ function renderCal(){
   const doneN = totals.d + totals.ls + totals.vc;
   const pendN = totals.s + totals.w;
   document.getElementById('cal-s-sub').textContent =
-    `${T('cal_label_book')} ${totals.s} · ${T('cal_label_wait')} ${totals.w} · ${T('cal_label_done')} ${doneN} (${T('cal_total')} ${pendN+doneN}${u})`;
+    `${T('cal_total')} ${pendN+doneN}${u}`;
+  // 보고서 헤더의 카운트 카드 (상태별 큰 숫자)
+  const cardsEl = document.getElementById('cal-stat-cards');
+  if(cardsEl){
+    cardsEl.innerHTML = [
+      ['s','📅', T('cal_label_book'),  totals.s],
+      ['w','⏳', T('cal_label_wait'),  totals.w],
+      ['d','✅', T('cal_label_done'),  totals.d],
+      ['vc','📹',T('cal_label_video'), totals.vc],
+      ['ls','⬜',T('cal_label_langsung'), totals.ls],
+    ].map(([k,icon,lbl,n])=>`<div class="cstat cs-${k}">
+      <div class="cs-lbl">${icon} ${lbl}</div>
+      <div class="cs-num">${n}</div>
+    </div>`).join('');
+  }
 
   const dows = [T('dow_mon'),T('dow_tue'),T('dow_wed'),T('dow_thu'),T('dow_fri'),T('dow_sat'),T('dow_sun')];
   let h = dows.map((d,i)=>`<div class="cal-dow ${i===5?'sat':i===6?'sun':''}">${d}</div>`).join('');
