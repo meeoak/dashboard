@@ -624,11 +624,13 @@ body.focus-mode #detail-section-hd{display:none!important}
 .team-bg-G{background:#dbeafe;color:#1d4ed8;border-left-color:#1a73e8}
 .team-bg-T{background:#dcfce7;color:#15803d;border-left-color:#16a34a}
 .team-bg-L{background:#fee2e2;color:#dc2626;border-left-color:#ea4335}
-/* 완료된 방문 - 취소선 표시 */
-.cal-ag-chip.done{opacity:.55;background:#f3f4f6 !important;color:#6b7280 !important;border-left-color:#9ca3af !important}
-.cal-ag-chip.done > span:not(.cal-ag-chip-icon){text-decoration:line-through;text-decoration-thickness:1.5px}
-.cal-ag-chip.done:hover{opacity:.85}
+/* 완료된 방문 - 취소선 + 회색 처리 */
+.cal-ag-chip.done{background:#e5e7eb !important;color:#6b7280 !important;border-left-color:#9ca3af !important;filter:grayscale(.4)}
+.cal-ag-chip.done > span:not(.cal-ag-chip-icon){text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:#dc2626;text-underline-offset:1px}
+.cal-ag-chip.done .cal-ag-chip-icon{opacity:.7}
+.cal-ag-chip.done:hover{filter:grayscale(0);background:#f3f4f6 !important}
 .cal-leg-done{font-size:11px;color:#6b7280;font-weight:700}
+.cal-leg-done s{text-decoration:line-through;text-decoration-color:#dc2626;text-decoration-thickness:2px}
 
 /* ─ 통계 테이블 ─ */
 .month-tbl{width:100%;border-collapse:collapse;font-size:14px}
