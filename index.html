@@ -817,9 +817,20 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-agent-stat{padding:3px 9px;border-radius:6px;background:#f1f5f9;color:#475569;border:1px solid #e5e7eb}
 .r3d-agent-stat.urg{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
 .r3d-agent-stat.zero{background:#fafafa;color:#94a3b8;border-color:#f1f5f9}
-.r3d-agent-sec{padding:0}
-.r3d-agent-sec + .r3d-agent-sec{border-top:1px dashed #e5e7eb}
-.r3d-agent-sec-hd{padding:8px 14px 4px;font-size:10.5px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;background:#fcfcfd}
+/* 요약 칩 행 */
+.r3d-urg-summary{padding:10px 14px;display:flex;align-items:center;flex-wrap:wrap;gap:7px;background:#fafbfc;border-bottom:1px dashed #e5e7eb}
+.r3d-urg-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:800;border:1.5px solid;letter-spacing:-.2px}
+.r3d-urg-chip.zero{opacity:.35;border-style:dashed}
+.r3d-urg-chip.c-noMemo{background:#fef3c7;color:#92400e;border-color:#fde68a}
+.r3d-urg-chip.c-overdue{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+.r3d-urg-chip.c-idle{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+.r3d-urg-chip.c-wait{background:#dbeafe;color:#1e3a8a;border-color:#bfdbfe}
+.r3d-urg-chip.c-soon{background:#dbeafe;color:#1e3a8a;border-color:#bfdbfe}
+.r3d-urg-toggle{cursor:pointer;background:#fff;border:1.5px solid #cbd5e1;border-radius:7px;padding:4px 12px;font-size:11.5px;font-weight:800;color:#475569;margin-left:auto;display:flex;align-items:center;gap:5px;transition:all .12s}
+.r3d-urg-toggle:hover{background:#f8fafc;border-color:#1e3a8a;color:#1e3a8a}
+.r3d-urg-list-wrap{display:none}
+.r3d-urg-list-wrap.expanded{display:block}
+/* 긴급 회원 테이블 */
 .r3d-urg-tbl{width:100%;border-collapse:collapse;font-size:12px}
 .r3d-urg-tbl td{padding:7px 10px;border-bottom:1px solid #f5f5f5;vertical-align:middle;cursor:pointer;transition:background .12s}
 .r3d-urg-tbl tr:last-child td{border-bottom:none}
@@ -831,7 +842,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-urg-dday{font-weight:900;font-size:11.5px;color:#dc2626;text-align:right;white-space:nowrap}
 .r3d-urg-dday.warn{color:#d97706}
 .r3d-urg-dday.ok{color:#64748b}
-.r3d-urg-empty{padding:12px 14px;text-align:center;color:#94a3b8;font-size:11.5px;font-style:italic}
+.r3d-urg-empty{padding:14px;text-align:center;color:#94a3b8;font-size:11.5px;font-style:italic}
 @media(max-width:640px){
   .r3d-grid{padding:10px 12px;gap:10px}
   .r3d-team-hd{padding:10px 12px}
@@ -4694,7 +4705,7 @@ function renderRecent7DaysByTeam(){
       </div>`;
     });
   } else {
-    // 팀 선택 모드 — 에이전트별 카드로 분리 + 긴급 관리 리스트 포함
+    // 팀 선택 모드 — 에이전트별 카드: [헤더] + [요약 칩] + [긴급 리스트 접고/펼치기]
     const team = curTeam;
     const color = TC[team] || '#888';
     const teamLbl = teamShortName(team);
@@ -4702,51 +4713,64 @@ function renderRecent7DaysByTeam(){
     agents.forEach(a=>{
       const meta = D.agent_meta[a]||{};
       const short = meta.short || a;
-      // 최근 7일 업데이트
-      const recs = (D.records||[]).filter(r=>{
-        if(r.a !== a) return false;
-        const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
-        const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
-        return adInWin || vdInWin;
-      });
-      recs.sort((a2,b2)=> (pickUpdateDate(b2)||'').localeCompare(pickUpdateDate(a2)||''));
-      const total = recs.length;
       // 긴급 회원 리스트
       const urgent = findUrgentForAgent(a, todayStr);
+      // 카테고리별 카운트
+      let cNoMemo=0, cOverdue=0, cIdle=0, cWait=0, cSoon=0;
+      let urgentTotal=0;
+      urgent.forEach(u=>{
+        const memoEmpty = !u.memo || !String(u.memo).trim();
+        const noOption = u.st === 'none';
+        const isNoMemo = memoEmpty && noOption;
+        const isIdle = !memoEmpty && !noOption;
+        if(isNoMemo) cNoMemo++;
+        if(isIdle) cIdle++;
+        if(u.urgentIcon==='⚠️') cOverdue++;
+        else if(u.urgentIcon==='⏳') cWait++;
+        else if(u.urgentIcon==='📅') cSoon++;
+        // 긴급 = 1+2+3 union
+        if(isNoMemo || isIdle || u.urgentIcon==='⚠️') urgentTotal++;
+      });
       const urgCount = urgent.length;
-      // 업데이트도 긴급도 0이면 카드 자체 생략
-      if(total===0 && urgCount===0) return;
-      const rows = render7DRows(recs);
+      // 긴급 0건이면 카드 자체 생략
+      if(urgCount===0) return;
+      const chip = (cls, icon, lbl, n)=>
+        `<span class="r3d-urg-chip ${cls} ${n===0?'zero':''}" title="${lbl}">${icon} ${n}</span>`;
       html += `
       <div class="r3d-agent-card" style="border-left-color:${color}">
         <div class="r3d-agent-hd">
           <span class="r3d-agent-name"><span class="r3d-agent-team-tag" style="background:${color}">${teamLbl}</span>${esc(short)}</span>
           <div class="r3d-agent-stats">
-            <span class="r3d-agent-stat${total===0?' zero':''}">📅 최근 7일 ${total}건</span>
-            <span class="r3d-agent-stat${urgCount===0?' zero':' urg'}">🚨 긴급 ${urgCount}건</span>
+            <span class="r3d-agent-stat urg">🚨 긴급 ${urgentTotal}건</span>
           </div>
         </div>
-        <div class="r3d-agent-sec">
-          <div class="r3d-agent-sec-hd">📅 최근 7일 업데이트</div>
-          ${total === 0
-            ? '<div class="r3d-empty-team">최근 7일 업데이트 없음</div>'
-            : `<table class="r3d-detail-tbl">
-                <thead><tr><th title="상태 업데이트일">📅 업데이트</th><th title="DB 배정일">📋 배정일</th><th>회원명 (후원자)</th><th>에이전트</th><th>상태/옵션</th><th>📝 상담기록</th></tr></thead>
-                <tbody>${rows}</tbody>
-              </table>
-              ${total > initialShown ? `<button class="r3d-more-btn" onclick="openRecent7DAgent('${a.replace(/'/g,"\\'")}','${fromStr}')">+${total-initialShown}건 더 보기 →</button>` : ''}`
-          }
+        <div class="r3d-urg-summary">
+          ${chip('c-noMemo','📝','상담기록없음',cNoMemo)}
+          ${chip('c-overdue','⚠️','방문일 지남',cOverdue)}
+          ${chip('c-idle','🚨','응답없음',cIdle)}
+          ${chip('c-wait','⏳','일정대기 누적',cWait)}
+          ${chip('c-soon','📅','방문 임박',cSoon)}
+          <button class="r3d-urg-toggle" onclick="toggleAgentUrgent(this)">▼ 펼치기</button>
         </div>
-        <div class="r3d-agent-sec">
-          <div class="r3d-agent-sec-hd">🚨 긴급 관리 대상 (${urgCount}건)</div>
+        <div class="r3d-urg-list-wrap">
           ${renderUrgRows(urgent, a)}
         </div>
       </div>`;
     });
-    if(!html) html = '<div class="r3d-empty">선택한 팀/에이전트에 표시할 데이터가 없습니다</div>';
+    if(!html) html = '<div class="r3d-empty">선택한 팀/에이전트에 긴급 관리 대상이 없습니다</div>';
   }
   if(!html) html = '<div class="r3d-empty">팀이 선택되지 않았습니다</div>';
   wrap.innerHTML = html;
+}
+
+// 에이전트 카드 — 긴급 리스트 펼치기/접기
+function toggleAgentUrgent(btn){
+  const card = btn.closest('.r3d-agent-card');
+  if(!card) return;
+  const wrap = card.querySelector('.r3d-urg-list-wrap');
+  if(!wrap) return;
+  const expanded = wrap.classList.toggle('expanded');
+  btn.innerHTML = expanded ? '▲ 접기' : '▼ 펼치기';
 }
 
 // 에이전트별 7일 업데이트 — 더 보기 (전체 모달)
