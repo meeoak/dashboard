@@ -763,8 +763,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .rteam{font-size:11px;color:#64748b;font-weight:700}
 .rteam b{color:#0f172a;font-weight:900}
 .rbar-bg{height:5px;background:#f1f5f9;border-radius:3px;margin-top:6px;overflow:visible;position:relative}
-.rbar-pace-mark{position:absolute;top:-2px;bottom:-2px;width:2px;background:#0f172a;transform:translateX(-1px);pointer-events:none}
-.rbar-pace-mark::after{content:'';position:absolute;top:-3px;left:-3px;width:8px;height:8px;background:#0f172a;border-radius:50%;border:1.5px solid #fff}
+.rbar-pace-mark{position:absolute;top:-14px;bottom:-4px;width:0;border-left:2px dashed #0f172a;transform:translateX(-1px);pointer-events:none;z-index:2}
+.rbar-pace-mark::after{content:'';position:absolute;bottom:-3px;left:-4px;width:8px;height:8px;background:#0f172a;border-radius:50%;border:1.5px solid #fff}
+.rbar-pace-lbl{position:absolute;top:-3px;left:0;transform:translateX(-50%);background:#0f172a;color:#fff;font-size:9px;font-weight:900;padding:1px 5px;border-radius:4px;white-space:nowrap;letter-spacing:-.2px;line-height:1.2}
 .rbar{height:100%;border-radius:3px;transition:width .5s}
 .rstats{display:flex;gap:5px;flex-shrink:0;align-items:center}
 .rstat{text-align:center;min-width:36px;padding:3px 5px;border-radius:6px;transition:background .12s}
@@ -807,10 +808,11 @@ body.focus-mode #detail-section-hd{display:none!important}
 .bc-idx-num small{font-size:14px;font-weight:800;color:#94a3b8;letter-spacing:-.2px}
 .bc-idx-lbl{font-size:11px;font-weight:800;color:#64748b;letter-spacing:-.2px;margin-bottom:7px}
 .bc-idx-lbl small{font-weight:700;color:#94a3b8;font-size:10px}
-.bc-idx-bar{height:7px;background:#f1f5f9;border-radius:4px;overflow:visible;position:relative}
+.bc-idx-bar{height:7px;background:#f1f5f9;border-radius:4px;overflow:visible;position:relative;margin-top:14px}
 .bc-idx-fill{height:100%;border-radius:4px;transition:width .4s}
-.bc-pace-mark{position:absolute;top:-3px;bottom:-3px;width:2.5px;background:#0f172a;transform:translateX(-1.25px);pointer-events:none}
-.bc-pace-mark::before{content:'📍';position:absolute;top:-16px;left:-7px;font-size:12px;line-height:1}
+.bc-pace-mark{position:absolute;top:-14px;bottom:-4px;width:0;border-left:2px dashed #0f172a;transform:translateX(-1px);pointer-events:none;z-index:2}
+.bc-pace-mark::after{content:'';position:absolute;bottom:-4px;left:-5px;width:10px;height:10px;background:#0f172a;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.bc-pace-lbl{position:absolute;top:-4px;left:0;transform:translateX(-50%);background:#0f172a;color:#fff;font-size:9.5px;font-weight:900;padding:2px 6px;border-radius:5px;white-space:nowrap;letter-spacing:-.2px;line-height:1.2;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .bc-sum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#f8fafc;border-radius:6px;margin-bottom:10px}
 .bc-sum-lbl{font-size:10.5px;font-weight:800;color:#64748b;letter-spacing:-.2px}
 .bc-sum-val{font-size:14px;font-weight:900;letter-spacing:-.3px}
@@ -3324,6 +3326,13 @@ function renderStats(){
 function renderRank(){
   const kpiTarget = periodKpiTarget();  // 한달 KPI 목표 100점 (고정)
   const pacePct = paceMarkPct();        // 오늘 기준 페이스 (0~100), 기간 밖이면 null
+  // 페이스 라벨: '오늘 M/D · N%' 형태
+  let paceLbl = '';
+  if(pacePct !== null){
+    const t = (D.today||'').split('-');
+    const md = t.length===3 ? `${parseInt(t[1])}/${parseInt(t[2])}` : '';
+    paceLbl = `📍 오늘${md?' '+md:''} · ${pacePct}%`;
+  }
   // 에이전트별 활동지수 사전 계산 (클로징×5 + 완료/랑숭/비디오 ×1)
   const allAgents = Object.keys(D.agent_total);
   const agentStats = {};
@@ -3372,7 +3381,7 @@ function renderRank(){
         <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명 · 한달 KPI ${kpiTarget}점)</small></div>
         <div class="bc-idx-bar">
           <div class="bc-idx-fill" style="width:${barPct}%;background:${TC[t]}"></div>
-          ${pacePct!==null?`<div class="bc-pace-mark" style="left:${pacePct}%" title="오늘(${D.today}) 기준 페이스 ${pacePct}%"></div>`:''}
+          ${pacePct!==null?`<div class="bc-pace-mark" style="left:${pacePct}%" title="오늘 ${D.today} · 페이스 ${pacePct}%"><span class="bc-pace-lbl">${paceLbl}</span></div>`:''}
         </div>
       </div>
       <div class="bc-sum-row">
@@ -3433,7 +3442,7 @@ function renderRank(){
         <div class="rteam">${team} · DB→클로징 <b>${r_dc}%</b> · KPI 달성 <b>${Math.round(achPct)}%</b></div>
         <div class="rbar-bg">
           <div class="rbar" style="width:${barPct}%;background:${TC[team]}"></div>
-          ${pacePct!==null?`<div class="rbar-pace-mark" style="left:${pacePct}%" title="오늘 기준 페이스 ${pacePct}%"></div>`:''}
+          ${pacePct!==null?`<div class="rbar-pace-mark" style="left:${pacePct}%" title="오늘 ${D.today} · 페이스 ${pacePct}%"><span class="rbar-pace-lbl">${paceLbl}</span></div>`:''}
         </div>
       </div>
       <div class="rstats">
