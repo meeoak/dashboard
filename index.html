@@ -1662,7 +1662,14 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     <div id="ai-urgent-banner"></div>
     <div class="r3d-grid" id="ai-urgent-grid"></div>
 
-    <!-- 섹션 5: 📅 방문 캘린더 (맨 아래) -->
+    <!-- 섹션 5: 📊 에이전트 현황 -->
+    <div class="sec-hd" style="background:linear-gradient(180deg,#f5f3ff 0%,#fff 100%);margin-top:14px">
+      <div><div class="sec-title">📊 에이전트 현황</div>
+      <div class="sec-sub">숫자 클릭 → 회원 목록 · 배정일 기준</div></div>
+    </div>
+    <div style="overflow-x:auto"><table class="month-tbl" id="ai-stats-tbl"></table></div>
+
+    <!-- 섹션 6: 📅 방문 캘린더 (맨 아래) -->
     <div class="sec-hd" style="background:linear-gradient(180deg,#f0fdf4 0%,#fff 100%);margin-top:14px">
       <div><div class="sec-title">📅 방문 캘린더</div>
       <div class="sec-sub">기간 내 일별 방문 일정 (예약/완료/비디오/랑숭)</div></div>
@@ -5488,6 +5495,7 @@ function renderAgentInsightOnly(){
   renderUrgentBanner();
   renderRecent7DaysByTeam();
   renderCal();
+  renderStats();
   // 2. ai-* 컨테이너로 HTML 복사
   const copyHtml = (from, to)=>{
     const f = document.getElementById(from);
@@ -5500,6 +5508,7 @@ function renderAgentInsightOnly(){
   copyHtml('urgent-banner',    'ai-urgent-banner');
   copyHtml('ins-recent-3d-grid','ai-urgent-grid');
   copyHtml('rank-lbl',         'ai-rank-lbl');
+  copyHtml('month-tbl',        'ai-stats-tbl');
   // 캘린더는 content-cal의 .cal-wrap 전체 복사
   const calSrc = document.querySelector('#content-cal .cal-wrap');
   const calDst = document.getElementById('ai-cal-wrap');
