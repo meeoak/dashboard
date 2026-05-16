@@ -577,6 +577,16 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cal-agent-sel{padding:8px 14px;border:2px solid #cbd5e1;border-radius:8px;background:white;font-size:13px;font-weight:600;color:#334155;cursor:pointer;min-width:160px}
 .cal-agent-sel:hover{border-color:#94a3b8}
 .cal-agent-sel:focus{outline:none;border-color:#0284c7;box-shadow:0 0 0 3px rgba(2,132,199,.15)}
+/* 에이전트 단추 — 드롭다운 대체 */
+.cal-agent-tabs{display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:100%}
+.cal-at-btn{padding:5px 12px;border:1.5px solid #cbd5e1;background:#fff;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
+.cal-at-btn:hover{background:#f1f5f9;border-color:#94a3b8;transform:translateY(-1px)}
+.cal-at-btn.on{background:#1e293b;color:#fff;border-color:#1e293b;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.cal-at-btn .cal-at-dot{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1.5px rgba(255,255,255,.5)}
+@media(max-width:640px){
+  .cal-agent-tabs{gap:4px}
+  .cal-at-btn{padding:4px 10px;font-size:11px}
+}
 .cal-title{font-size:17px;font-weight:900}
 .cal-sub{font-size:11px;color:#aaa;margin-left:6px}
 .cal-legend{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
@@ -1190,14 +1200,12 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
       <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월">▶</button>
     </div>
     <div class="cal-team-tabs">
-      <button class="cal-tt-btn on" data-team="ALL" onclick="setCalTeamQuick('ALL')">🌐 전체</button>
+      <button class="cal-tt-btn on" data-team="ALL" onclick="setCalTeamQuick('ALL')">🌐 전체팀</button>
       <button class="cal-tt-btn" data-team="TIM_GIAR" onclick="setCalTeamQuick('TIM_GIAR')"><span class="cal-tt-dot" style="background:#1a73e8"></span>GIAR</button>
       <button class="cal-tt-btn" data-team="TIM_TINA" onclick="setCalTeamQuick('TIM_TINA')"><span class="cal-tt-dot" style="background:#16a34a"></span>TINA</button>
       <button class="cal-tt-btn" data-team="TIM_LIDIA" onclick="setCalTeamQuick('TIM_LIDIA')"><span class="cal-tt-dot" style="background:#ea4335"></span>LIDIA</button>
     </div>
-    <select class="cal-agent-sel" id="cal-agent-sel" onchange="setCalAgentQuick(this.value)">
-      <option value="ALL">👥 전체 에이전트</option>
-    </select>
+    <div class="cal-agent-tabs" id="cal-agent-tabs"></div>
   </div>
   <!-- 캘린더 (예정 위 + 완료 아래) -->
   <div id="content-cal">
@@ -1799,14 +1807,29 @@ function updateCalControls(){
   document.querySelectorAll('.cal-tt-btn').forEach(b=>{
     b.classList.toggle('on', b.dataset.team===curTeam);
   });
-  // 에이전트 셀렉트
-  const aSel = document.getElementById('cal-agent-sel');
-  if(aSel){
-    const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
-    aSel.innerHTML = '<option value="ALL">👥 전체 에이전트</option>' +
-      agents.map(a=>`<option value="${a}">${(D.agent_meta[a]||{}).short || a}</option>`).join('');
-    aSel.value = curAgent || 'ALL';
-  }
+  // 에이전트 단추 (드롭다운 대체) — 팀 선택 시 그 팀의 에이전트 표시
+  buildCalAgentButtons();
+}
+
+// 에이전트 단추 그리기 (curTeam 기준)
+function buildCalAgentButtons(){
+  const wrap = document.getElementById('cal-agent-tabs');
+  if(!wrap) return;
+  const isAll = curTeam==='ALL';
+  const agents = isAll ? [] : (D.team_members[curTeam]||[]);
+  const tcol = isAll ? '#1e293b' : (TC[curTeam] || '#888');
+  let html = `<button class="cal-at-btn ${curAgent==='ALL'?'on':''}" data-agent="ALL" onclick="setCalAgentQuick('ALL')">👥 전체 에이전트</button>`;
+  agents.forEach(a=>{
+    const meta = D.agent_meta[a]||{};
+    const short = meta.short || a;
+    const safeA = a.replace(/'/g,"\\'");
+    const isOn = curAgent === a;
+    const onStyle = isOn ? `background:${tcol};border-color:${tcol};color:#fff` : '';
+    html += `<button class="cal-at-btn ${isOn?'on':''}" data-agent="${a.replace(/"/g,'&quot;')}" style="${onStyle}" onclick="setCalAgentQuick('${safeA}')">
+      <span class="cal-at-dot" style="background:${tcol}"></span>${short}
+    </button>`;
+  });
+  wrap.innerHTML = html;
 }
 
 function selectScope(scope){
