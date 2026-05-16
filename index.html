@@ -191,7 +191,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 
 /* 📋 DB 배정 분석 섹션 - Refined */
 .db-section{max-width:1180px;margin:0 auto;padding:8px 20px 20px;border-bottom:8px solid #f0ede8}
-.db-grid{display:grid;grid-template-columns:1.2fr 1.3fr 1.5fr 2fr;gap:14px;align-items:stretch}
+.db-grid{display:grid;grid-template-columns:1fr 1.1fr 1.3fr;gap:14px;align-items:stretch}
 @media(max-width:900px){.db-grid{grid-template-columns:1fr 1fr}}
 .db-card{background:#fff;border:1px solid #ececec;border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px #0000000a;transition:all .2s;display:flex;flex-direction:column}
 .db-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px #00000010;border-color:#e5d8c7}
@@ -843,7 +843,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 <!-- 📋 DB 배정 분석 섹션 -->
 <div class="section-hd"><div class="section-hd-inner">
   <span class="section-title">📋 <span data-t="sec_db">DB 배정 분석</span></span>
-  <span class="section-sub" data-t="sec_db_sub">DB 종류·활동상태·TOP 채널 분포</span>
+  <span class="section-sub" data-t="sec_db_sub">DB 종류·활동상태 분포</span>
 </div></div>
 <div class="db-section">
   <div class="db-grid" id="db-grid"></div>
@@ -1131,7 +1131,7 @@ const LANG = {
     today_lbl:'오늘',
     s_d:'방문완료', s_ls:'랑숭비짓', s_vc:'비디오콜', s_s:'방문예약', s_w:'일정대기',
     s_cl:'클로징', s_overdue:'⚠️ 확인필요', s_db:'📋 DB 배정 전체', s_none:'미진행', s_x:'취소/거절',
-    sec_db:'DB 배정 분석', sec_db_sub:'DB 종류·활동상태·TOP 채널 분포',
+    sec_db:'DB 배정 분석', sec_db_sub:'DB 종류·활동상태 분포',
     db_total:'전체 DB 배정', db_split:'OFF vs MKT 분포', db_status:'배정 DB 관리율',
     db_active:'DB관리 진행됨', db_idle:'DB관리 미진행', db_cancel:'취소·거절', db_top_chan:'TOP 5 채널',
     sec_targets:'4대 핵심 KPI 목표 달성 현황',
@@ -1206,7 +1206,7 @@ const LANG = {
     s_d:'Visit Selesai', s_ls:'Visit Langsung', s_vc:'Video Call', s_s:'Jadwal Kunjungan',
     s_w:'Menunggu Jadwal', s_cl:'Closing', s_overdue:'⚠️ Perlu Konfirmasi',
     s_db:'📋 Semua Alokasi DB', s_none:'Belum Diproses', s_x:'Batal/Tolak',
-    sec_db:'Analisis Alokasi DB', sec_db_sub:'Distribusi DB · Status · TOP Channel',
+    sec_db:'Analisis Alokasi DB', sec_db_sub:'Distribusi DB · Status',
     db_total:'Total Alokasi DB', db_split:'OFF vs MKT', db_status:'Tingkat Manajemen DB',
     db_active:'DB Diproses', db_idle:'DB Belum Diproses', db_cancel:'Batal/Tolak', db_top_chan:'TOP 5 Channel',
     sec_targets:'4 KPI Utama - Pencapaian Target',
@@ -2002,19 +2002,7 @@ function renderDBSummary(){
         </div>
       </div>
     </div>
-    <div class="db-card">
-      <div class="db-card-lbl">📡 ${T('db_top_chan')||'TOP 5 채널'}</div>
-      <div class="db-chan-rows">
-        ${topChans.map(([ch,cnt],i)=>{
-          const w = (cnt/maxChan)*100;
-          return `<div class="db-chan-row" title="${ch} - ${f(cnt)}건 · 클릭→회원목록" style="background:linear-gradient(90deg,#fefce8 ${w}%,#fafafa ${w}%);cursor:pointer" onclick="openMemChannel('${ch.replace(/'/g, "\\'")}')">
-            <span class="db-chan-rank">${i+1}</span>
-            <span class="db-chan-name">${ch}</span>
-            <span class="db-chan-cnt">${f(cnt)}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
+    `;
   document.getElementById('db-grid').innerHTML = html;
 }
 
