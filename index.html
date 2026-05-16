@@ -4765,7 +4765,8 @@ function renderRecent7DaysByTeam(){
       else if(!memoEmpty && !noOption) kindCls = 'kind-idle';
       else if(u.urgentIcon === '⏳') kindCls = 'kind-wait';
       else if(u.urgentIcon === '📅') kindCls = 'kind-soon';
-      const band = kindBandMap[kindCls] || {icon:u.urgentIcon||'•', lbl:''};
+      else kindCls = 'kind-idle';
+      const band = kindBandMap[kindCls];
       return `<tr class="${kindCls}" data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
         <td><span class="r3d-urg-band">${band.icon} ${esc(band.lbl)}</span></td>
         <td class="r3d-urg-nm"><b>${esc(u.nm||'-')}</b>${u.pa?`<small>${esc(u.pa)}</small>`:''}</td>
