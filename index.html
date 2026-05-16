@@ -3383,6 +3383,12 @@ function switchTab(tab){
   renderTab();
   // 탭 전환 시 에이전트 단추도 다시 그림 (인사이트 탭에서 긴급 0건 숨김 적용)
   if(typeof updateCalControls==='function') updateCalControls();
+  // 긴급관리/에이전트 인사이트는 '오늘' 기준 데이터라 월 이동이 무의미 → 월 네비 숨김
+  const monthNav = document.querySelector('.cal-month-nav');
+  if(monthNav){
+    const hide = tab === 'team_insight' || tab === 'agent_insight';
+    monthNav.style.display = hide ? 'none' : '';
+  }
 }
 
 // 상단 빠른 이동: 포커스 모드로 전환 (상단 요약 섹션 숨김 + 해당 탭만 표시)
