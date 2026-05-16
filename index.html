@@ -5461,7 +5461,13 @@ function renderAgentInsightOnly(){
   copyHtml('urgent-banner',    'ai-urgent-banner');
   copyHtml('ins-recent-3d-grid','ai-urgent-grid');
   copyHtml('rank-lbl',         'ai-rank-lbl');
-  // 3. 기존 상세 분석 카드
+  // 3. 단일 에이전트 선택 시: 중복 섹션 숨김 (팀 배틀 + 메인 긴급 배너)
+  const singleAgent = curAgent !== 'ALL';
+  const battleEl  = document.getElementById('ai-battle-wrap');
+  const bannerEl  = document.getElementById('ai-urgent-banner');
+  if(battleEl) battleEl.style.display = singleAgent ? 'none' : '';
+  if(bannerEl) bannerEl.style.display = singleAgent ? 'none' : '';
+  // 4. 기존 상세 분석 카드
   renderAgentCardsOnly();
 }
 // 하위호환: 기존 호출 (renderInsight 등에서 사용)
@@ -5726,7 +5732,8 @@ function renderAgentCardsOnly(){
   });
   agHtml += '</div>';
 
-  // 하단 요약 테이블
+  // 하단 요약 테이블 — 단일 에이전트 선택 시 숨김 (중복 정보)
+  if(curAgent === 'ALL' && list.length > 1){
   agHtml += `<div class="ins-ag-full">
     <div style="font-weight:800;font-size:13px;color:#555;margin:14px 0 8px">📋 전체 에이전트 요약 (점수 순)</div>
     <table class="ins-ag-tbl">
@@ -5751,6 +5758,7 @@ function renderAgentCardsOnly(){
       </tbody>
     </table>
   </div>`;
+  }
   agentWrap.innerHTML = agHtml;
 }
 function renderAll(){ invalidateStatsCache(); buildAgentSelect(); renderMode(); renderDBSummary(); render3MonthTrend(); renderTargets(); renderGaps(); renderKPI(); renderTab(); if(typeof updateCalControls==='function') updateCalControls(); }
