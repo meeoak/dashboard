@@ -3462,6 +3462,18 @@ function findUrgentForAgent(agentName, todayStr){
   return urgent;
 }
 
+// 긴급 회원 1행 → 단일 카테고리 (상호 배타). 띠지/칩/배너/필터 모두 동일 규칙으로 일관.
+// 우선순위: 1) 상담기록없음 (메모X+옵션X) → 2) 아이콘별 (⚠️/⏳/📅) → 3) 응답없음 (🚨+메모)
+function classifyUrgent(u){
+  const memoEmpty = !u.memo || !String(u.memo).trim();
+  const noOption = u.st === 'none';
+  if(memoEmpty && noOption) return 'noMemo';
+  if(u.urgentIcon === '⚠️') return 'overdue';
+  if(u.urgentIcon === '⏳') return 'wait';
+  if(u.urgentIcon === '📅') return 'soon';
+  return 'idle';
+}
+
 // ===== 전체 긴급 배너 (인사이트 탭 상단) =====
 function renderUrgentBanner(){
   const banner = document.getElementById('urgent-banner');
@@ -3472,27 +3484,17 @@ function renderUrgentBanner(){
   if(curAgent !== 'ALL') agents = [curAgent];
   else if(curTeam !== 'ALL') agents = D.team_members[curTeam] || [];
   else agents = Object.keys(D.agent_total||{});
-  // 모든 활동 에이전트의 긴급 건수 집계
+  // 모든 활동 에이전트의 긴급 건수 집계 (상호 배타 분류 — classifyUrgent와 동일)
   const totals = {overdue:0, wait:0, idle:0, soon:0, noMemo:0, byAgent:{}, total:0};
   agents.forEach(a=>{
     const urgent = findUrgentForAgent(a, todayStr);
     if(urgent.length===0)return;
     let agentUrgentCount = 0;
     urgent.forEach(u=>{
-      if(u.urgentIcon==='⚠️')totals.overdue++;
-      else if(u.urgentIcon==='⏳')totals.wait++;
-      else if(u.urgentIcon==='📅')totals.soon++;
-      // 🚨 icon (구 응답없음=st='none'+3일) → 더 이상 별도 카운트 안 함
-      const memoEmpty = !u.memo || !String(u.memo).trim();
-      const noOption = u.st === 'none';
-      // 상담기록없음(1): 메모 비어있음 AND 옵션 미선택
-      const isNoMemo = memoEmpty && noOption;
-      if(isNoMemo) totals.noMemo++;
-      // 응답없음(3) NEW: 메모 있음 AND 옵션 선택됨 → 에이전트는 했는데 회원 무응답
-      const isIdle = !memoEmpty && !noOption;
-      if(isIdle) totals.idle++;
+      const kind = classifyUrgent(u);
+      totals[kind]++;
       // 긴급 = 상담기록없음(1) + 방문일 지남(2) + 응답없음(3)
-      if(isNoMemo || u.urgentIcon==='⚠️' || isIdle) agentUrgentCount++;
+      if(kind==='noMemo' || kind==='overdue' || kind==='idle') agentUrgentCount++;
     });
     if(agentUrgentCount>0) totals.byAgent[a] = agentUrgentCount;
   });
@@ -3559,16 +3561,7 @@ function openUrgentByType(kind, agentOverride){
   agents.forEach(a=>{
     const urgent = findUrgentForAgent(a, todayStr);
     urgent.forEach(u=>{
-      const memoEmpty = !u.memo || !String(u.memo).trim();
-      const noOption = u.st === 'none';
-      if(kind === 'noMemo'){
-        if(memoEmpty && noOption) recs.push(u);
-      } else if(kind === 'idle'){
-        // 응답없음 NEW: 메모 있음 + 옵션 선택됨
-        if(!memoEmpty && !noOption) recs.push(u);
-      } else if(u.urgentIcon === info.icon) {
-        recs.push(u);
-      }
+      if(classifyUrgent(u) === kind) recs.push(u);
     });
   });
   memCache = recs;
@@ -4757,15 +4750,7 @@ function renderRecent7DaysByTeam(){
     return `<table class="r3d-urg-tbl">${urgent.map(u=>{
       const ddayCls = u.daysLeft<=3 ? '' : (u.daysLeft<=7 ? 'warn' : 'ok');
       const recKey = esc(JSON.stringify({a:u.a, nm:u.nm||'', ad:u.ad||''}));
-      const memoEmpty = !u.memo || !String(u.memo).trim();
-      const noOption = u.st === 'none';
-      let kindCls = '';
-      if(memoEmpty && noOption) kindCls = 'kind-noMemo';
-      else if(u.urgentIcon === '⚠️') kindCls = 'kind-overdue';
-      else if(!memoEmpty && !noOption) kindCls = 'kind-idle';
-      else if(u.urgentIcon === '⏳') kindCls = 'kind-wait';
-      else if(u.urgentIcon === '📅') kindCls = 'kind-soon';
-      else kindCls = 'kind-idle';
+      const kindCls = 'kind-' + classifyUrgent(u);
       const band = kindBandMap[kindCls];
       return `<tr class="${kindCls}" data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
         <td><span class="r3d-urg-band">${band.icon} ${esc(band.lbl)}</span></td>
@@ -4789,24 +4774,20 @@ function renderRecent7DaysByTeam(){
     });
   }
 
-  // 각 에이전트별 긴급 데이터 계산
+  // 각 에이전트별 긴급 데이터 계산 (상호 배타 분류 — classifyUrgent와 동일)
   const agentData = agentPool.map(a=>{
     const urgent = findUrgentForAgent(a, todayStr);
-    let cNoMemo=0, cOverdue=0, cIdle=0, cWait=0, cSoon=0, urgentTotal=0;
+    const counts = {noMemo:0, overdue:0, idle:0, wait:0, soon:0};
+    let urgentTotal = 0;
     urgent.forEach(u=>{
-      const memoEmpty = !u.memo || !String(u.memo).trim();
-      const noOption = u.st === 'none';
-      const isNoMemo = memoEmpty && noOption;
-      const isIdle = !memoEmpty && !noOption;
-      if(isNoMemo) cNoMemo++;
-      if(isIdle) cIdle++;
-      if(u.urgentIcon==='⚠️') cOverdue++;
-      else if(u.urgentIcon==='⏳') cWait++;
-      else if(u.urgentIcon==='📅') cSoon++;
-      // 긴급 = 1+2+3 union (배너 정의와 동일)
-      if(isNoMemo || isIdle || u.urgentIcon==='⚠️') urgentTotal++;
+      const kind = classifyUrgent(u);
+      counts[kind]++;
+      // 긴급 = 상담기록없음(1) + 방문일 지남(2) + 응답없음(3) — 배너와 동일
+      if(kind==='noMemo' || kind==='overdue' || kind==='idle') urgentTotal++;
     });
-    return {agent:a, urgent, cNoMemo, cOverdue, cIdle, cWait, cSoon, urgentTotal};
+    return {agent:a, urgent,
+      cNoMemo:counts.noMemo, cOverdue:counts.overdue, cIdle:counts.idle,
+      cWait:counts.wait, cSoon:counts.soon, urgentTotal};
   });
 
   // 긴급 0건 에이전트 제외 + 긴급 많은 순 정렬
