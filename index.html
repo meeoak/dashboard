@@ -5237,17 +5237,21 @@ function showSheetStatus(msg,color){
   let el=document.getElementById('sheet-status');
   if(!el){
     el=document.createElement('div');el.id='sheet-status';
-    el.style.cssText='position:fixed;top:0;left:0;right:0;color:white;padding:8px 16px;text-align:center;z-index:9999;font-size:13px;font-weight:600';
+    el.style.cssText='position:fixed;bottom:16px;right:16px;color:white;padding:7px 12px;border-radius:8px;z-index:9999;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18);max-width:340px;line-height:1.35;letter-spacing:-.2px';
     document.body.appendChild(el);
   }
   el.style.background=color||'#2563eb';el.innerHTML=msg;el.style.display='block';
 }
 function hideSheetStatus(){const el=document.getElementById('sheet-status');if(el)el.style.display='none';}
 
-async function loadFromSheet(){
-  showSheetStatus('📡 구글시트에서 실시간 데이터 불러오는 중...');
+async function loadFromSheet(opts){
+  const silent = opts && opts.silent;
+  if(!silent) showSheetStatus('📡 시트 동기화 중...');
   try{
-    const resp=await fetch(SHEET_CSV_URL,{cache:'no-store'});
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 8000);
+    const resp=await fetch(SHEET_CSV_URL,{cache:'no-store', signal:ctrl.signal});
+    clearTimeout(timer);
     if(!resp.ok)throw new Error('HTTP '+resp.status);
     const csv=await resp.text();
     const rows=parseCSV(csv);
@@ -5354,8 +5358,14 @@ async function boot(){
     applySheetRecords(cachedRecs);
     renderAll();
   }
-  // 3) 백그라운드에서 시트 동기화 후 머지·재렌더
-  const newD=await loadFromSheet();
+  // 3) 캐시가 매우 신선(2분 이내)이면 시트 재동기화 스킵
+  const savedAt = parseInt(localStorage.getItem(SHEET_CACHE_TIME_KEY)||'0',10);
+  const cacheAgeMin = (Date.now() - savedAt) / 60000;
+  if(cachedRecs && cacheAgeMin < 2){
+    return; // 사용자가 새로고침으로 강제 동기화 가능
+  }
+  // 4) 백그라운드 시트 동기화 (캐시 있으면 silent로)
+  const newD=await loadFromSheet({silent: !!cachedRecs});
   if(newD&&newD.records){
     saveSheetCache(newD.records);
     applySheetRecords(newD.records);
