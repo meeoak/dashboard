@@ -3179,7 +3179,6 @@ function _buildAgentReportSection(agent, rank){
   const gradeColor = grade==='A'?'#16a34a':grade==='B'?'#0284c7':grade==='C'?'#d97706':'#dc2626';
   const medals=['🥇','🥈','🥉'];
   const rankIcon = rank!=null && rank<3 ? medals[rank] : (rank!=null?`#${rank+1}`:'');
-  const analysis = analyzeAgent(x);
   const urgent = findUrgentForAgent(agent, D.today);
 
   const sched = x.sched||0, visit = x.visit||0, db = x.db||0, cl = x.cl||0;
@@ -3204,19 +3203,18 @@ function _buildAgentReportSection(agent, rank){
     </div>`;
   };
 
-  // 📅 캘린더용 일정 수집
+  // 📅 캘린더용 일정 수집 — 현재 필터 범위(해당월)만
   const dayName = (dateStr)=>{
     const d = new Date(dateStr);
     return ['일','월','화','수','목','금','토'][d.getDay()];
   };
   const stIcon = {s:'📅', w:'⏳', d:'✅', vc:'📹', ls:'⬜'};
-  const stLbl = {s:'예약', w:'대기', d:'방문완료', vc:'비디오콜', ls:'랑숭'};
-  const calRecs = (D.cal_recs || []).filter(r => r.a === agent);
-  const upcoming = calRecs.filter(r => ['s','w'].includes(r.st) && r.vd && r.vd >= D.today)
+  const inRange = (vd)=> vd && vd >= curFrom && vd <= curTo;
+  const calRecs = (D.cal_recs || []).filter(r => r.a === agent && inRange(r.vd));
+  const upcoming = calRecs.filter(r => ['s','w'].includes(r.st))
                           .sort((a,b)=>a.vd.localeCompare(b.vd));
-  const completed = calRecs.filter(r => ['d','ls','vc'].includes(r.st) && r.vd)
-                           .sort((a,b)=>b.vd.localeCompare(a.vd))
-                           .slice(0, 40);
+  const completed = calRecs.filter(r => ['d','ls','vc'].includes(r.st))
+                           .sort((a,b)=>b.vd.localeCompare(a.vd));
   const groupByDate = (list)=>{
     const map = {};
     list.forEach(r=>{ if(!map[r.vd]) map[r.vd]=[]; map[r.vd].push(r); });
@@ -3276,21 +3274,17 @@ function _buildAgentReportSection(agent, rank){
         ${kpiCard('💰','DB→클로', r_dc, TARGETS.dc, true)}
       </div>
     </div>
-    <!-- 💡 인사이트 분석 -->
+    <!-- 📅 일정 캘린더 (해당월 필터) -->
     <div class="ag-rpt-section">
-      <div class="ag-rpt-h">💡 인사이트 분석</div>
-      <div class="ins-cols">
-        <div class="ins-col good">
-          <div class="ins-col-h">✅ 강점</div>
-          ${analysis.strengths.length ? analysis.strengths.map(s=>`<div class="ins-col-item">${esc(s)}</div>`).join('') : '<div class="ins-empty">강점 미확인 - 지표 미달 영역 우선 개선 필요</div>'}
+      <div class="ag-rpt-h">📅 일정 캘린더 <span style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:0">${esc(curFrom)} ~ ${esc(curTo)}</span></div>
+      <div class="cal-grid">
+        <div class="cal-block">
+          <div class="cal-block-h cal-up">📅 방문예약<span class="cal-block-cnt">${upcoming.length}건</span></div>
+          ${upGroups.length ? upGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">예약된 방문 없음</div>'}
         </div>
-        <div class="ins-col bad">
-          <div class="ins-col-h">⚠️ 약점 / 병목</div>
-          ${analysis.weaknesses.length ? analysis.weaknesses.map(w=>`<div class="ins-col-item"><b>${w.icon} ${esc(w.text)}</b><div class="ins-col-detail">${esc(w.detail)}</div></div>`).join('') : '<div class="ins-empty">약점 없음 - 모든 지표 양호</div>'}
-        </div>
-        <div class="ins-col tip">
-          <div class="ins-col-h">💡 코칭 액션</div>
-          ${analysis.advices.length ? analysis.advices.map((a,j)=>`<div class="ins-col-item"><b>${j+1}. ${a.icon}</b> ${esc(a.text)}</div>`).join('') : '<div class="ins-empty">현재 코칭 권고사항 없음</div>'}
+        <div class="cal-block">
+          <div class="cal-block-h cal-done">✅ 방문완료<span class="cal-block-cnt">${completed.length}건</span></div>
+          ${doneGroups.length ? doneGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">완료된 방문 없음</div>'}
         </div>
       </div>
     </div>
@@ -3323,20 +3317,6 @@ function _buildAgentReportSection(agent, rank){
             </tr>`).join('')}
         </tbody>
       </table>`}
-    </div>
-    <!-- 📅 일정 캘린더 -->
-    <div class="ag-rpt-section">
-      <div class="ag-rpt-h">📅 일정 캘린더 (방문예약 + 방문완료)</div>
-      <div class="cal-grid">
-        <div class="cal-block">
-          <div class="cal-block-h cal-up">📅 방문예약 (앞으로)<span class="cal-block-cnt">${upcoming.length}건</span></div>
-          ${upGroups.length ? upGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">앞으로 예약된 방문 없음</div>'}
-        </div>
-        <div class="cal-block">
-          <div class="cal-block-h cal-done">✅ 방문완료 (최근)<span class="cal-block-cnt">${completed.length}건</span></div>
-          ${doneGroups.length ? doneGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">최근 방문 완료 없음</div>'}
-        </div>
-      </div>
     </div>
   </div>
 </div>`;
