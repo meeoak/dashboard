@@ -579,13 +579,14 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cal-agent-sel:hover{border-color:#94a3b8}
 .cal-agent-sel:focus{outline:none;border-color:#0284c7;box-shadow:0 0 0 3px rgba(2,132,199,.15)}
 /* 에이전트 단추 — 드롭다운 대체 */
-.cal-agent-tabs{display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:100%}
+.cal-team-tabs{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.cal-agent-tabs{display:flex;gap:5px;align-items:center;flex-wrap:wrap;flex-basis:100%;max-width:100%}
 .cal-at-btn{padding:5px 12px;border:1.5px solid #cbd5e1;background:#fff;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
 .cal-at-btn:hover{background:#f1f5f9;border-color:#94a3b8;transform:translateY(-1px)}
 .cal-at-btn.on{background:#1e293b;color:#fff;border-color:#1e293b;box-shadow:0 2px 6px rgba(0,0,0,.12)}
 .cal-at-btn .cal-at-dot{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1.5px rgba(255,255,255,.5)}
 @media(max-width:640px){
-  .cal-agent-tabs{gap:4px}
+  .cal-team-tabs,.cal-agent-tabs{gap:4px}
   .cal-at-btn{padding:4px 10px;font-size:11px}
 }
 .cal-title{font-size:17px;font-weight:900}
@@ -1214,6 +1215,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
       <span class="cal-month-label" id="cal-month-label">5월</span>
       <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월">▶</button>
     </div>
+    <div class="cal-team-tabs" id="cal-team-tabs"></div>
     <div class="cal-agent-tabs" id="cal-agent-tabs"></div>
   </div>
   <!-- 캘린더 (예정 위 + 완료 아래) -->
@@ -1822,34 +1824,37 @@ function updateCalControls(){
 
 // 에이전트 단추 그리기 (curTeam 기준)
 function buildCalAgentButtons(){
-  const wrap = document.getElementById('cal-agent-tabs');
-  if(!wrap) return;
+  const teamWrap = document.getElementById('cal-team-tabs');
+  const agentWrap = document.getElementById('cal-agent-tabs');
+  if(!teamWrap || !agentWrap) return;
   const isAll = curTeam==='ALL';
   const agents = isAll ? [] : (D.team_members[curTeam]||[]);
   const tcol = isAll ? '#1e293b' : (TC[curTeam] || '#888');
-  // 전체 에이전트 + 팀 단추 3개
-  let html = `<button class="cal-at-btn ${curAgent==='ALL' && isAll ?'on':''}" data-agent="ALL" onclick="setCalAgentQuick('ALL')">👥 전체 에이전트</button>`;
+  // ── 상단(월 옆): 전체 에이전트 + 팀 단추 3개 ──
+  let teamHtml = `<button class="cal-at-btn ${curAgent==='ALL' && isAll ?'on':''}" data-agent="ALL" onclick="setCalAgentQuick('ALL')">👥 전체 에이전트</button>`;
   ['TIM_GIAR','TIM_TINA','TIM_LIDIA'].forEach(t=>{
     const isOn = curTeam === t;
     const c = TC[t];
     const onStyle = isOn ? `background:${c};border-color:${c};color:#fff` : '';
     const name = teamShortName(t);
-    html += `<button class="cal-at-btn cal-team-btn ${isOn?'on':''}" style="${onStyle}" onclick="selectScope('${t}')">
+    teamHtml += `<button class="cal-at-btn cal-team-btn ${isOn?'on':''}" style="${onStyle}" onclick="selectScope('${t}')">
       <span class="cal-at-dot" style="background:${c}"></span>${name}
     </button>`;
   });
-  // 팀의 에이전트 단추
+  teamWrap.innerHTML = teamHtml;
+  // ── 하단: 팀의 에이전트 단추 (팀 미선택 시 빈 영역) ──
+  let agentHtml = '';
   agents.forEach(a=>{
     const meta = D.agent_meta[a]||{};
     const short = meta.short || a;
     const safeA = a.replace(/'/g,"\\'");
     const isOn = curAgent === a;
     const onStyle = isOn ? `background:${tcol};border-color:${tcol};color:#fff` : '';
-    html += `<button class="cal-at-btn ${isOn?'on':''}" data-agent="${a.replace(/"/g,'&quot;')}" style="${onStyle}" onclick="setCalAgentQuick('${safeA}')">
+    agentHtml += `<button class="cal-at-btn ${isOn?'on':''}" data-agent="${a.replace(/"/g,'&quot;')}" style="${onStyle}" onclick="setCalAgentQuick('${safeA}')">
       <span class="cal-at-dot" style="background:${tcol}"></span>${short}
     </button>`;
   });
-  wrap.innerHTML = html;
+  agentWrap.innerHTML = agentHtml;
 }
 
 function selectScope(scope){
