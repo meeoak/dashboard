@@ -3912,6 +3912,16 @@ function renderInsight(){
 function switchTab(tab){
   // 'insight'는 하위호환 별칭 — 팀 인사이트로 매핑
   if(tab === 'insight') tab = 'team_insight';
+  // 에이전트별 토탈관리 진입 시 기본 에이전트(GIAR 첫 멤버)로 자동 선택
+  if(tab === 'agent_insight' && curAgent === 'ALL'){
+    const ginAgents = (D.team_members && D.team_members.TIM_GIAR) || [];
+    if(ginAgents.length){
+      curTeam = 'TIM_GIAR';
+      curAgent = ginAgents[0];
+      const sel = document.getElementById('fsel-agent');
+      if(sel){ buildAgentSelect(); sel.value = curAgent; }
+    }
+  }
   ['cal','stats','rank','team_insight','agent_insight'].forEach(t=>{
     const tabEl = document.getElementById('tab-'+t);
     const contEl = document.getElementById('content-'+t);
