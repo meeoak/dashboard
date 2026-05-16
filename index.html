@@ -378,6 +378,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 /* 미진행 세부 분류 */
 .mgmt-sub{margin-top:10px;padding-top:10px;border-top:1px dashed #e5e7eb}
 .mgmt-sub-lbl{font-size:10.5px;font-weight:800;color:#a16207;margin-bottom:7px;letter-spacing:-.2px}
+.mgmt-sub-lbl small{font-weight:700;color:#94a3b8;font-size:9.5px}
 .mgmt-sub-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .mgmt-sub-item{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:7px;background:#fffbeb;border:1.5px solid #fde68a;cursor:pointer;transition:all .12s;font-size:11px}
 .mgmt-sub-item:hover{background:#fef3c7;border-color:#fbbf24;transform:translateY(-1px)}
@@ -2585,19 +2586,19 @@ function renderDBSummary(){
         </div>
       </div>
       ${idle>0?`<div class="mgmt-sub">
-        <div class="mgmt-sub-lbl">⏳ 미진행 ${f(idle)}건 세부</div>
+        <div class="mgmt-sub-lbl">⏳ 미진행 ${f(idle)}건 세부 <small>(전체 ${f(total)} 대비)</small></div>
         <div class="mgmt-sub-row">
           <div class="mgmt-sub-item" onclick="openMemStatus('idle_noMemo')" title="메모도 없는 미진행 — 즉시 관리 필요">
             <span class="mgmt-sub-icon">📝</span>
             <span class="mgmt-sub-name">메모없음</span>
             <b>${f(idleNoMemo)}</b>
-            <span class="mgmt-sub-pct">${pctOf(idleNoMemo, idle)}%</span>
+            <span class="mgmt-sub-pct">${pct(idleNoMemo)}%</span>
           </div>
           <div class="mgmt-sub-item" onclick="openMemStatus('idle_noResp')" title="메모는 있지만 옵션 미선택 — 응답없음">
             <span class="mgmt-sub-icon">🚨</span>
             <span class="mgmt-sub-name">응답없음</span>
             <b>${f(idleNoResp)}</b>
-            <span class="mgmt-sub-pct">${pctOf(idleNoResp, idle)}%</span>
+            <span class="mgmt-sub-pct">${pct(idleNoResp)}%</span>
           </div>
         </div>
       </div>`:''}
