@@ -789,6 +789,10 @@ body.focus-mode #detail-section-hd{display:none!important}
 .ins-ag-d-btn:hover{background:linear-gradient(135deg,#0369a1,#075985);transform:translateY(-2px);box-shadow:0 4px 14px rgba(2,132,199,.4)}
 .ins-ag-d-btn-pdf{background:linear-gradient(135deg,#1e3a8a,#2563eb);box-shadow:0 2px 6px rgba(30,58,138,.25)}
 .ins-ag-d-btn-pdf:hover{background:linear-gradient(135deg,#1e40af,#1d4ed8);box-shadow:0 4px 14px rgba(30,58,138,.4)}
+.ins-ag-d-btn-sheet{background:linear-gradient(135deg,#15803d,#16a34a);box-shadow:0 2px 6px rgba(21,128,61,.25);color:#fff}
+.ins-ag-d-btn-sheet:hover{background:linear-gradient(135deg,#14532d,#15803d);box-shadow:0 4px 14px rgba(21,128,61,.4)}
+.ins-ag-d-btn-cfg{background:#475569;color:#fff;box-shadow:0 2px 6px rgba(71,85,105,.25)}
+.ins-ag-d-btn-cfg:hover{background:#334155}
 /* 펀널 시각화 - 강화 */
 .ins-funnel{display:flex;align-items:stretch;gap:0;background:linear-gradient(90deg,#f8fafc 0%,#fff 50%,#f8fafc 100%);border:2px solid #cbd5e1;border-radius:14px;padding:20px 14px;margin-bottom:18px;box-shadow:inset 0 1px 4px rgba(0,0,0,.04)}
 .ins-f-stage{flex:1;text-align:center;padding:10px 8px;border-radius:10px;transition:all .15s}
@@ -1300,10 +1304,12 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     <div class="sec-hd" style="background:linear-gradient(180deg,#fef3c7 0%,#fff 100%)">
       <div><div class="sec-title">👤 에이전트별 상세 분석</div>
       <div class="sec-sub">에이전트 배포용 · 📊 펀널 + ✅ 강점 + ⚠️ 약점/병목 + 💡 코칭 액션 (활동 있는 에이전트만)</div></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
+      <div style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap">
         <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
         <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('ko')" title="전체 에이전트 한국어 일괄 PDF" style="padding:8px 14px;font-size:12px">📄 전체 · KR</button>
         <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('id')" title="Semua agen Laporan Bahasa PDF" style="padding:8px 14px;font-size:12px">📄 전체 · ID</button>
+        <button class="ins-ag-d-btn ins-ag-d-btn-sheet" onclick="sendAllAgentReportsToSheet()" title="전체 에이전트 보고서를 구글 시트로 전송" style="padding:8px 14px;font-size:12px">📤 전체 시트 전송</button>
+        <button class="ins-ag-d-btn ins-ag-d-btn-cfg" onclick="openSheetConfig()" title="Apps Script Webhook URL 설정" style="padding:8px 10px;font-size:12px">⚙️</button>
       </div>
     </div>
     <div class="ins-agent-wrap" id="ins-agent-wrap"></div>
@@ -4093,6 +4099,149 @@ function _buildAgentReportSection(agent, rank, lang){
 </div>`;
 }
 
+// ═════════════════════════════════════════════════════════════
+//  📤 Google Apps Script Webhook (에이전트 보고서 자동 전송)
+//  ↳ 사용자가 Apps Script Web App을 배포 후 URL을 한 번 등록하면
+//    이후 버튼 한 번으로 시트에 일일 보고서 자동 누적
+// ═════════════════════════════════════════════════════════════
+const SHEET_WEBHOOK_KEY = 'dashboard.sheetWebhookUrl.v1';
+function getSheetWebhookUrl(){
+  try { return localStorage.getItem(SHEET_WEBHOOK_KEY) || ''; } catch(e){ return ''; }
+}
+function setSheetWebhookUrl(url){
+  try { localStorage.setItem(SHEET_WEBHOOK_KEY, url||''); } catch(e){}
+}
+function openSheetConfig(){
+  const cur = getSheetWebhookUrl();
+  const msg =
+    '구글 Apps Script Web App URL을 입력하세요.\n' +
+    '(처음이면 README의 google-apps-script.gs 코드를 시트에 배포한 후 발급된 URL을 붙여넣기)\n\n' +
+    '현재 값: ' + (cur ? cur.slice(0,60)+'…' : '(미설정)');
+  const next = prompt(msg, cur);
+  if(next === null) return; // cancel
+  setSheetWebhookUrl(next.trim());
+  showSheetStatus('⚙️ Webhook URL 저장됨', '#16a34a');
+  setTimeout(hideSheetStatus, 2500);
+}
+function _buildAgentSheetPayload(agent){
+  const meta = D.agent_meta[agent] || {};
+  const s = statsRange(curFrom, curTo, null, agent);
+  const urgent = findUrgentForAgent(agent, D.today);
+  const items = urgent.map(r => ({
+    severity: r.severity,
+    icon: r.urgentIcon || '',
+    nm: r.nm || '',
+    pa: r.pa || '',
+    ad: r.ad || '',
+    vd: r.vd || '',
+    st: r.st || '',
+    daysSince: r.daysSince,
+    daysLeft: r.daysLeft,
+    reason: r.reason || '',
+    memo: (r.memo || '').slice(0, 200)
+  }));
+  return {
+    generatedAt: new Date().toISOString(),
+    today: D.today,
+    period: {from: curFrom, to: curTo},
+    agent: {
+      key: agent,
+      name: meta.short || agent,
+      team: meta.team || '',
+      teamLabel: teamShortName(meta.team || '')
+    },
+    kpi: {
+      db: s.db || 0,
+      sched: s.sched || 0,
+      visit: s.visit || 0,
+      cl: s.cl || 0,
+      r_ds: s.r_ds || 0,
+      r_sv: s.r_sv || 0,
+      r_vc: s.r_vc || 0,
+      r_dc: s.r_dc || 0,
+      score: s.score || 0
+    },
+    urgent: {
+      total: items.length,
+      bySeverity: {
+        high: items.filter(x=>x.severity>=3).length,
+        med:  items.filter(x=>x.severity===2).length,
+        low:  items.filter(x=>x.severity===1).length
+      },
+      items
+    }
+  };
+}
+async function _postAgentPayload(payload){
+  const url = getSheetWebhookUrl();
+  if(!url){
+    showSheetStatus('⚠️ Webhook URL 미설정 — ⚙️ 버튼으로 등록 필요', '#dc2626');
+    setTimeout(hideSheetStatus, 5000);
+    throw new Error('webhook_not_set');
+  }
+  // text/plain body (Apps Script CORS 우회 — preflight 없음)
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload),
+    redirect: 'follow'
+  });
+  if(!resp.ok) throw new Error('HTTP ' + resp.status);
+  return resp.json().catch(()=> ({ok:true}));
+}
+async function sendAgentReportToSheet(agent){
+  try{
+    const payload = _buildAgentSheetPayload(agent);
+    const short = (D.agent_meta[agent]||{}).short || agent;
+    showSheetStatus(`📤 ${short} 보고서 전송 중…`);
+    await _postAgentPayload(payload);
+    showSheetStatus(`✅ ${short} 보고서 시트 전송 완료 (${payload.urgent.total}건 긴급)`, '#16a34a');
+    setTimeout(hideSheetStatus, 4000);
+  }catch(e){
+    if(e.message !== 'webhook_not_set'){
+      console.error('Sheet send error:', e);
+      showSheetStatus('⚠️ 시트 전송 실패: ' + e.message, '#dc2626');
+      setTimeout(hideSheetStatus, 6000);
+    }
+  }
+}
+async function sendAllAgentReportsToSheet(){
+  if(!getSheetWebhookUrl()){
+    openSheetConfig();
+    return;
+  }
+  // 현재 인사이트 탭에서 보이는 에이전트들 (curTeam/curAgent 필터 반영)
+  let agents;
+  if(curAgent !== 'ALL') agents = [curAgent];
+  else if(curTeam !== 'ALL') agents = D.team_members[curTeam] || [];
+  else agents = Object.keys(D.agent_total || {});
+  const active = agents.filter(a=>{
+    const s = statsRange(curFrom, curTo, null, a);
+    return (s.db||0) > 0;
+  });
+  if(active.length === 0){
+    showSheetStatus('⚠️ 전송할 활동 에이전트 없음', '#dc2626');
+    setTimeout(hideSheetStatus, 4000);
+    return;
+  }
+  if(!confirm(`${active.length}명 에이전트 보고서를 시트로 전송할까요?`)) return;
+  let ok = 0, fail = 0;
+  for(let i = 0; i < active.length; i++){
+    const a = active[i];
+    const short = (D.agent_meta[a]||{}).short || a;
+    showSheetStatus(`📤 (${i+1}/${active.length}) ${short} 전송 중…`);
+    try{
+      await _postAgentPayload(_buildAgentSheetPayload(a));
+      ok++;
+    }catch(e){
+      console.error('Send fail:', a, e);
+      fail++;
+    }
+  }
+  showSheetStatus(`✅ 전송 완료: 성공 ${ok}명${fail?` · 실패 ${fail}명`:''}`, fail?'#d97706':'#16a34a');
+  setTimeout(hideSheetStatus, 6000);
+}
+
 function openAgentReport(agent, lang){
   lang = lang || 'ko';
   const t = _reportT(lang);
@@ -4556,6 +4705,7 @@ function renderAgentCardsOnly(){
           <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}','ko')" title="한국어 일일 보고서 PDF">📄 KR</button>
           <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}','id')" title="Laporan Harian PDF (Bahasa)">📄 ID</button>
           <button class="ins-ag-d-btn" onclick="openMem('${x.a}','db')" title="회원 목록 보기">📋 회원 목록</button>
+          <button class="ins-ag-d-btn ins-ag-d-btn-sheet" onclick="sendAgentReportToSheet('${x.a}')" title="구글 시트로 전송 (Apps Script 연동)">📤 시트</button>
         </div>
       </div>
 
