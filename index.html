@@ -3395,21 +3395,26 @@ function renderUrgentBanner(){
   agents.forEach(a=>{
     const urgent = findUrgentForAgent(a, todayStr);
     if(urgent.length===0)return;
-    totals.byAgent[a] = urgent.length;
-    totals.total += urgent.length;
+    let agentUrgentCount = 0;
     urgent.forEach(u=>{
       if(u.urgentIcon==='⚠️')totals.overdue++;
       else if(u.urgentIcon==='⏳')totals.wait++;
       else if(u.urgentIcon==='🚨')totals.idle++;
       else if(u.urgentIcon==='📅')totals.soon++;
-      // 메모 없음 + 옵션 미선택(st='none'): 에이전트가 아무 액션도 기록 안 한 회원
+      // 상담기록없음 + 옵션 미선택(st='none'): 에이전트가 아무 액션도 기록 안 한 회원
       const memoEmpty = !u.memo || !String(u.memo).trim();
       const noOption = u.st === 'none';
-      if(memoEmpty && noOption) totals.noMemo++;
+      const isNoMemo = memoEmpty && noOption;
+      if(isNoMemo) totals.noMemo++;
+      // 긴급 = 상담기록없음(1) + 방문일 지남(2) 만
+      if(isNoMemo || u.urgentIcon==='⚠️') agentUrgentCount++;
     });
+    if(agentUrgentCount>0) totals.byAgent[a] = agentUrgentCount;
   });
+  totals.total = totals.noMemo + totals.overdue;
+  const anyItems = totals.noMemo + totals.overdue + totals.idle + totals.wait + totals.soon;
 
-  if(totals.total===0){
+  if(anyItems===0){
     banner.innerHTML = `<div class="urgent-banner-ok">
       <div class="ub-icon">✅</div>
       <div class="ub-content"><div class="ub-title">긴급 관리 대상 없음</div><div class="ub-sub">배정 후 2주 이내 회원 중 즉시 액션 필요한 건 없습니다</div></div>
@@ -3436,11 +3441,11 @@ function renderUrgentBanner(){
       </div>
     </div>
     <div class="ub-stats">
+      ${totals.noMemo>0?`<div class="ub-stat ub-stat-amber" onclick="openUrgentByType('noMemo')" title="상담기록도 없고 옵션도 선택 안된 회원 목록 (아무 액션도 기록 안 됨)"><b>${totals.noMemo}</b><span>📝 상담기록없음</span></div>`:''}
       ${totals.overdue>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('overdue')" title="방문일 지남 회원 목록"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>`:''}
-      ${totals.idle>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('idle')" title="미진행 응답없음 회원 목록"><b>${totals.idle}</b><span>🚨 미진행 응답없음</span></div>`:''}
+      ${totals.idle>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('idle')" title="응답없음 회원 목록"><b>${totals.idle}</b><span>🚨 응답없음</span></div>`:''}
       ${totals.wait>0?`<div class="ub-stat ub-stat-orange" onclick="openUrgentByType('wait')" title="일정대기 누적 회원 목록"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>`:''}
       ${totals.soon>0?`<div class="ub-stat ub-stat-blue" onclick="openUrgentByType('soon')" title="방문 임박 회원 목록"><b>${totals.soon}</b><span>📅 방문 임박</span></div>`:''}
-      ${totals.noMemo>0?`<div class="ub-stat ub-stat-amber" onclick="openUrgentByType('noMemo')" title="메모도 없고 옵션도 선택 안된 회원 목록 (아무 액션도 기록 안 됨)"><b>${totals.noMemo}</b><span>📝 메모 없음</span></div>`:''}
     </div>
     ${curAgent==='ALL' && topAgents.length ? `<div class="ub-agents">
       <div class="ub-agents-lbl">긴급 건수 TOP 에이전트:</div>
@@ -3457,10 +3462,10 @@ function renderUrgentBanner(){
 function openUrgentByType(kind){
   const typeMap = {
     overdue: {icon:'⚠️', label:'방문일 지남', bg:'#fee2e2', color:'#7f1d1d'},
-    idle:    {icon:'🚨', label:'미진행 응답없음', bg:'#fee2e2', color:'#7f1d1d'},
+    idle:    {icon:'🚨', label:'응답없음', bg:'#fee2e2', color:'#7f1d1d'},
     wait:    {icon:'⏳', label:'일정대기 누적', bg:'#dbeafe', color:'#1e3a8a'},
     soon:    {icon:'📅', label:'방문 임박', bg:'#dbeafe', color:'#1e3a8a'},
-    noMemo:  {icon:'📝', label:'메모 없음 (옵션 미선택)', bg:'#fef3c7', color:'#92400e'},
+    noMemo:  {icon:'📝', label:'상담기록없음 (옵션 미선택)', bg:'#fef3c7', color:'#92400e'},
   };
   const info = typeMap[kind] || typeMap.overdue;
   const todayStr = D.today;
@@ -3597,7 +3602,7 @@ function _reportT(lang){
     urgent_main_title: '🚨 긴급 관리 일일 보고서',
     urgent_subtitle: (team, today, total)=>`${team} · ${today} 기준 · 배정 후 2주 이내 이관 임박 회원 ${total}건`,
     urgent_overdue: '⚠️ 방문일 지남',
-    urgent_idle: '🚨 미진행 응답없음',
+    urgent_idle: '🚨 응답없음',
     urgent_wait: '⏳ 일정대기 누적',
     urgent_soon: '📅 방문 임박',
     urgent_empty_title: '긴급 관리 대상 없음',
@@ -3658,7 +3663,7 @@ function _reportT(lang){
     col_channel: '채널',
     col_memo: '📝 상담기록',
     type_overdue: '방문일 지남',
-    type_idle: '미진행 응답없음',
+    type_idle: '응답없음',
     type_wait: '일정대기 누적',
     type_soon: '방문 임박',
     bulk_doc_title: (team)=>`${team} 에이전트 일일 보고서`,
@@ -4912,7 +4917,7 @@ function renderAgentCardsOnly(){
           <div class="ins-urgent-hd">🚨 긴급 관리 필요 <span class="urg-count">${urgent.length}건</span> <small>(배정 후 2주 이내 · 이관 임박)</small></div>
           <div class="ins-urg-cats">
             <div class="ins-urg-cat ${c_overdue>0?'red':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','s_o')" title="방문일 지남 · 클릭→명단"><b>${c_overdue}</b><span>⚠️ 방문일 지남</span></div>
-            <div class="ins-urg-cat ${c_idle>0?'red':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','none')" title="미진행 응답없음 · 클릭→명단"><b>${c_idle}</b><span>🚨 미진행 응답없음</span></div>
+            <div class="ins-urg-cat ${c_idle>0?'red':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','none')" title="응답없음 · 클릭→명단"><b>${c_idle}</b><span>🚨 응답없음</span></div>
             <div class="ins-urg-cat ${c_wait>0?'blue':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','w')" title="일정대기 누적 · 클릭→명단"><b>${c_wait}</b><span>⏳ 일정대기 누적</span></div>
             <div class="ins-urg-cat ${c_soon>0?'yellow':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','s_f')" title="방문 임박 · 클릭→명단"><b>${c_soon}</b><span>📅 방문 임박</span></div>
           </div>
