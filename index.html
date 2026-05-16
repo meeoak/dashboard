@@ -702,7 +702,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-detail-tbl th{background:#f8fafc;padding:7px 10px;text-align:left;font-size:10.5px;font-weight:800;color:#475569;border-bottom:1.5px solid #cbd5e1;letter-spacing:-.2px;white-space:nowrap}
 .r3d-detail-tbl td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top;font-weight:600}
 .r3d-detail-tbl tr:last-child td{border-bottom:none}
-.r3d-detail-tbl tr:hover td{background:#fef9c3}
+.r3d-detail-tbl tr.r3d-row{cursor:pointer;transition:background .12s}
+.r3d-detail-tbl tr.r3d-row:hover td{background:#fef9c3}
+.r3d-detail-tbl tr.r3d-row:active td{background:#fde68a}
 .r3d-detail-tbl .r3d-d{font-weight:800;color:#1e293b;font-size:11.5px;white-space:nowrap;width:64px}
 .r3d-detail-tbl .r3d-d.r3d-ad{color:#64748b;font-weight:700;width:60px;font-size:11px}
 .r3d-detail-tbl .r3d-m{font-size:12px}
@@ -965,7 +967,7 @@ body.focus-mode #detail-section-hd{display:none!important}
    - 포커스 모드: 섹션 헤더·요약 모두 완전 숨김
    ═══════════════════════════════════════════════════════ */
 /* 1) 헤더: 1줄 압축 */
-.hdr-in{padding:11px 22px 9px;padding-top:44px}
+.hdr-in{padding:11px 22px 9px}
 .hdr-center{gap:10px}
 .hdr-flame{font-size:22px}
 .hdr-flame:nth-of-type(2){display:none}
@@ -973,7 +975,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 .hdr-sub-row{margin-top:3px;gap:6px}
 .hdr-sub{font-size:11px;color:#cbd5e1}
 .live-badge{font-size:9.5px;padding:2px 8px}
-.hdr-lang{position:absolute;top:10px;left:22px;right:auto;margin:0;z-index:5}
+.hdr-lang{display:none}
 .hdr-row2{display:none}
 
 /* 2) 스코프 바: dark → light & compact + sticky */
@@ -985,8 +987,20 @@ body.focus-mode #detail-section-hd{display:none!important}
 .scope-btn.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a;box-shadow:0 2px 6px rgba(30,58,138,.2)}
 .scope-btn.on .scope-dot{box-shadow:none}
 
-/* 3) 빠른 이동 = 메인 탭 (sticky로 상단 고정) */
-.quick-nav-bar{background:#fff;border-bottom:2px solid #fcd34d;padding:0 22px;box-shadow:0 1px 0 #fcd34d;position:sticky;top:46px;z-index:49}
+/* 2-a) 스코프 바 안의 언어 토글 + 새로고침 (오른쪽) */
+.scope-lang{display:inline-flex;gap:0;background:#f1f5f9;border:1.5px solid #cbd5e1;border-radius:8px;padding:2px}
+.scope-lang .lang-btn{color:#64748b;font-size:11.5px;padding:4px 9px;border-radius:6px;font-weight:800}
+.scope-lang .lang-btn:hover{color:#1e3a8a;background:#fff}
+.scope-lang .lang-btn.on{background:#1e3a8a;color:#fff;box-shadow:none}
+.scope-refresh-btn{background:#16a34a;color:#fff;border:1.5px solid #15803d;padding:5px 11px;font-size:12px;font-weight:800;border-radius:8px;cursor:pointer;letter-spacing:-.2px;white-space:nowrap;transition:all .12s}
+.scope-refresh-btn:hover{background:#15803d;border-color:#14532d}
+
+/* 2-b) 팀 바 (2행): scope-bar 바로 아래 */
+.team-bar{background:#f8fafc;border-bottom:1.5px solid #e5e7eb;padding:0 22px;box-shadow:0 1px 4px rgba(0,0,0,.03);position:sticky;top:46px;z-index:49}
+.team-bar .scope-in{padding:7px 0;gap:6px}
+
+/* 3) 빠른 이동 = 메인 탭 (sticky로 상단 고정) — team-bar 아래 */
+.quick-nav-bar{background:#fff;border-bottom:2px solid #fcd34d;padding:0 22px;box-shadow:0 1px 0 #fcd34d;position:sticky;top:88px;z-index:48}
 .quick-nav-in{padding:0;gap:0;flex-wrap:nowrap;overflow-x:auto}
 .quick-nav-lbl{display:none}
 .quick-nav-btn{background:transparent;border:none;color:#64748b;font-size:13px;padding:12px 16px;border-radius:0;border-bottom:3px solid transparent;letter-spacing:-.3px;position:relative;top:2px}
@@ -1018,13 +1032,15 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 
 /* 7) 모바일 추가 조정 */
 @media(max-width:640px){
-  .hdr-in{padding:9px 12px 7px;padding-top:38px}
-  .hdr-lang{top:8px;left:12px}
+  .hdr-in{padding:9px 12px 7px}
   .hdr-title{font-size:18px}
   .hdr-flame{font-size:20px}
   .scope-bar{padding:0 12px}
   .scope-btn{padding:4px 10px;font-size:11.5px}
-  .quick-nav-bar{padding:0 12px;top:42px}
+  .scope-lang .lang-btn{font-size:10.5px;padding:3px 7px}
+  .scope-refresh-btn{font-size:11px;padding:4px 9px}
+  .team-bar{padding:0 12px;top:42px}
+  .quick-nav-bar{padding:0 12px;top:80px}
   .quick-nav-btn{padding:10px 12px;font-size:12px}
   .filter-bar{padding:7px 12px}
 }
@@ -1046,20 +1062,24 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     </div>
     <span class="hdr-flame">🔥</span>
   </div>
-  <div class="lang-toggle hdr-lang">
-    <button class="lang-btn on" data-lang="ko" onclick="setLang('ko')">🇰🇷 한국어</button>
-    <button class="lang-btn" data-lang="id" onclick="setLang('id')">🇮🇩 Bahasa</button>
-    <button class="lang-btn" onclick="refreshFromSheet()" title="구글시트에서 다시 불러오기" style="margin-left:8px;background:#16a34a;color:white;border-color:#15803d">🔄 새로고침</button>
-  </div>
   <span style="display:none" id="hdr-score"></span>
 </div></div>
 
-<!-- 스코프 탭: DB 종류 (왼쪽) + 팀별 (오른쪽) -->
+<!-- 스코프 탭 (1행): DB 종류 (왼쪽) + 언어·새로고침 (오른쪽) -->
 <div class="scope-bar"><div class="scope-in" id="scope-bar">
-  <button class="scope-btn on" data-scope="ALL" onclick="selectScope('ALL')" data-t="all_unified">전체 통합</button>
+  <button class="scope-btn on" data-scope="ALL" onclick="selectScope('ALL')" data-t="all_unified">전체DB(OFF+MKT)</button>
   <button class="scope-btn" data-scope="OFF" onclick="selectScope('OFF')"><span class="scope-dot" style="background:#a855f7"></span>OFF DB</button>
   <button class="scope-btn" data-scope="MKT" onclick="selectScope('MKT')"><span class="scope-dot" style="background:#06b6d4"></span>MKT DB</button>
   <div style="flex:1"></div>
+  <div class="lang-toggle scope-lang">
+    <button class="lang-btn on" data-lang="ko" onclick="setLang('ko')">🇰🇷 한국어</button>
+    <button class="lang-btn" data-lang="id" onclick="setLang('id')">🇮🇩 Bahasa</button>
+  </div>
+  <button class="scope-refresh-btn" onclick="refreshFromSheet()" title="구글시트에서 다시 불러오기">🔄 새로고침</button>
+</div></div>
+
+<!-- 스코프 탭 (2행): 팀별 -->
+<div class="team-bar"><div class="scope-in" id="team-bar">
   <button class="scope-btn" data-scope="TEAM_ALL" onclick="selectScope('TEAM_ALL')">🌐 전체팀</button>
   <button class="scope-btn" data-scope="TIM_GIAR"  onclick="selectScope('TIM_GIAR')"><span class="scope-dot" style="background:#1a73e8"></span>TIM_GIAR</button>
   <button class="scope-btn" data-scope="TIM_TINA"  onclick="selectScope('TIM_TINA')"><span class="scope-dot" style="background:#16a34a"></span>TIM_TINA</button>
@@ -1399,7 +1419,7 @@ const LANG = {
   ko: {
     title:'영업팀 통합 대시보드', subtitle:'실시간 방문영업 현황',
     score_lbl:'총 점수 (클로징×5 + 방문×1)',
-    all_unified:'전체 통합', all_period:'전체 기간', all_agents:'전체 에이전트',
+    all_unified:'전체DB(OFF+MKT)', all_period:'전체 기간', all_agents:'전체 에이전트',
     today:'오늘', last_n:'최근', this_month:'이번달', last_month:'지난달', all:'전체',
     today_lbl:'오늘',
     s_d:'방문완료', s_ls:'랑숭비짓', s_vc:'비디오콜', s_s:'방문예약', s_w:'일정대기',
@@ -1473,7 +1493,7 @@ const LANG = {
   id: {
     title:'Dashboard Penjualan Terpadu', subtitle:'Status Penjualan Kunjungan Real-time',
     score_lbl:'Total Skor (Closing×5 + Visit×1)',
-    all_unified:'Total Terpadu', all_period:'Semua Periode', all_agents:'Semua Agen',
+    all_unified:'Semua DB (OFF+MKT)', all_period:'Semua Periode', all_agents:'Semua Agen',
     today:'Hari ini', last_n:'Terakhir', this_month:'Bulan ini', last_month:'Bulan lalu', all:'Semua',
     today_lbl:'Hari ini',
     s_d:'Visit Selesai', s_ls:'Visit Langsung', s_vc:'Video Call', s_s:'Jadwal Kunjungan',
@@ -4229,21 +4249,26 @@ function renderRecent7DaysByTeam(){
   };
 
   const fmtDate = (s)=> s ? s.slice(5).replace('-','/') : '-';
+  const todayStr = D.today;
+  // 업데이트 일자: vd 가 fromStr ~ today 사이면 vd, 아니면 ad
+  const pickUpdateDate = (r)=>{
+    const vdInWindow = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+    return vdInWindow ? r.vd : r.ad;
+  };
   const teams = curTeam==='ALL' ? ['TIM_GIAR','TIM_TINA','TIM_LIDIA'] : [curTeam];
   let html = '';
   teams.forEach(t=>{
-    // 최근 7일 내 활동: 배정일 OR 방문일이 fromStr 이후 — 에이전트 필터도 적용
+    // 최근 7일 내 활동: 배정일 OR 방문일이 fromStr~today 범위 — 에이전트 필터도 적용
+    // 미래 예약 방문(vd>today)은 '업데이트'로 보지 않음
     const recs = (D.records||[]).filter(r=>{
       if(r.t !== t) return false;
       if(curAgent !== 'ALL' && r.a !== curAgent) return false;
-      return (r.ad && r.ad >= fromStr) || (r.vd && r.vd >= fromStr);
+      const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
+      const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+      return adInWin || vdInWin;
     });
-    // 최신순 정렬 (vd 또는 ad의 최대값 기준)
-    recs.sort((a,b)=>{
-      const dA = (a.vd && a.vd >= fromStr) ? a.vd : a.ad;
-      const dB = (b.vd && b.vd >= fromStr) ? b.vd : b.ad;
-      return (dB||'').localeCompare(dA||'');
-    });
+    // 최신순 정렬 (업데이트 일자 기준)
+    recs.sort((a,b)=> (pickUpdateDate(b)||'').localeCompare(pickUpdateDate(a)||''));
     const total = recs.length;
     const color = TC[t] || '#888';
     const name = teamShortName(t) + (curAgent !== 'ALL' ? ` · ${(D.agent_meta[curAgent]||{}).short || curAgent}` : '');
@@ -4251,7 +4276,7 @@ function renderRecent7DaysByTeam(){
     const initialShown = 15;
     const visibleRecs = recs.slice(0, initialShown);
     const rows = visibleRecs.map(r=>{
-      const updateDate = (r.vd && r.vd >= fromStr) ? r.vd : r.ad;
+      const updateDate = pickUpdateDate(r);
       const agentShort = (D.agent_meta[r.a]||{}).short || r.a;
       const memoRaw = (r.memo||'').trim();
       // 한국어 모드일 때 자동 번역
@@ -4259,7 +4284,8 @@ function renderRecent7DaysByTeam(){
       const memoCell = memo
         ? `<td class="r3d-memo" title="${esc(memoRaw)}">${esc(memo.slice(0,60))}${memo.length>60?'…':''}</td>`
         : `<td class="r3d-memo empty">${curLang==='id'?'Tidak ada catatan':'메모 없음'}</td>`;
-      return `<tr>
+      const recKey = esc(JSON.stringify({a:r.a, nm:r.nm||'', ad:r.ad||''}));
+      return `<tr class="r3d-row" data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
         <td class="r3d-d">${fmtDate(updateDate)}</td>
         <td class="r3d-d r3d-ad">${fmtDate(r.ad)}</td>
         <td class="r3d-m"><b>${esc(r.nm||'-')}</b>${r.pa?`<small>${esc(r.pa)}</small>`:''}</td>
@@ -4291,17 +4317,20 @@ function renderRecent7DaysByTeam(){
 
 // 최근 7일 더 보기 — 팀 전체 회원 목록
 function openRecent7DTeam(team, fromStr){
+  const todayStr = D.today;
   const recs = (D.records||[]).filter(r=>{
     if(r.t !== team) return false;
     if(curAgent !== 'ALL' && r.a !== curAgent) return false;
-    return (r.ad && r.ad >= fromStr) || (r.vd && r.vd >= fromStr);
+    const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
+    const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+    return adInWin || vdInWin;
   });
-  // 최신순 정렬
-  recs.sort((a,b)=>{
-    const dA = (a.vd && a.vd >= fromStr) ? a.vd : a.ad;
-    const dB = (b.vd && b.vd >= fromStr) ? b.vd : b.ad;
-    return (dB||'').localeCompare(dA||'');
-  });
+  // 최신순 정렬 (미래 vd 제외, fromStr ~ today 윈도우 안의 vd 우선)
+  const pickD = (r)=>{
+    const vdIn = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+    return vdIn ? r.vd : r.ad;
+  };
+  recs.sort((a,b)=> (pickD(b)||'').localeCompare(pickD(a)||''));
   memCache = recs;
   const tcol = TC[team] || '#888';
   const tName = teamShortName(team);
@@ -4325,6 +4354,42 @@ function openRecent7DTeam(team, fromStr){
   document.getElementById('page-member').style.display='block';
   window.scrollTo(0,0);
 }
+
+// 최근 7일 행 클릭 — 해당 회원의 단일 레코드를 회원 리스트로 열기
+function openRecent7DMember(tr){
+  if(!tr || !tr.dataset || !tr.dataset.rec) return;
+  let k;
+  try { k = JSON.parse(tr.dataset.rec); } catch(e){ return; }
+  const recs = (D.records||[]).filter(r =>
+    r.a === k.a && (r.nm||'') === (k.nm||'') && (r.ad||'') === (k.ad||'')
+  );
+  if(!recs.length) return;
+  memCache = recs;
+  const r = recs[0];
+  const tcol = TC[r.t] || '#888';
+  const agentShort = (D.agent_meta[r.a]||{}).short || r.a;
+  document.getElementById('mem-header').innerHTML = `
+    <div class="mem-av" style="background:${tcol}">${(r.nm||'?').charAt(0)}</div>
+    <div class="mem-info"><h2>${(r.nm||'-')}</h2>
+      <p>${teamShortName(r.t)} · ${agentShort} · 배정 ${r.ad||'-'}</p>
+      <span class="mem-pill" style="background:#dbeafe;color:#1e3a8a">${recs.length}건 레코드</span></div>
+    <div style="margin-left:auto;text-align:right">
+      <div class="mem-count">${recs.length}</div>
+      <div style="font-size:11px;color:#aaa">건</div></div>`;
+  const sb = document.getElementById('mem-search'); if(sb) sb.value='';
+  const cl = document.getElementById('mem-count-lbl'); if(cl) cl.textContent = `총 ${recs.length}건`;
+  if(typeof buildMemFilters==='function'){
+    ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    buildMemFilters();
+  }
+  renderMemTable(recs);
+  document.getElementById('page-main').style.display='none';
+  document.getElementById('page-member').style.display='block';
+  window.scrollTo(0,0);
+}
+
 // 에이전트 인사이트 탭 — 에이전트별 상세 카드만
 function renderAgentInsightOnly(){
   renderAgentCardsOnly();
