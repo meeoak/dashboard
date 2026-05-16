@@ -3458,26 +3458,10 @@ function renderRank(){
     if(prevAvg > 0){
       prevMarkHtml = '<div class="bc-prev-mark '+(beatPrev?'beat':'below')+'" style="left:'+prevPct+'%" title="전월 평균 활동지수 '+prevAvg.toFixed(1)+'점"></div>';
     }
-    // 당월 vs 전월 비교 행 (사전 계산)
-    const diff = avgIdx - prevAvg;
-    const diffTxt = prevAvg > 0
-      ? (diff >= 0 ? '✅ +' + diff.toFixed(1) : '⬇ ' + diff.toFixed(1))
-      : '신규';
-    const diffCls = prevAvg > 0 ? (beatPrev ? 'beat' : 'below') : 'none';
     bh+=`<div class="bcard ${cls}" style="border-top:4px solid ${TC[t]}">
       <div class="bc-name" style="color:${TC[t]}">${teamShortName(t)}</div>
-      <div class="bc-compare">
-        <div class="bc-compare-block bc-compare-now">
-          <div class="bc-compare-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}</div>
-          <div class="bc-compare-lbl">📊 당월</div>
-        </div>
-        <div class="bc-compare-vs ${diffCls}">${diffTxt}</div>
-        <div class="bc-compare-block bc-compare-prev">
-          <div class="bc-compare-num">${prevAvg.toFixed(1)}</div>
-          <div class="bc-compare-lbl">📅 전월</div>
-        </div>
-      </div>
       <div class="bc-idx-block">
+        <div class="bc-idx-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}<small>/${kpiTarget}</small></div>
         <div class="bc-idx-lbl-row">평균 활동지수 <small>(${headcount}명 · 한달 KPI ${kpiTarget}점)</small></div>
         <div class="bc-dual-bar">
           <div class="bc-dual-row">
