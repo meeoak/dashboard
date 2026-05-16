@@ -3549,8 +3549,11 @@ function renderRank(){
   });
   document.getElementById('battle-wrap').innerHTML = bh;
 
-  // ── 에이전트 랭킹: 활동지수 기준 정렬 ──
-  const agents = curTeam==='ALL' ? allAgents : (D.team_members[curTeam]||[]);
+  // ── 에이전트 랭킹: 활동지수 기준 정렬 (단일 에이전트 선택 시 본인만) ──
+  let agents;
+  if(curAgent !== 'ALL') agents = [curAgent];
+  else if(curTeam !== 'ALL') agents = D.team_members[curTeam]||[];
+  else agents = allAgents;
   const list = agents.map(a=>agentStats[a]).filter(x=>x && x.db>0).sort((a,b)=>b.actIdx-a.actIdx);
   const medals=['🥇','🥈','🥉'];
   const totalAgents = list.length;
