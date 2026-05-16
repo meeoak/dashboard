@@ -3421,31 +3421,33 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 .ins-col-item:last-child{border-bottom:none}
 .ins-col-detail{font-size:10.5px;color:#475569;font-weight:600;margin-top:2px}
 .ins-empty{font-size:11px;color:#94a3b8;font-style:italic;text-align:center;padding:6px}
-/* 📅 일정 캘린더 */
-.cal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.cal-block{border:1.5px solid #cbd5e1;border-radius:10px;overflow:hidden;background:#fff}
-.cal-block-h{padding:9px 14px;font-weight:900;font-size:12.5px;letter-spacing:-.2px;display:flex;align-items:center;gap:6px}
-.cal-block-h.cal-up{background:linear-gradient(135deg,#dbeafe,#eff6ff);color:#1e3a8a;border-bottom:1.5px solid #93c5fd}
-.cal-block-h.cal-done{background:linear-gradient(135deg,#dcfce7,#f0fdf4);color:#14532d;border-bottom:1.5px solid #86efac}
-.cal-block-h .cal-block-cnt{margin-left:auto;background:rgba(255,255,255,.7);font-size:11px;padding:1px 8px;border-radius:5px;font-weight:800}
-.cal-day{padding:7px 14px;border-bottom:1px dashed #e2e8f0}
-.cal-day:last-child{border-bottom:none}
-.cal-day-h{font-weight:900;font-size:11px;color:#1e293b;margin-bottom:4px;display:flex;align-items:center;gap:5px;letter-spacing:-.2px}
-.cal-day-h.is-today{color:#dc2626}
-.cal-day-h .cal-dow{color:#94a3b8;font-weight:700}
-.cal-day-h .cal-day-cnt{margin-left:auto;background:#f1f5f9;padding:0px 6px;border-radius:5px;font-size:9.5px;color:#64748b;font-weight:800}
-.cal-item{font-size:10.5px;padding:3px 0;display:flex;align-items:center;gap:6px;font-weight:600;line-height:1.4}
-.cal-icon{font-size:11px;flex-shrink:0;width:14px;text-align:center}
-.cal-name{font-weight:800;color:#0f172a;font-size:11px;letter-spacing:-.1px}
-.cal-pa{color:#64748b;font-size:10px;font-weight:600}
-.cal-cl-pill{background:#dc2626;color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:900;margin-left:auto}
-.cal-empty{padding:22px 14px;text-align:center;color:#94a3b8;font-style:italic;font-size:11.5px}
+/* 📅 일정 월간 캘린더 그리드 */
+.cal-month{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#cbd5e1;border:1.5px solid #cbd5e1;border-radius:10px;overflow:hidden}
+.cal-dow-cell{background:linear-gradient(180deg,#1e3a8a,#2563eb);color:#fff;padding:7px 0;text-align:center;font-weight:900;font-size:11px;letter-spacing:-.2px}
+.cal-day-cell{background:#fff;padding:5px 6px;min-height:74px;font-size:9px;position:relative;display:flex;flex-direction:column;gap:2px}
+.cal-day-cell.empty{background:#f8fafc}
+.cal-day-cell.today{background:linear-gradient(180deg,#fef3c7,#fffbeb)}
+.cal-day-num{font-weight:900;font-size:11px;color:#1e293b;letter-spacing:-.2px;margin-bottom:2px}
+.cal-day-num.sun{color:#dc2626}
+.cal-day-num.sat{color:#2563eb}
+.cal-day-cell.today .cal-day-num{display:inline-block;background:#dc2626;color:#fff;padding:1px 6px;border-radius:5px;align-self:flex-start}
+.cal-event{font-size:8.5px;padding:2px 5px;border-radius:4px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.1px;line-height:1.2}
+.cal-event.scheduled{background:#dbeafe;color:#1e3a8a;border-left:2px solid #2563eb}
+.cal-event.completed{background:#dcfce7;color:#14532d;border-left:2px solid #16a34a}
+.cal-event.video{background:#ede9fe;color:#4c1d95;border-left:2px solid #7c3aed}
+.cal-event.langsung{background:#f1f5f9;color:#1e293b;border-left:2px solid #475569}
+.cal-event.waiting{background:#fef3c7;color:#854d0e;border-left:2px solid #d97706}
+.cal-event-more{font-size:8.5px;color:#64748b;font-weight:800;text-align:right;padding:0 3px}
+.cal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:10px;font-weight:700;color:#475569}
+.cal-legend span{display:inline-flex;align-items:center;gap:4px}
+.cal-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;font-style:normal}
+.cal-empty{padding:22px 14px;text-align:center;color:#94a3b8;font-style:italic;font-size:11.5px;background:#fff;border:1.5px solid #cbd5e1;border-radius:10px}
 /* 푸터 */
 .rpt-footer{margin-top:14px;padding-top:12px;border-top:1.5px dashed #cbd5e1;font-size:10px;color:#64748b;line-height:1.6}
 @media print{
   .rpt-print-btn{display:none}
   body{padding:0;background:#fff;font-size:10.5px}
-  .ag-rpt,.ag-rpt-hd,.ag-rpt-range,.ag-funnel,.f-rate,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip,.ag-kpi-card.good,.ag-kpi-card.bad,.ag-kpi-card.final,.ag-kpi-diff,.ag-kpi-card.final::before,.ag-sf-stage.up,.ag-sf-stage.wait,.ag-sf-stage.urgent,.ag-db-card.total,.ag-db-card.active,.ag-db-card.idle,.ag-db-card.cancel,.cal-block-h.cal-up,.cal-block-h.cal-done,.cal-cl-pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ag-rpt,.ag-rpt-hd,.ag-rpt-range,.ag-funnel,.f-rate,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip,.ag-kpi-card.good,.ag-kpi-card.bad,.ag-kpi-card.final,.ag-kpi-diff,.ag-kpi-card.final::before,.ag-sf-stage.up,.ag-sf-stage.wait,.ag-sf-stage.urgent,.ag-db-card.total,.ag-db-card.active,.ag-db-card.idle,.ag-db-card.cancel,.cal-dow-cell,.cal-day-cell.today,.cal-event.scheduled,.cal-event.completed,.cal-event.video,.cal-event.langsung,.cal-event.waiting{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 `;
 }
@@ -3494,38 +3496,68 @@ function _buildAgentReportSection(agent, rank, lang){
   const dbCancel = agentRecs.filter(r=> r.st==='x' && r.cl!==1).length;
   const dbPct = (n)=> db ? Math.round(n/db*100) : 0;
 
-  // 📅 캘린더용 일정 수집 — 현재 필터 범위(해당월)만
-  const dayName = (dateStr)=>{
-    const d = new Date(dateStr);
-    return t.day_names[d.getDay()];
-  };
-  const stIcon = {s:'📅', w:'⏳', d:'✅', vc:'📹', ls:'⬜'};
+  // 📅 캘린더용 일정 수집 — curFrom 의 월을 캘린더 한 달 그리드로 표시
   const inRange = (vd)=> vd && vd >= curFrom && vd <= curTo;
   const calRecs = (D.cal_recs || []).filter(r => r.a === agent && inRange(r.vd));
-  const upcoming = calRecs.filter(r => ['s','w'].includes(r.st))
-                          .sort((a,b)=>a.vd.localeCompare(b.vd));
-  const completed = calRecs.filter(r => ['d','ls','vc'].includes(r.st))
-                           .sort((a,b)=>b.vd.localeCompare(a.vd));
-  const groupByDate = (list)=>{
-    const map = {};
-    list.forEach(r=>{ if(!map[r.vd]) map[r.vd]=[]; map[r.vd].push(r); });
-    return Object.entries(map);
+  // 일자별 그룹
+  const eventsByDay = {};
+  calRecs.forEach(r=>{
+    const day = parseInt(r.vd.slice(8,10),10);
+    if(!eventsByDay[day]) eventsByDay[day] = [];
+    eventsByDay[day].push(r);
+  });
+  // 월 정보 (curFrom 기준)
+  const fromParts = curFrom.split('-').map(Number);
+  const calYear = fromParts[0];
+  const calMonth = fromParts[1] - 1; // 0-11
+  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const lastDate = new Date(calYear, calMonth+1, 0).getDate();
+  // 이벤트 클래스 매핑
+  const evtClass = {s:'scheduled', d:'completed', vc:'video', ls:'langsung', w:'waiting'};
+  const evtIcon  = {s:'📅', d:'✅', vc:'📹', ls:'⬜', w:'⏳'};
+  // 한 셀 안에 표시할 이벤트
+  const renderEventsInCell = (events)=>{
+    const max = 3;
+    let html = events.slice(0, max).map(e=>{
+      const cls = evtClass[e.st] || 'scheduled';
+      const ico = evtIcon[e.st] || '•';
+      const nm = e.nm || '-';
+      const cl = e.cl===1 ? ' 🏆' : '';
+      return `<div class="cal-event ${cls}" title="${esc(nm)}${e.pa?' ('+esc(e.pa)+')':''}">${ico} ${esc(nm)}${cl}</div>`;
+    }).join('');
+    if(events.length > max){
+      html += `<div class="cal-event-more">+${events.length-max}</div>`;
+    }
+    return html;
   };
-  const renderDayBlock = (date, items)=>{
-    const isToday = date === D.today;
-    return `<div class="cal-day">
-      <div class="cal-day-h${isToday?' is-today':''}">${date} <span class="cal-dow">(${dayName(date)}${isToday?' · '+esc(t.cal_today):''})</span><span class="cal-day-cnt">${items.length}${esc(t.cal_count_suffix)}</span></div>
-      ${items.map(r=>`
-        <div class="cal-item">
-          <span class="cal-icon">${stIcon[r.st]||'❓'}</span>
-          <span class="cal-name">${esc(r.nm||'-')}</span>
-          ${r.pa?`<span class="cal-pa">(${esc(r.pa)})</span>`:''}
-          ${r.cl===1?`<span class="cal-cl-pill">${esc(t.cl_pill)}</span>`:''}
-        </div>`).join('')}
+  // 그리드 빌드
+  let calCells = t.day_names.map(d=>`<div class="cal-dow-cell">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++) calCells += '<div class="cal-day-cell empty"></div>';
+  for(let day=1; day<=lastDate; day++){
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isToday = dateStr === D.today;
+    const dow = (firstDay + day - 1) % 7;
+    const dayCls = dow===0 ? 'sun' : dow===6 ? 'sat' : '';
+    const dayEvents = eventsByDay[day] || [];
+    calCells += `<div class="cal-day-cell${isToday?' today':''}">
+      <div class="cal-day-num ${dayCls}">${day}</div>
+      ${renderEventsInCell(dayEvents)}
     </div>`;
-  };
-  const upGroups = groupByDate(upcoming);
-  const doneGroups = groupByDate(completed);
+  }
+  // 마지막 행 채우기
+  const totalCells = firstDay + lastDate;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for(let i=0;i<remaining;i++) calCells += '<div class="cal-day-cell empty"></div>';
+  const calendarHtml = calRecs.length
+    ? `<div class="cal-month">${calCells}</div>
+       <div class="cal-legend">
+         <span><i style="background:#dbeafe;border-left:2px solid #2563eb">📅</i> ${esc(t.cal_upcoming)}</span>
+         <span><i style="background:#dcfce7;border-left:2px solid #16a34a">✅</i> ${esc(t.cal_completed)}</span>
+         <span><i style="background:#ede9fe;border-left:2px solid #7c3aed">📹</i> 비디오콜</span>
+         <span><i style="background:#f1f5f9;border-left:2px solid #475569">⬜</i> 랑숭</span>
+         <span><i style="background:#fef3c7;border-left:2px solid #d97706">⏳</i> 대기</span>
+       </div>`
+    : `<div class="cal-empty">${esc(t.cal_empty_done)}</div>`;
 
   return `<div class="ag-rpt">
   <div class="ag-rpt-hd">
@@ -3605,19 +3637,10 @@ function _buildAgentReportSection(agent, rank, lang){
         </div>`:''}
       </div>
     </div>
-    <!-- 📅 일정 캘린더 (해당월 필터) -->
+    <!-- 📅 일정 캘린더 (월간 그리드) -->
     <div class="ag-rpt-section">
       <div class="ag-rpt-h">${esc(t.cal_title)} <span style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:0">${esc(curFrom)} ~ ${esc(curTo)}</span></div>
-      <div class="cal-grid">
-        <div class="cal-block">
-          <div class="cal-block-h cal-up">${esc(t.cal_upcoming)}<span class="cal-block-cnt">${upcoming.length}${esc(t.cal_count_suffix)}</span></div>
-          ${upGroups.length ? upGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">'+esc(t.cal_empty_up)+'</div>'}
-        </div>
-        <div class="cal-block">
-          <div class="cal-block-h cal-done">${esc(t.cal_completed)}<span class="cal-block-cnt">${completed.length}${esc(t.cal_count_suffix)}</span></div>
-          ${doneGroups.length ? doneGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">'+esc(t.cal_empty_done)+'</div>'}
-        </div>
-      </div>
+      ${calendarHtml}
     </div>
     <!-- 🚨 긴급 관리 -->
     <div class="ag-rpt-section">
