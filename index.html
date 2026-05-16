@@ -2508,14 +2508,14 @@ function renderDBSummary(){
     document.getElementById('db-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#aaa;padding:30px">데이터 없음</div>';
     return;
   }
-  // OFF vs MKT
-  const offCnt = records.filter(r=>r.dk==='OFF').length;
-  const mktCnt = records.filter(r=>r.dk==='MKT').length;
-  const offPct = Math.round(offCnt/total*100);
-  const mktPct = 100 - offPct;
   // 활동 상태 — 부적합 DB(Keterangan DB 입력)는 다른 카테고리에서 제외
   const isUnfit = (r) => (r.kt && String(r.kt).trim()) || (r.st==='x' && r.cl!==1);
+  // OFF vs MKT vs 부적합 (상호 배타 — 합 = total)
+  const offCnt = records.filter(r=>r.dk==='OFF' && !isUnfit(r)).length;
+  const mktCnt = records.filter(r=>r.dk==='MKT' && !isUnfit(r)).length;
   const cancelled = records.filter(isUnfit).length;
+  const offPct = total ? Math.round(offCnt/total*100) : 0;
+  const mktPct = total ? Math.round(mktCnt/total*100) : 0;
   const active = records.filter(r=> !isUnfit(r) && (['s','d','vc','ls','w'].includes(r.st) || r.cl===1)).length;
   const idleRecs = records.filter(r=> !isUnfit(r) && r.st==='none' && r.cl!==1);
   const idle = idleRecs.length;
@@ -2543,7 +2543,7 @@ function renderDBSummary(){
     <div class="db-card">
       <div class="db-card-lbl">📊 ${T('db_split')||'OFF vs MKT 분포'}</div>
       <div class="db-donut-wrap">
-        ${donutChart(offCnt, mktCnt)}
+        ${donutChart(offCnt, mktCnt, cancelled)}
         <div class="db-donut-legend">
           <div class="dlg-item" onclick="setScopeAndOpen('OFF')" style="cursor:pointer">
             <span class="dlg-dot" style="background:#a855f7"></span>
@@ -2624,20 +2624,33 @@ function setScopeAndOpen(scope){
   selectScope(scope);
 }
 
-// OFF vs MKT 도넛 차트
-function donutChart(offCnt, mktCnt){
-  const total = offCnt + mktCnt;
+// OFF vs MKT vs 부적합 도넛 차트 (3구간)
+function donutChart(offCnt, mktCnt, unfitCnt){
+  const total = offCnt + mktCnt + (unfitCnt||0);
   if(total === 0) return '<div style="text-align:center;color:#aaa;padding:30px">데이터 없음</div>';
   const r = 38, cx = 50, cy = 50;
   const c = 2 * Math.PI * r;
-  const offRatio = offCnt / total;
-  const offLen = c * offRatio;
-  const mktLen = c - offLen;
+  const offLen = c * offCnt / total;
+  const mktLen = c * mktCnt / total;
+  const unfitLen = c * (unfitCnt||0) / total;
+  // 3개 원을 겹쳐 각 세그먼트가 다른 색으로 표시되도록 dasharray + dashoffset 사용
   return `<svg width="100" height="100" viewBox="0 0 100 100" class="db-donut">
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#06b6d4" stroke-width="14"/>
+    <!-- 배경 회색 (빈 공간 방지) -->
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f1f5f9" stroke-width="14"/>
+    <!-- OFF (보라) -->
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#a855f7" stroke-width="14"
-      stroke-dasharray="${offLen} ${mktLen}"
+      stroke-dasharray="${offLen} ${c - offLen}"
       transform="rotate(-90 ${cx} ${cy})"/>
+    <!-- MKT (시안) -->
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#06b6d4" stroke-width="14"
+      stroke-dasharray="${mktLen} ${c - mktLen}"
+      stroke-dashoffset="${-offLen}"
+      transform="rotate(-90 ${cx} ${cy})"/>
+    ${unfitLen>0?`<!-- 부적합 (빨강) -->
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#dc2626" stroke-width="14"
+      stroke-dasharray="${unfitLen} ${c - unfitLen}"
+      stroke-dashoffset="${-(offLen + mktLen)}"
+      transform="rotate(-90 ${cx} ${cy})"/>`:''}
     <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="18" font-weight="900" fill="#1a1a1a">${f(total)}</text>
     <text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9" font-weight="700" fill="#888">TOTAL</text>
   </svg>`;
