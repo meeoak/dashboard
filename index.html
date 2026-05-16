@@ -3504,8 +3504,7 @@ function renderUrgentBanner(){
         <div class="ub-sub">배정 후 2주 이내 · 이관 임박 · 매일 자동 업데이트 (오늘 ${todayStr})</div>
       </div>
       <div class="ub-actions">
-        <button class="ub-pdf-btn" onclick="openUrgentReport('ko')" title="긴급 관리 회원 전체 목록을 한국어 PDF로 저장/인쇄">📄 PDF · KR</button>
-        <button class="ub-pdf-btn" onclick="openUrgentReport('id')" title="Daftar lengkap member manajemen mendesak ke PDF Bahasa">📄 PDF · ID</button>
+        <button class="ub-pdf-btn" onclick="sendAllAgentReportsToSheet()" title="현재 범위 에이전트들의 긴급 관리 보고서를 구글 시트로 전송 (Apps Script 연동)">📤 시트로 내보내기</button>
       </div>
     </div>
     <div class="ub-stats">
