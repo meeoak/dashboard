@@ -1491,7 +1491,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <div id="content-rank" style="display:none">
     <div class="sec-hd" style="padding-bottom:8px">
       <div><div class="sec-title">⚔️ 팀 배틀</div>
-      <div class="sec-sub">평균 활동지수 기준 · 한달 KPI 목표 100점 (기간 일수에 비례 조정)</div></div>
+      <div class="sec-sub">평균 활동지수 기준 · 한달 KPI 목표 100점</div></div>
       <div id="rank-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="battle-wrap" id="battle-wrap"></div>
@@ -1851,19 +1851,14 @@ const TARGETS = {
 };
 
 // 활동지수 — 클로징 5점, 방문완료/랑숭/비디오콜 각 1점
-// 한달 KPI 목표 = 100점
+// 한달 KPI 목표 = 100점 (기간과 무관하게 고정 — 비교 기준 통일)
 const MONTHLY_KPI_TARGET = 100;
 function calcActivityIndex(s){
   if(!s) return 0;
   return (s.cl||0)*5 + (s.d||0) + (s.ls||0) + (s.vc||0);
 }
-// 현재 기간(일수) 기반으로 KPI 목표를 비례 조정 — 한달 기준 100점
 function periodKpiTarget(){
-  const f = new Date((curFrom||'').replace(/-/g,'/'));
-  const t = new Date((curTo||'').replace(/-/g,'/'));
-  if(!isFinite(f) || !isFinite(t)) return MONTHLY_KPI_TARGET;
-  const days = Math.max(1, Math.round((t-f)/(1000*60*60*24)) + 1);
-  return Math.max(1, Math.round(MONTHLY_KPI_TARGET * days / 30));
+  return MONTHLY_KPI_TARGET;
 }
 
 function targetStatus(actual, target){
@@ -3310,7 +3305,7 @@ function renderStats(){
 
 // ── 랭킹 & 배틀 ─────────────────────────────────────────
 function renderRank(){
-  const kpiTarget = periodKpiTarget();  // 기간 비례 KPI 목표
+  const kpiTarget = periodKpiTarget();  // 한달 KPI 목표 100점 (고정)
   // 에이전트별 활동지수 사전 계산 (클로징×5 + 완료/랑숭/비디오 ×1)
   const allAgents = Object.keys(D.agent_total);
   const agentStats = {};
@@ -3356,7 +3351,7 @@ function renderRank(){
       <span class="bc-grade" style="background:${gradeColor}">${grade}등급 · KPI ${Math.round(achPct)}%</span>
       <div class="bc-idx-block">
         <div class="bc-idx-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}<small>/${kpiTarget}</small></div>
-        <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명 · 기간 KPI ${kpiTarget}점)</small></div>
+        <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명 · 한달 KPI ${kpiTarget}점)</small></div>
         <div class="bc-idx-bar"><div class="bc-idx-fill" style="width:${barPct}%;background:${TC[t]}"></div></div>
       </div>
       <div class="bc-sum-row">
