@@ -843,6 +843,20 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-urg-dday.warn{color:#d97706}
 .r3d-urg-dday.ok{color:#64748b}
 .r3d-urg-empty{padding:14px;text-align:center;color:#94a3b8;font-size:11.5px;font-style:italic}
+/* 영업팀용 시각 강조: 랭킹 배지 + 심각도 */
+.r3d-rank{font-size:13.5px;font-weight:900;padding:3px 9px;border-radius:7px;background:#f1f5f9;color:#475569;letter-spacing:-.3px;display:inline-flex;align-items:center;justify-content:center;min-width:38px;line-height:1.1}
+.r3d-rank.gold{background:linear-gradient(135deg,#fef3c7,#fbbf24);color:#78350f;box-shadow:0 2px 5px rgba(251,191,36,.35)}
+.r3d-rank.silver{background:linear-gradient(135deg,#f8fafc,#cbd5e1);color:#1e293b;box-shadow:0 2px 5px rgba(148,163,184,.3)}
+.r3d-rank.bronze{background:linear-gradient(135deg,#fed7aa,#fb923c);color:#7c2d12;box-shadow:0 2px 5px rgba(251,146,60,.35)}
+.r3d-agent-stat.urg-big{font-size:13px;font-weight:900;padding:4px 12px;letter-spacing:-.2px}
+.r3d-agent-stat.urg-big.sev-red{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#7f1d1d;border-color:#f87171;box-shadow:0 1px 3px rgba(220,38,38,.18)}
+.r3d-agent-stat.urg-big.sev-amber{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.r3d-agent-card.sev-red-card{box-shadow:0 0 0 2px #fecaca,0 2px 6px rgba(220,38,38,.12)}
+.r3d-agent-card.rank-top{box-shadow:0 0 0 3px #fee2e2,0 4px 14px rgba(220,38,38,.2)}
+.r3d-action-hint{font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:5px;letter-spacing:.2px}
+.r3d-action-hint.danger{background:#dc2626;color:#fff;animation:hintBlink 2.2s ease-in-out infinite}
+.r3d-action-hint.warn{background:#d97706;color:#fff}
+@keyframes hintBlink{0%,100%{opacity:1}50%{opacity:.6}}
 @media(max-width:640px){
   .r3d-grid{padding:10px 12px;gap:10px}
   .r3d-team-hd{padding:10px 12px}
@@ -1390,10 +1404,10 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <div id="content-team_insight" style="display:none">
     <!-- 🚨 전체 긴급 관리 배너 (배정 후 2주 이내) -->
     <div id="urgent-banner"></div>
-    <!-- 📊 최근 7일 업데이트 (팀별 상세) -->
+    <!-- 🔥 에이전트별 긴급 현황 (랭킹) -->
     <div class="sec-hd">
-      <div><div class="sec-title">📊 팀별 최근 7일 업데이트</div>
-      <div class="sec-sub">에이전트별 회원·상태·상담기록 (시트 동기화 기반)</div></div>
+      <div><div class="sec-title">🔥 에이전트별 긴급 현황</div>
+      <div class="sec-sub">긴급 건수 많은 순 · 1+2+3 합산 · 즉시 액션 필요</div></div>
       <div id="r3d-range-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="r3d-grid" id="ins-recent-3d-grid"></div>
@@ -4673,93 +4687,95 @@ function renderRecent7DaysByTeam(){
 
   let html = '';
 
-  if(curTeam === 'ALL'){
-    // 전체 팀 모드 — 기존 팀 카드 형태 유지
+  // 에이전트 목록 결정: 에이전트 선택 > 팀 선택 > 전체 (3팀 모두)
+  let agentPool;
+  if(curAgent !== 'ALL') agentPool = [curAgent];
+  else if(curTeam !== 'ALL') agentPool = (D.team_members[curTeam]||[]);
+  else {
+    agentPool = [];
     ['TIM_GIAR','TIM_TINA','TIM_LIDIA'].forEach(t=>{
-      const recs = (D.records||[]).filter(r=>{
-        if(r.t !== t) return false;
-        if(curAgent !== 'ALL' && r.a !== curAgent) return false;
-        const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
-        const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
-        return adInWin || vdInWin;
-      });
-      recs.sort((a,b)=> (pickUpdateDate(b)||'').localeCompare(pickUpdateDate(a)||''));
-      const total = recs.length;
-      const color = TC[t] || '#888';
-      const name = teamShortName(t) + (curAgent !== 'ALL' ? ` · ${(D.agent_meta[curAgent]||{}).short || curAgent}` : '');
-      const rows = render7DRows(recs);
-      html += `
-      <div class="r3d-team-card" style="border-left-color:${color}">
-        <div class="r3d-team-hd">
-          <span class="r3d-team-name" style="color:${color}">${name}</span>
-          <span class="r3d-team-total">총 ${total}건 업데이트</span>
-        </div>
-        ${total === 0
-          ? '<div class="r3d-empty-team">최근 7일 업데이트 없음</div>'
-          : `<table class="r3d-detail-tbl">
-              <thead><tr><th title="상태 업데이트일">📅 업데이트</th><th title="DB 배정일">📋 배정일</th><th>회원명 (후원자)</th><th>에이전트</th><th>상태/옵션</th><th>📝 상담기록</th></tr></thead>
-              <tbody>${rows}</tbody>
-            </table>
-            ${total > initialShown ? `<button class="r3d-more-btn" onclick="openRecent7DTeam('${t}','${fromStr}')">+${total-initialShown}건 더 보기 →</button>` : ''}`
-        }
-      </div>`;
+      (D.team_members[t]||[]).forEach(a=>agentPool.push(a));
     });
-  } else {
-    // 팀 선택 모드 — 에이전트별 카드: [헤더] + [요약 칩] + [긴급 리스트 접고/펼치기]
-    const team = curTeam;
-    const color = TC[team] || '#888';
-    const teamLbl = teamShortName(team);
-    const agents = curAgent !== 'ALL' ? [curAgent] : (D.team_members[team]||[]);
-    agents.forEach(a=>{
-      const meta = D.agent_meta[a]||{};
-      const short = meta.short || a;
-      // 긴급 회원 리스트
-      const urgent = findUrgentForAgent(a, todayStr);
-      // 카테고리별 카운트
-      let cNoMemo=0, cOverdue=0, cIdle=0, cWait=0, cSoon=0;
-      let urgentTotal=0;
-      urgent.forEach(u=>{
-        const memoEmpty = !u.memo || !String(u.memo).trim();
-        const noOption = u.st === 'none';
-        const isNoMemo = memoEmpty && noOption;
-        const isIdle = !memoEmpty && !noOption;
-        if(isNoMemo) cNoMemo++;
-        if(isIdle) cIdle++;
-        if(u.urgentIcon==='⚠️') cOverdue++;
-        else if(u.urgentIcon==='⏳') cWait++;
-        else if(u.urgentIcon==='📅') cSoon++;
-        // 긴급 = 1+2+3 union
-        if(isNoMemo || isIdle || u.urgentIcon==='⚠️') urgentTotal++;
-      });
-      const urgCount = urgent.length;
-      // 긴급 0건이면 카드 자체 생략
-      if(urgCount===0) return;
-      const chip = (cls, icon, lbl, n)=>
-        `<span class="r3d-urg-chip ${cls} ${n===0?'zero':''}" title="${lbl}">${icon} ${n}</span>`;
-      html += `
-      <div class="r3d-agent-card" style="border-left-color:${color}">
-        <div class="r3d-agent-hd">
-          <span class="r3d-agent-name"><span class="r3d-agent-team-tag" style="background:${color}">${teamLbl}</span>${esc(short)}</span>
-          <div class="r3d-agent-stats">
-            <span class="r3d-agent-stat urg">🚨 긴급 ${urgentTotal}건</span>
-          </div>
-        </div>
-        <div class="r3d-urg-summary">
-          ${chip('c-noMemo','📝','상담기록없음',cNoMemo)}
-          ${chip('c-overdue','⚠️','방문일 지남',cOverdue)}
-          ${chip('c-idle','🚨','응답없음',cIdle)}
-          ${chip('c-wait','⏳','일정대기 누적',cWait)}
-          ${chip('c-soon','📅','방문 임박',cSoon)}
-          <button class="r3d-urg-toggle" onclick="toggleAgentUrgent(this)">▼ 펼치기</button>
-        </div>
-        <div class="r3d-urg-list-wrap">
-          ${renderUrgRows(urgent, a)}
-        </div>
-      </div>`;
-    });
-    if(!html) html = '<div class="r3d-empty">선택한 팀/에이전트에 긴급 관리 대상이 없습니다</div>';
   }
-  if(!html) html = '<div class="r3d-empty">팀이 선택되지 않았습니다</div>';
+
+  // 각 에이전트별 긴급 데이터 계산
+  const agentData = agentPool.map(a=>{
+    const urgent = findUrgentForAgent(a, todayStr);
+    let cNoMemo=0, cOverdue=0, cIdle=0, cWait=0, cSoon=0, urgentTotal=0;
+    urgent.forEach(u=>{
+      const memoEmpty = !u.memo || !String(u.memo).trim();
+      const noOption = u.st === 'none';
+      const isNoMemo = memoEmpty && noOption;
+      const isIdle = !memoEmpty && !noOption;
+      if(isNoMemo) cNoMemo++;
+      if(isIdle) cIdle++;
+      if(u.urgentIcon==='⚠️') cOverdue++;
+      else if(u.urgentIcon==='⏳') cWait++;
+      else if(u.urgentIcon==='📅') cSoon++;
+      // 긴급 = 1+2+3 union (배너 정의와 동일)
+      if(isNoMemo || isIdle || u.urgentIcon==='⚠️') urgentTotal++;
+    });
+    return {agent:a, urgent, cNoMemo, cOverdue, cIdle, cWait, cSoon, urgentTotal};
+  });
+
+  // 긴급 0건 에이전트 제외 + 긴급 많은 순 정렬
+  const visible = agentData
+    .filter(d => d.urgent.length > 0)
+    .sort((x,y)=> y.urgentTotal - x.urgentTotal);
+
+  // 랭킹 배지 (TOP3는 메달, 그 외는 #N)
+  const rankBadge = (i)=>{
+    if(i===0) return '<span class="r3d-rank gold">🥇 1</span>';
+    if(i===1) return '<span class="r3d-rank silver">🥈 2</span>';
+    if(i===2) return '<span class="r3d-rank bronze">🥉 3</span>';
+    return `<span class="r3d-rank">#${i+1}</span>`;
+  };
+  // 심각도 클래스 (긴급 합산 기준)
+  const sevClass = (n)=> n>=15 ? 'sev-red' : (n>=5 ? 'sev-amber' : '');
+  const actionHint = (n)=>{
+    if(n>=15) return '<span class="r3d-action-hint danger">🔥 즉시 조치</span>';
+    if(n>=5)  return '<span class="r3d-action-hint warn">⚠️ 우선 관리</span>';
+    return '';
+  };
+
+  visible.forEach((d, idx)=>{
+    const a = d.agent;
+    const meta = D.agent_meta[a]||{};
+    const short = meta.short || a;
+    const tm = meta.team || curTeam;
+    const color = TC[tm] || '#888';
+    const teamLbl = teamShortName(tm);
+    const sev = sevClass(d.urgentTotal);
+    const sevCardCls = (idx===0 && d.urgentTotal>=15) ? 'rank-top' : (sev==='sev-red' ? 'sev-red-card' : '');
+    const chip = (cls, icon, lbl, n)=>
+      `<span class="r3d-urg-chip ${cls} ${n===0?'zero':''}" title="${lbl}">${icon} ${n}</span>`;
+    html += `
+    <div class="r3d-agent-card ${sevCardCls}" style="border-left-color:${color}">
+      <div class="r3d-agent-hd">
+        <span class="r3d-agent-name">
+          ${rankBadge(idx)}
+          <span class="r3d-agent-team-tag" style="background:${color}">${teamLbl}</span>${esc(short)}
+          ${actionHint(d.urgentTotal)}
+        </span>
+        <div class="r3d-agent-stats">
+          <span class="r3d-agent-stat urg urg-big ${sev}">🚨 긴급 ${d.urgentTotal}건</span>
+        </div>
+      </div>
+      <div class="r3d-urg-summary">
+        ${chip('c-noMemo','📝','상담기록없음',d.cNoMemo)}
+        ${chip('c-overdue','⚠️','방문일 지남',d.cOverdue)}
+        ${chip('c-idle','🚨','응답없음',d.cIdle)}
+        ${chip('c-wait','⏳','일정대기 누적',d.cWait)}
+        ${chip('c-soon','📅','방문 임박',d.cSoon)}
+        <button class="r3d-urg-toggle" onclick="toggleAgentUrgent(this)">▼ 펼치기</button>
+      </div>
+      <div class="r3d-urg-list-wrap">
+        ${renderUrgRows(d.urgent, a)}
+      </div>
+    </div>`;
+  });
+
+  if(!html) html = '<div class="r3d-empty">긴급 관리 대상이 있는 에이전트가 없습니다 👍</div>';
   wrap.innerHTML = html;
 }
 
