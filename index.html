@@ -6122,13 +6122,15 @@ function hideSheetStatus(){const el=document.getElementById('sheet-status');if(e
 
 async function loadFromSheet(opts){
   const silent = opts && opts.silent;
-  if(!silent) showSheetStatus('📡 시트 동기화 중...');
+  if(!silent) showSheetStatus('📡 시트 동기화 중... (대용량 데이터는 30~50초 소요)');
   try{
     const ctrl = new AbortController();
-    const timer = setTimeout(()=>ctrl.abort(), 20000);
+    // 대용량 시트(10K+ 행) 대비 — 응답 지연 60초까지 허용
+    const timer = setTimeout(()=>ctrl.abort(), 60000);
     const resp=await fetch(SHEET_CSV_URL,{cache:'no-store', signal:ctrl.signal});
     clearTimeout(timer);
     if(!resp.ok)throw new Error('HTTP '+resp.status);
+    if(!silent) showSheetStatus('📊 데이터 파싱 중...');
     const csv=await resp.text();
     const rows=parseCSV(csv);
     if(rows.length<2)throw new Error('시트가 비어있음');
@@ -6165,7 +6167,7 @@ async function loadFromSheet(opts){
     } else {
       const isAbort = (e.name === 'AbortError') || /aborted/i.test(e.message||'');
       const msg = isAbort
-        ? '⚠️ 시트 응답 지연 (20초 초과) · 기존 데이터 표시 중'
+        ? '⚠️ 시트 응답 지연 (60초 초과) · 기존 데이터 표시 중 · 잠시 후 다시 시도'
         : '⚠️ 시트 불러오기 실패: '+e.message+' (정적 데이터 표시 중)';
       showSheetStatus(msg,'#dc2626');
       setTimeout(hideSheetStatus,8000);
