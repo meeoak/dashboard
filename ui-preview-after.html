@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>변경안 미리보기 — 영업팀 통합 대시보드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f0ede8;color:#0f172a;font-size:14px;line-height:1.4}
+
+/* ─── 1. 헤더 (1줄 압축) ─── */
+.hdr{background:linear-gradient(135deg,#0a0a1a,#1a1a2e,#2d1b4e,#0f3460);color:#fff;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.hdr-left{display:flex;align-items:center;gap:12px;min-width:0}
+.hdr-flame{font-size:24px;filter:drop-shadow(0 0 10px #fbbf24);animation:flame 1.5s ease-in-out infinite alternate}
+@keyframes flame{0%{transform:rotate(-3deg) scale(1)}100%{transform:rotate(3deg) scale(1.08)}}
+.hdr-title{font-size:18px;font-weight:900;letter-spacing:-.6px;background:linear-gradient(135deg,#fff 0%,#fde68a 40%,#2563eb 70%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-meta{font-size:11.5px;color:#cbd5e1;font-weight:600;letter-spacing:-.2px}
+.hdr-meta .live{display:inline-flex;align-items:center;gap:4px;background:#1e3a8a;color:#fff;font-size:9.5px;font-weight:900;padding:2px 8px;border-radius:10px;margin-right:8px}
+.hdr-right{display:flex;align-items:center;gap:6px}
+.hdr-btn{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18);padding:6px 11px;border-radius:7px;font-size:11.5px;font-weight:800;cursor:pointer;letter-spacing:-.2px;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.hdr-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3)}
+.hdr-btn.refresh{background:#16a34a;border-color:#15803d}
+.hdr-btn.refresh:hover{background:#15803d}
+
+/* ─── 2. 통합 컨트롤 바 (스코프+팀+에이전트 한 줄) ─── */
+.ctrl{background:#fff;border-bottom:1.5px solid #e5e7eb;padding:9px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.ctrl-group{display:flex;gap:4px;align-items:center}
+.ctrl-lbl{font-size:10.5px;font-weight:900;color:#64748b;margin-right:5px;letter-spacing:.3px;text-transform:uppercase}
+.pill{background:#f1f5f9;border:1.5px solid #cbd5e1;color:#475569;font-size:12px;font-weight:800;padding:5px 11px;border-radius:7px;cursor:pointer;white-space:nowrap;letter-spacing:-.2px;transition:all .12s;display:inline-flex;align-items:center;gap:5px}
+.pill:hover{background:#eff6ff;border-color:#93c5fd;color:#1e3a8a}
+.pill.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a;box-shadow:0 2px 6px rgba(30,58,138,.2)}
+.pill .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.pill.team-g.on{background:#1a73e8;border-color:#1a73e8}
+.pill.team-t.on{background:#16a34a;border-color:#16a34a}
+.pill.team-l.on{background:#ea4335;border-color:#ea4335}
+.ctrl select{font-size:12px;padding:5px 9px;border:1.5px solid #cbd5e1;border-radius:7px;background:#fff;font-weight:700;color:#1e293b;cursor:pointer}
+
+/* ─── 3. 메인 탭 (빠른 이동을 승격) ─── */
+.tabs{background:#fff;border-bottom:2px solid #fcd34d;padding:0 20px;display:flex;gap:0;align-items:center;box-shadow:0 1px 0 #fcd34d}
+.tab{background:transparent;border:none;padding:13px 18px;font-size:13px;font-weight:900;color:#64748b;cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:center;gap:5px;letter-spacing:-.3px;position:relative;top:2px;transition:all .12s}
+.tab:hover{color:#1e3a8a;background:#fef9c3}
+.tab.on{color:#1e3a8a;border-bottom-color:#1e3a8a;background:linear-gradient(180deg,#fff,#fef9c3)}
+.tab-restore{margin-left:auto;font-size:11px;font-weight:800;background:#dbeafe;color:#1e3a8a;border:1.5px solid #93c5fd;padding:5px 11px;border-radius:7px;cursor:pointer;align-self:center;display:flex;align-items:center;gap:4px;transition:all .12s}
+.tab-restore:hover{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
+
+/* ─── 4. 필터 바 (콤팩트 한 줄) ─── */
+.filter{background:#fafbfc;border-bottom:1px solid #e5e7eb;padding:8px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.filter select,.filter input{font-size:12px;padding:5px 9px;border:1.5px solid #cbd5e1;border-radius:7px;background:#fff;font-weight:700;color:#1e293b}
+.filter .cal-icon{font-size:14px}
+.filter .sep{color:#94a3b8;font-weight:700;margin:0 2px}
+.presets{display:flex;gap:3px}
+.presets button{font-size:11px;padding:4px 9px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;font-weight:700;color:#475569;transition:all .1s}
+.presets button:hover{background:#eff6ff;border-color:#1e3a8a;color:#1e3a8a}
+.presets button.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
+.filter-today{margin-left:auto;font-size:11px;color:#64748b;font-weight:700}
+
+/* ─── 5. 메인 콘텐츠 영역 ─── */
+.content{padding:18px 22px}
+.section-h{font-size:14px;font-weight:900;color:#0f172a;letter-spacing:-.3px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-h .badge{background:#1e3a8a;color:#fff;font-size:10px;padding:2px 7px;border-radius:5px;margin-left:4px;font-weight:800}
+
+/* 배틀 카드 (랭킹 탭 미리보기) */
+.battle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.battle-card{background:#fff;border:2px solid;border-radius:12px;padding:18px;text-align:center;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.battle-card.r1{border-color:#fbbf24;background:linear-gradient(180deg,#fffbeb,#fff)}
+.battle-card.r2{border-color:#94a3b8;background:linear-gradient(180deg,#f8fafc,#fff)}
+.battle-card.r3{border-color:#fb923c;background:linear-gradient(180deg,#fff7ed,#fff)}
+.battle-rank{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#1e3a8a;color:#fff;font-size:10px;font-weight:900;padding:3px 11px;border-radius:7px;letter-spacing:.3px;display:flex;align-items:center;gap:4px}
+.battle-card.r1 .battle-rank{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+.battle-card.r2 .battle-rank{background:linear-gradient(135deg,#94a3b8,#64748b)}
+.battle-card.r3 .battle-rank{background:linear-gradient(135deg,#fb923c,#ea580c)}
+.battle-team{font-size:14px;font-weight:900;color:#1e293b;margin-top:6px;letter-spacing:-.3px}
+.battle-score{font-size:36px;font-weight:900;line-height:1;letter-spacing:-1.5px;margin:8px 0 2px}
+.battle-card.r1 .battle-score{color:#854d0e}
+.battle-card.r2 .battle-score{color:#475569}
+.battle-card.r3 .battle-score{color:#c2410c}
+.battle-lbl{font-size:11px;color:#64748b;font-weight:700;margin-bottom:8px}
+.battle-stat{font-size:11px;color:#0f172a;font-weight:700;background:#f1f5f9;border-radius:6px;padding:5px 10px;display:inline-block}
+
+/* 에이전트 랭킹 표 */
+.rank-tbl{background:#fff;border:1.5px solid #cbd5e1;border-radius:11px;overflow:hidden}
+.rank-row{display:grid;grid-template-columns:50px 1fr auto auto auto auto;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid #f1f5f9;transition:background .12s;cursor:pointer}
+.rank-row:last-child{border-bottom:none}
+.rank-row:hover{background:#fef9c3}
+.rank-no{font-size:13px;font-weight:900;color:#94a3b8;text-align:center}
+.rank-no.top{font-size:20px}
+.rank-name{font-weight:800;font-size:13px;color:#0f172a}
+.rank-name small{display:block;font-size:10.5px;color:#64748b;font-weight:600;margin-top:2px}
+.rank-team{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:5px;color:#fff;letter-spacing:-.2px}
+.rank-stat{text-align:center;font-size:12px;font-weight:800;color:#475569}
+.rank-stat b{display:block;font-size:16px;color:#1e293b;font-weight:900}
+
+/* 반응형 */
+@media(max-width:680px){
+  .hdr{padding:10px 14px;gap:8px}
+  .hdr-title{font-size:16px}
+  .hdr-meta{font-size:10.5px}
+  .hdr-btn{padding:5px 8px;font-size:10.5px}
+  .ctrl{padding:8px 12px;gap:10px}
+  .ctrl-lbl{font-size:10px}
+  .pill{font-size:11px;padding:4px 9px}
+  .tabs{padding:0 8px}
+  .tab{padding:11px 10px;font-size:11.5px}
+  .filter{padding:7px 12px;gap:6px}
+  .content{padding:14px 12px}
+  .battle-grid{grid-template-columns:1fr}
+  .rank-row{grid-template-columns:32px 1fr auto;gap:8px;padding:9px 12px}
+  .rank-row .rank-stat:nth-child(n+5){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ① 1줄 헤더 -->
+<div class="hdr">
+  <div class="hdr-left">
+    <span class="hdr-flame">🔥</span>
+    <div>
+      <div class="hdr-title">영업팀 통합 대시보드</div>
+      <div class="hdr-meta">
+        <span class="live">● LIVE</span>
+        MKT DB · LIDIA · Lastiar Manalu · 2026-05-01 ~ 2026-05-31 · 오늘 2026-05-15
+      </div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn">🇰🇷 한국어</button>
+    <button class="hdr-btn">🇮🇩 Bahasa</button>
+    <button class="hdr-btn refresh">🔄 새로고침</button>
+  </div>
+</div>
+
+<!-- ② 통합 컨트롤 바 -->
+<div class="ctrl">
+  <div class="ctrl-group">
+    <span class="ctrl-lbl">DB</span>
+    <button class="pill">전체</button>
+    <button class="pill on">MKT</button>
+    <button class="pill">OFF</button>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-lbl">팀</span>
+    <button class="pill team-g"><span class="dot" style="background:#1a73e8"></span>GIAR</button>
+    <button class="pill team-t"><span class="dot" style="background:#16a34a"></span>TINA</button>
+    <button class="pill team-l on"><span class="dot" style="background:#fff"></span>LIDIA</button>
+  </div>
+  <div style="flex:1"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-lbl">에이전트</span>
+    <select>
+      <option>Lastiar Manalu</option>
+      <option>전체</option>
+    </select>
+  </div>
+</div>
+
+<!-- ③ 메인 탭 -->
+<div class="tabs">
+  <button class="tab">📅 방문 캘린더</button>
+  <button class="tab">👥 에이전트 현황</button>
+  <button class="tab on">🏆 랭킹 & 배틀</button>
+  <button class="tab">🔥 팀·에이전트 인사이트</button>
+  <button class="tab-restore">↑ 대시보드 요약</button>
+</div>
+
+<!-- ④ 필터 바 -->
+<div class="filter">
+  <select><option>5월</option></select>
+  <span class="cal-icon">📅</span>
+  <input type="date" value="2026-05-01">
+  <span class="sep">~</span>
+  <input type="date" value="2026-05-31">
+  <div class="presets">
+    <button>오늘</button>
+    <button>7일</button>
+    <button>14일</button>
+    <button>21일</button>
+    <button class="on">이번달</button>
+    <button>지난달</button>
+    <button>전체</button>
+  </div>
+  <span class="filter-today">오늘 2026-05-15</span>
+</div>
+
+<!-- ⑤ 콘텐츠 -->
+<div class="content">
+  <div class="section-h">🏆 팀 배틀 <span class="badge">May 2026</span></div>
+  <div class="battle-grid">
+    <div class="battle-card r1">
+      <div class="battle-rank">🥇 1위</div>
+      <div class="battle-team">GIAR</div>
+      <div class="battle-score">32</div>
+      <div class="battle-lbl">점수</div>
+      <div class="battle-stat">방문완료 <b style="color:#16a34a">7건</b></div>
+    </div>
+    <div class="battle-card r2">
+      <div class="battle-rank">🥈 2위</div>
+      <div class="battle-team">TINA</div>
+      <div class="battle-score">20</div>
+      <div class="battle-lbl">점수</div>
+      <div class="battle-stat">방문완료 <b style="color:#16a34a">5건</b></div>
+    </div>
+    <div class="battle-card r3">
+      <div class="battle-rank">🥉 3위</div>
+      <div class="battle-team">LIDIA</div>
+      <div class="battle-score">20</div>
+      <div class="battle-lbl">점수</div>
+      <div class="battle-stat">방문완료 <b style="color:#16a34a">0건</b></div>
+    </div>
+  </div>
+
+  <div class="section-h" style="margin-top:24px">🏆 에이전트 랭킹 <span style="font-size:11px;color:#64748b;font-weight:700;margin-left:4px">점수 = 클로징×5 + 방문완료/랑숭/비디오콜×1</span></div>
+  <div class="rank-tbl">
+    <div class="rank-row">
+      <div class="rank-no top">🥇</div>
+      <div class="rank-name">Devi Rahayu<small>DB 60건</small></div>
+      <div class="rank-team" style="background:#1a73e8">GIAR</div>
+      <div class="rank-stat"><b>26</b>예약</div>
+      <div class="rank-stat"><b>21</b>방문</div>
+      <div class="rank-stat"><b style="color:#dc2626">4</b>클로</div>
+    </div>
+    <div class="rank-row">
+      <div class="rank-no top">🥈</div>
+      <div class="rank-name">Debby Novitasari<small>DB 63건</small></div>
+      <div class="rank-team" style="background:#1a73e8">GIAR</div>
+      <div class="rank-stat"><b>16</b>예약</div>
+      <div class="rank-stat"><b>12</b>방문</div>
+      <div class="rank-stat"><b style="color:#dc2626">2</b>클로</div>
+    </div>
+    <div class="rank-row">
+      <div class="rank-no top">🥉</div>
+      <div class="rank-name">Alya Ramadhani<small>DB 45건</small></div>
+      <div class="rank-team" style="background:#1a73e8">GIAR</div>
+      <div class="rank-stat"><b>10</b>예약</div>
+      <div class="rank-stat"><b>8</b>방문</div>
+      <div class="rank-stat"><b style="color:#dc2626">4</b>클로</div>
+    </div>
+    <div class="rank-row">
+      <div class="rank-no">#4</div>
+      <div class="rank-name">Lila Saefilah<small>DB 46건</small></div>
+      <div class="rank-team" style="background:#1a73e8">GIAR</div>
+      <div class="rank-stat"><b>10</b>예약</div>
+      <div class="rank-stat"><b>6</b>방문</div>
+      <div class="rank-stat"><b style="color:#dc2626">1</b>클로</div>
+    </div>
+    <div class="rank-row">
+      <div class="rank-no">#5</div>
+      <div class="rank-name">Nur Hasanah<small>DB 31건</small></div>
+      <div class="rank-team" style="background:#1a73e8">GIAR</div>
+      <div class="rank-stat"><b>8</b>예약</div>
+      <div class="rank-stat"><b>7</b>방문</div>
+      <div class="rank-stat" style="opacity:.4"><b>0</b>클로</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
