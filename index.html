@@ -3973,6 +3973,8 @@ function goAllDashboard(){
   document.body.classList.remove('focus-mode');
   document.querySelectorAll('.quick-nav-btn[data-qnav]').forEach(b=>b.classList.remove('on'));
   if(typeof selectScope === 'function') selectScope('ALL');
+  // 최초 홈화면 = 방문 캘린더 탭으로 복귀
+  if(typeof switchTab === 'function' && curTab !== 'cal') switchTab('cal');
   window.scrollTo(0, 0);
 }
 function renderTab(){
