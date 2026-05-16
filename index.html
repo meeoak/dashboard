@@ -811,6 +811,19 @@ body.focus-mode #detail-section-hd{display:none!important}
 .bc-name{font-size:16px;font-weight:900;letter-spacing:-.3px;text-align:center;margin-bottom:8px}
 .bc-grade{display:inline-block;color:#fff;font-size:11px;font-weight:900;padding:3px 11px;border-radius:10px;letter-spacing:-.2px;margin:0 auto 11px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.1)}
 .bc-idx-block{text-align:center;margin-bottom:11px;padding-bottom:11px;border-bottom:1px dashed #e5e7eb}
+.bc-compare{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:11px;border-bottom:1px dashed #e5e7eb;gap:6px}
+.bc-compare-block{flex:1;text-align:center;padding:6px 4px;border-radius:8px}
+.bc-compare-block.bc-compare-now{background:#f0fdf4;border:1.5px solid #bbf7d0}
+.bc-compare-block.bc-compare-prev{background:#fafafa;border:1.5px solid #e5e7eb;opacity:.85}
+.bc-compare-num{font-size:24px;font-weight:900;line-height:1;letter-spacing:-1px;margin-bottom:3px}
+.bc-compare-block.bc-compare-prev .bc-compare-num{color:#475569;font-size:20px}
+.bc-compare-lbl{font-size:9.5px;font-weight:800;color:#64748b;letter-spacing:-.2px}
+.bc-compare-vs{font-size:11px;font-weight:900;padding:5px 8px;border-radius:6px;letter-spacing:-.2px;white-space:nowrap;flex-shrink:0}
+.bc-compare-vs.beat{background:#dcfce7;color:#15803d;border:1.5px solid #86efac}
+.bc-compare-vs.below{background:#fef2f2;color:#b91c1c;border:1.5px solid #fecaca}
+.bc-compare-vs.none{background:#f1f5f9;color:#64748b;border:1.5px solid #cbd5e1}
+.bc-idx-lbl-row{font-size:10.5px;font-weight:800;color:#64748b;letter-spacing:-.2px;margin-bottom:8px;text-align:center}
+.bc-idx-lbl-row small{font-weight:700;color:#94a3b8;font-size:10px}
 .bc-idx-num{font-size:42px;font-weight:900;line-height:1;letter-spacing:-2px;margin-bottom:4px}
 .bc-idx-num small{font-size:14px;font-weight:800;color:#94a3b8;letter-spacing:-.2px}
 .bc-idx-lbl{font-size:11px;font-weight:800;color:#64748b;letter-spacing:-.2px;margin-bottom:7px}
@@ -3413,33 +3426,36 @@ function renderRank(){
     const mvpHtml = mvp
       ? `<div class="bc-mvp" onclick="openMem('${mvp.a}','d')" title="팀 MVP 회원 목록"><span class="bc-mvp-lbl">🔥 팀 MVP</span><span class="bc-mvp-name">${(D.agent_meta[mvp.a]||{}).short||mvp.a}</span><span class="bc-mvp-score" style="color:${TC[t]}">${mvp.actIdx}점</span></div>`
       : '';
-    // 전월 비교 라벨 (사전 계산 — 중첩 template literal 방지)
-    let prevLblHtml = '';
-    if(prevRange){
-      if(prevAvg > 0){
-        const diff = avgIdx - prevAvg;
-        const diffTxt = diff >= 0 ? ('✅ 초과 +' + diff.toFixed(1)) : ('⬇ ' + diff.toFixed(1));
-        const cls = beatPrev ? 'beat' : 'below';
-        prevLblHtml = '<div class="bc-prev-lbl '+cls+'">전월 '+prevAvg.toFixed(1)+'점 '+diffTxt+'</div>';
-      } else {
-        prevLblHtml = '<div class="bc-prev-lbl none">전월 데이터 없음</div>';
-      }
-    }
     let prevMarkHtml = '';
     if(prevAvg > 0){
       prevMarkHtml = '<div class="bc-prev-mark '+(beatPrev?'beat':'below')+'" style="left:'+prevPct+'%" title="전월 평균 활동지수 '+prevAvg.toFixed(1)+'점"></div>';
     }
+    // 당월 vs 전월 비교 행 (사전 계산)
+    const diff = avgIdx - prevAvg;
+    const diffTxt = prevAvg > 0
+      ? (diff >= 0 ? '✅ +' + diff.toFixed(1) : '⬇ ' + diff.toFixed(1))
+      : '신규';
+    const diffCls = prevAvg > 0 ? (beatPrev ? 'beat' : 'below') : 'none';
     bh+=`<div class="bcard ${cls}" style="border-top:4px solid ${TC[t]}">
       <div class="bc-name" style="color:${TC[t]}">${teamShortName(t)}</div>
+      <div class="bc-compare">
+        <div class="bc-compare-block bc-compare-now">
+          <div class="bc-compare-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}</div>
+          <div class="bc-compare-lbl">📊 당월</div>
+        </div>
+        <div class="bc-compare-vs ${diffCls}">${diffTxt}</div>
+        <div class="bc-compare-block bc-compare-prev">
+          <div class="bc-compare-num">${prevAvg.toFixed(1)}</div>
+          <div class="bc-compare-lbl">📅 전월</div>
+        </div>
+      </div>
       <div class="bc-idx-block">
-        <div class="bc-idx-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}<small>/${kpiTarget}</small></div>
-        <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명 · 한달 KPI ${kpiTarget}점)</small></div>
+        <div class="bc-idx-lbl-row">평균 활동지수 <small>(${headcount}명 · 한달 KPI ${kpiTarget}점)</small></div>
         <div class="bc-idx-bar">
           <div class="bc-idx-fill" style="width:${barPct}%;background:${TC[t]}"></div>
           ${prevMarkHtml}
           ${pacePct!==null?`<div class="bc-pace-mark" style="left:${pacePct}%" title="오늘 ${D.today} · 페이스 ${pacePct}%"></div>`:''}
         </div>
-        ${prevLblHtml}
       </div>
       <div class="bc-sum-row">
         <span class="bc-sum-lbl">팀 합계</span>
