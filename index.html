@@ -6423,7 +6423,8 @@ function rowToRecord(row,today){
   if(st==='s'){if(visitDate&&visitDate>=today)s_f=1;else s_o=1;}
   // OFF/MKT 분류 (3-4월 기준): "Homepage" 들어가면 MKT, 나머지는 모두 OFF
   const dk = channel.toLowerCase().includes('homepage') ? 'MKT' : 'OFF';
-  const cl=clType?1:0;
+  // 'Tidak Closing' / 'Tidak Closng' 등은 클로징이 아님 — cl=0 처리
+  const cl = (clType && !/^tidak\b/i.test(clType)) ? 1 : 0;
   return{a:agent,t:team,m:ad.slice(0,7),st,cl,cl_type:clType,nm:childName,pa:parentName,ph:phone,pv:province,ch:channel,vd:visitDate,ad,od:0,dk,cancel:'',memo,kt,_sf:s_f,_so:s_o};
 }
 
