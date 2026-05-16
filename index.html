@@ -3409,13 +3409,15 @@ function renderUrgentBanner(){
     urgent.forEach(u=>{
       if(u.urgentIcon==='⚠️')totals.overdue++;
       else if(u.urgentIcon==='⏳')totals.wait++;
-      else if(u.urgentIcon==='🚨')totals.idle++;
       else if(u.urgentIcon==='📅')totals.soon++;
-      // 상담기록없음 + 옵션 미선택(st='none'): 에이전트가 아무 액션도 기록 안 한 회원
+      // 🚨 icon (구 응답없음=st='none'+3일) → 더 이상 별도 카운트 안 함
       const memoEmpty = !u.memo || !String(u.memo).trim();
       const noOption = u.st === 'none';
+      // 상담기록없음(1): 메모 비어있음 AND 옵션 미선택
       const isNoMemo = memoEmpty && noOption;
       if(isNoMemo) totals.noMemo++;
+      // 응답없음(3) NEW: 메모 있음 AND 옵션 선택됨 → 에이전트는 했는데 회원 무응답
+      if(!memoEmpty && !noOption) totals.idle++;
       // 긴급 = 상담기록없음(1) + 방문일 지남(2) 만
       if(isNoMemo || u.urgentIcon==='⚠️') agentUrgentCount++;
     });
@@ -3453,7 +3455,7 @@ function renderUrgentBanner(){
     <div class="ub-stats">
       ${totals.noMemo>0?`<div class="ub-stat ub-stat-amber" onclick="openUrgentByType('noMemo')" title="상담기록도 없고 옵션도 선택 안된 회원 목록 (아무 액션도 기록 안 됨)"><b>${totals.noMemo}</b><span>📝 상담기록없음</span></div>`:''}
       ${totals.overdue>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('overdue')" title="방문일 지남 회원 목록"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>`:''}
-      ${totals.idle>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('idle')" title="응답없음 회원 목록"><b>${totals.idle}</b><span>🚨 응답없음</span></div>`:''}
+      ${totals.idle>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('idle')" title="상담기록 있고 옵션도 선택됐는데 회원 무응답"><b>${totals.idle}</b><span>🚨 응답없음</span></div>`:''}
       ${totals.wait>0?`<div class="ub-stat ub-stat-orange" onclick="openUrgentByType('wait')" title="일정대기 누적 회원 목록"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>`:''}
       ${totals.soon>0?`<div class="ub-stat ub-stat-blue" onclick="openUrgentByType('soon')" title="방문 임박 회원 목록"><b>${totals.soon}</b><span>📅 방문 임박</span></div>`:''}
     </div>
@@ -3472,7 +3474,7 @@ function renderUrgentBanner(){
 function openUrgentByType(kind){
   const typeMap = {
     overdue: {icon:'⚠️', label:'방문일 지남', bg:'#fee2e2', color:'#7f1d1d'},
-    idle:    {icon:'🚨', label:'응답없음', bg:'#fee2e2', color:'#7f1d1d'},
+    idle:    {icon:'🚨', label:'응답없음 (상담기록·옵션 있음)', bg:'#fee2e2', color:'#7f1d1d'},
     wait:    {icon:'⏳', label:'일정대기 누적', bg:'#dbeafe', color:'#1e3a8a'},
     soon:    {icon:'📅', label:'방문 임박', bg:'#dbeafe', color:'#1e3a8a'},
     noMemo:  {icon:'📝', label:'상담기록없음 (옵션 미선택)', bg:'#fef3c7', color:'#92400e'},
@@ -3487,10 +3489,13 @@ function openUrgentByType(kind){
   agents.forEach(a=>{
     const urgent = findUrgentForAgent(a, todayStr);
     urgent.forEach(u=>{
+      const memoEmpty = !u.memo || !String(u.memo).trim();
+      const noOption = u.st === 'none';
       if(kind === 'noMemo'){
-        const memoEmpty = !u.memo || !String(u.memo).trim();
-        const noOption = u.st === 'none';
         if(memoEmpty && noOption) recs.push(u);
+      } else if(kind === 'idle'){
+        // 응답없음 NEW: 메모 있음 + 옵션 선택됨
+        if(!memoEmpty && !noOption) recs.push(u);
       } else if(u.urgentIcon === info.icon) {
         recs.push(u);
       }
