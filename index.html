@@ -4794,7 +4794,7 @@ function renderRecent7DaysByTeam(){
     if(i===0) return '<span class="r3d-rank danger-1">🚨 긴급 1위</span>';
     if(i===1) return '<span class="r3d-rank danger-2">🔥 긴급 2위</span>';
     if(i===2) return '<span class="r3d-rank danger-3">⚠️ 긴급 3위</span>';
-    return `<span class="r3d-rank">긴급 #${i+1}</span>`;
+    return `<span class="r3d-rank">#${i+1}</span>`;
   };
   // 심각도 클래스 (긴급 합산 기준)
   const sevClass = (n)=> n>=15 ? 'sev-red' : (n>=5 ? 'sev-amber' : '');
