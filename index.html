@@ -702,7 +702,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-detail-tbl th{background:#f8fafc;padding:7px 10px;text-align:left;font-size:10.5px;font-weight:800;color:#475569;border-bottom:1.5px solid #cbd5e1;letter-spacing:-.2px;white-space:nowrap}
 .r3d-detail-tbl td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top;font-weight:600}
 .r3d-detail-tbl tr:last-child td{border-bottom:none}
-.r3d-detail-tbl tr:hover td{background:#fef9c3}
+.r3d-detail-tbl tr.r3d-row{cursor:pointer;transition:background .12s}
+.r3d-detail-tbl tr.r3d-row:hover td{background:#fef9c3}
+.r3d-detail-tbl tr.r3d-row:active td{background:#fde68a}
 .r3d-detail-tbl .r3d-d{font-weight:800;color:#1e293b;font-size:11.5px;white-space:nowrap;width:64px}
 .r3d-detail-tbl .r3d-d.r3d-ad{color:#64748b;font-weight:700;width:60px;font-size:11px}
 .r3d-detail-tbl .r3d-m{font-size:12px}
@@ -4229,21 +4231,26 @@ function renderRecent7DaysByTeam(){
   };
 
   const fmtDate = (s)=> s ? s.slice(5).replace('-','/') : '-';
+  const todayStr = D.today;
+  // 업데이트 일자: vd 가 fromStr ~ today 사이면 vd, 아니면 ad
+  const pickUpdateDate = (r)=>{
+    const vdInWindow = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+    return vdInWindow ? r.vd : r.ad;
+  };
   const teams = curTeam==='ALL' ? ['TIM_GIAR','TIM_TINA','TIM_LIDIA'] : [curTeam];
   let html = '';
   teams.forEach(t=>{
-    // 최근 7일 내 활동: 배정일 OR 방문일이 fromStr 이후 — 에이전트 필터도 적용
+    // 최근 7일 내 활동: 배정일 OR 방문일이 fromStr~today 범위 — 에이전트 필터도 적용
+    // 미래 예약 방문(vd>today)은 '업데이트'로 보지 않음
     const recs = (D.records||[]).filter(r=>{
       if(r.t !== t) return false;
       if(curAgent !== 'ALL' && r.a !== curAgent) return false;
-      return (r.ad && r.ad >= fromStr) || (r.vd && r.vd >= fromStr);
+      const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
+      const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+      return adInWin || vdInWin;
     });
-    // 최신순 정렬 (vd 또는 ad의 최대값 기준)
-    recs.sort((a,b)=>{
-      const dA = (a.vd && a.vd >= fromStr) ? a.vd : a.ad;
-      const dB = (b.vd && b.vd >= fromStr) ? b.vd : b.ad;
-      return (dB||'').localeCompare(dA||'');
-    });
+    // 최신순 정렬 (업데이트 일자 기준)
+    recs.sort((a,b)=> (pickUpdateDate(b)||'').localeCompare(pickUpdateDate(a)||''));
     const total = recs.length;
     const color = TC[t] || '#888';
     const name = teamShortName(t) + (curAgent !== 'ALL' ? ` · ${(D.agent_meta[curAgent]||{}).short || curAgent}` : '');
@@ -4251,7 +4258,7 @@ function renderRecent7DaysByTeam(){
     const initialShown = 15;
     const visibleRecs = recs.slice(0, initialShown);
     const rows = visibleRecs.map(r=>{
-      const updateDate = (r.vd && r.vd >= fromStr) ? r.vd : r.ad;
+      const updateDate = pickUpdateDate(r);
       const agentShort = (D.agent_meta[r.a]||{}).short || r.a;
       const memoRaw = (r.memo||'').trim();
       // 한국어 모드일 때 자동 번역
@@ -4259,7 +4266,8 @@ function renderRecent7DaysByTeam(){
       const memoCell = memo
         ? `<td class="r3d-memo" title="${esc(memoRaw)}">${esc(memo.slice(0,60))}${memo.length>60?'…':''}</td>`
         : `<td class="r3d-memo empty">${curLang==='id'?'Tidak ada catatan':'메모 없음'}</td>`;
-      return `<tr>
+      const recKey = esc(JSON.stringify({a:r.a, nm:r.nm||'', ad:r.ad||''}));
+      return `<tr class="r3d-row" data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
         <td class="r3d-d">${fmtDate(updateDate)}</td>
         <td class="r3d-d r3d-ad">${fmtDate(r.ad)}</td>
         <td class="r3d-m"><b>${esc(r.nm||'-')}</b>${r.pa?`<small>${esc(r.pa)}</small>`:''}</td>
@@ -4291,17 +4299,20 @@ function renderRecent7DaysByTeam(){
 
 // 최근 7일 더 보기 — 팀 전체 회원 목록
 function openRecent7DTeam(team, fromStr){
+  const todayStr = D.today;
   const recs = (D.records||[]).filter(r=>{
     if(r.t !== team) return false;
     if(curAgent !== 'ALL' && r.a !== curAgent) return false;
-    return (r.ad && r.ad >= fromStr) || (r.vd && r.vd >= fromStr);
+    const adInWin = r.ad && r.ad >= fromStr && r.ad <= todayStr;
+    const vdInWin = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+    return adInWin || vdInWin;
   });
-  // 최신순 정렬
-  recs.sort((a,b)=>{
-    const dA = (a.vd && a.vd >= fromStr) ? a.vd : a.ad;
-    const dB = (b.vd && b.vd >= fromStr) ? b.vd : b.ad;
-    return (dB||'').localeCompare(dA||'');
-  });
+  // 최신순 정렬 (미래 vd 제외, fromStr ~ today 윈도우 안의 vd 우선)
+  const pickD = (r)=>{
+    const vdIn = r.vd && r.vd >= fromStr && r.vd <= todayStr;
+    return vdIn ? r.vd : r.ad;
+  };
+  recs.sort((a,b)=> (pickD(b)||'').localeCompare(pickD(a)||''));
   memCache = recs;
   const tcol = TC[team] || '#888';
   const tName = teamShortName(team);
@@ -4325,6 +4336,42 @@ function openRecent7DTeam(team, fromStr){
   document.getElementById('page-member').style.display='block';
   window.scrollTo(0,0);
 }
+
+// 최근 7일 행 클릭 — 해당 회원의 단일 레코드를 회원 리스트로 열기
+function openRecent7DMember(tr){
+  if(!tr || !tr.dataset || !tr.dataset.rec) return;
+  let k;
+  try { k = JSON.parse(tr.dataset.rec); } catch(e){ return; }
+  const recs = (D.records||[]).filter(r =>
+    r.a === k.a && (r.nm||'') === (k.nm||'') && (r.ad||'') === (k.ad||'')
+  );
+  if(!recs.length) return;
+  memCache = recs;
+  const r = recs[0];
+  const tcol = TC[r.t] || '#888';
+  const agentShort = (D.agent_meta[r.a]||{}).short || r.a;
+  document.getElementById('mem-header').innerHTML = `
+    <div class="mem-av" style="background:${tcol}">${(r.nm||'?').charAt(0)}</div>
+    <div class="mem-info"><h2>${(r.nm||'-')}</h2>
+      <p>${teamShortName(r.t)} · ${agentShort} · 배정 ${r.ad||'-'}</p>
+      <span class="mem-pill" style="background:#dbeafe;color:#1e3a8a">${recs.length}건 레코드</span></div>
+    <div style="margin-left:auto;text-align:right">
+      <div class="mem-count">${recs.length}</div>
+      <div style="font-size:11px;color:#aaa">건</div></div>`;
+  const sb = document.getElementById('mem-search'); if(sb) sb.value='';
+  const cl = document.getElementById('mem-count-lbl'); if(cl) cl.textContent = `총 ${recs.length}건`;
+  if(typeof buildMemFilters==='function'){
+    ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    buildMemFilters();
+  }
+  renderMemTable(recs);
+  document.getElementById('page-main').style.display='none';
+  document.getElementById('page-member').style.display='block';
+  window.scrollTo(0,0);
+}
+
 // 에이전트 인사이트 탭 — 에이전트별 상세 카드만
 function renderAgentInsightOnly(){
   renderAgentCardsOnly();
