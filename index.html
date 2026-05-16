@@ -2388,6 +2388,11 @@ function selectScope(scope){
     curDbKind = 'ALL';
   }
   curAgent = 'ALL';
+  // 에이전트별 토탈관리 탭에서 특정 팀 선택 시: 그 팀의 첫 에이전트 자동 선택
+  if(curTab === 'agent_insight' && scope && scope.startsWith('TIM_')){
+    const teamAgents = (D.team_members && D.team_members[scope]) || [];
+    if(teamAgents.length) curAgent = teamAgents[0];
+  }
   document.querySelectorAll('.scope-btn').forEach(b=>{
     b.classList.toggle('on', b.dataset.scope===scope);
   });
