@@ -616,14 +616,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .ins-f-stage[onclick]:hover{background:rgba(255,255,255,.85);transform:translateY(-2px);box-shadow:0 3px 10px rgba(0,0,0,.08)}
 .ins-f-stage[onclick]:hover .ins-f-num{filter:brightness(.92)}
 /* 보조 펀널: 방문예정 / 일정대기 / 확인필요 */
-.ins-sub-funnel{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:18px}
-.ins-sf-stage{background:linear-gradient(135deg,#f8fafc,#fff);border:2px solid #e2e8f0;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:all .15s;cursor:pointer}
+.ins-sub-funnel{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.ins-sf-stage{background:linear-gradient(135deg,#f8fafc,#fff);border:2px solid #e2e8f0;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:all .15s;cursor:pointer}
 .ins-sf-stage:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1);border-color:#94a3b8}
+.ins-sf-stage.up{border-color:#93c5fd;background:linear-gradient(135deg,#dbeafe,#eff6ff)}
+.ins-sf-stage.up:hover{border-color:#2563eb;box-shadow:0 4px 14px rgba(37,99,235,.18)}
+.ins-sf-stage.wait{border-color:#fcd34d;background:linear-gradient(135deg,#fef3c7,#fffbeb)}
+.ins-sf-stage.wait:hover{border-color:#d97706;box-shadow:0 4px 14px rgba(217,119,6,.18)}
 .ins-sf-stage.urgent{border-color:#fca5a5;background:linear-gradient(135deg,#fef2f2,#fff)}
 .ins-sf-stage.urgent:hover{border-color:#dc2626;box-shadow:0 4px 14px rgba(220,38,38,.18)}
-.ins-sf-num{font-size:30px;font-weight:900;line-height:1;letter-spacing:-1px;flex-shrink:0;min-width:46px;text-align:center}
-.ins-sf-lbl{font-size:13px;font-weight:900;color:#0f172a;letter-spacing:-.2px;line-height:1.2}
-.ins-sf-sub{font-size:10.5px;font-weight:700;color:#64748b;margin-top:2px}
+/* 메인 펀널 숫자와 동일한 크기 — 방문예약수·일정대기수 모두 중요 지표 */
+.ins-sf-num{font-size:42px;font-weight:900;line-height:1;letter-spacing:-2px;flex-shrink:0;min-width:60px;text-align:center}
+.ins-sf-lbl{font-size:13px;font-weight:800;color:#475569;letter-spacing:-.2px;line-height:1.2;display:flex;align-items:center;gap:4px}
+.ins-sf-sub{font-size:11px;font-weight:700;color:#94a3b8;margin-top:3px}
 /* 분석 3열 - 강화 */
 .ins-ag-d-analysis{display:grid;grid-template-columns:1fr 1.2fr 1.5fr;gap:16px}
 @media(max-width:900px){.ins-ag-d-analysis{grid-template-columns:1fr}}
@@ -3853,22 +3858,20 @@ function renderTeamAgentInsight(){
         <div class="ins-f-arrow"><div class="ins-f-rate ${r_vc_ok?'good':'bad'}">${x.r_vc||0}%<small>클로율</small></div></div>
         <div class="ins-f-stage" onclick="openMem('${x.a}','cl')" style="cursor:pointer" title="클로징"><div class="ins-f-num" style="color:#dc2626">${x.cl||0}</div><div class="ins-f-lbl">🏆 클로</div></div>
       </div>
-      <!-- 보조 지표: 방문예정 + 일정대기 (숫자 클릭 → 회원 목록) -->
+      <!-- 보조 지표: 방문예정(파랑) + 일정대기(노랑) + 확인필요(빨강) - 메인 펀널과 동일 사이즈 -->
       <div class="ins-sub-funnel">
-        <div class="ins-sf-stage" onclick="openMem('${x.a}','s_f')" style="cursor:pointer" title="앞으로 다가올 방문예약">
-          <div class="ins-sf-num" style="color:#2563eb">${x.s_f||0}</div>
-          <div class="ins-sf-lbl">📅 방문예정</div>
-          <div class="ins-sf-sub">앞으로</div>
+        <div class="ins-sf-stage up" onclick="openMem('${x.a}','s_f')" style="cursor:pointer" title="앞으로 다가올 방문예약">
+          <div class="ins-sf-num" style="color:#1e3a8a">${x.s_f||0}</div>
+          <div><div class="ins-sf-lbl">📅 방문예정</div><div class="ins-sf-sub">앞으로</div></div>
         </div>
-        <div class="ins-sf-stage" onclick="openMem('${x.a}','w')" style="cursor:pointer" title="일정 미정 - 후속 컨택 필요">
-          <div class="ins-sf-num" style="color:#d97706">${x.w||0}</div>
-          <div class="ins-sf-lbl">⏳ 일정대기</div>
-          <div class="ins-sf-sub">후속 필요</div>
+        <div class="ins-sf-stage wait" onclick="openMem('${x.a}','w')" style="cursor:pointer" title="일정 미정 - 후속 컨택 필요">
+          <div class="ins-sf-num" style="color:#854d0e">${x.w||0}</div>
+          <div><div class="ins-sf-lbl">⏳ 일정대기</div><div class="ins-sf-sub">후속 필요</div></div>
         </div>
         ${x.s_o>0?`<div class="ins-sf-stage urgent" onclick="openMem('${x.a}','s_o')" style="cursor:pointer" title="방문일 지남 - 즉시 확인">
           <div class="ins-sf-num" style="color:#dc2626">${x.s_o}</div>
-          <div class="ins-sf-lbl">⚠️ 확인필요</div>
-          <div class="ins-sf-sub">방문일 지남</div>
+          <div><div class="ins-sf-lbl">⚠️ 확인필요</div>
+          <div class="ins-sf-sub">방문일 지남</div></div>
         </div>`:''}
       </div>
 
