@@ -1464,13 +1464,13 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <div id="content-rank" style="display:none">
     <div class="sec-hd" style="padding-bottom:8px">
       <div><div class="sec-title">⚔️ 팀 배틀</div>
-      <div class="sec-sub">평균 활동지수 기준 (100점 만점) · 인원 격차 없는 공정 평가</div></div>
+      <div class="sec-sub">평균 활동지수 기준 · 한달 KPI 목표 100점 (기간 일수에 비례 조정)</div></div>
       <div id="rank-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="battle-wrap" id="battle-wrap"></div>
     <div class="sec-hd" style="border-top:2px solid #f5f5f5">
       <div><div class="sec-title">🏆 에이전트 랭킹</div>
-      <div class="sec-sub">활동지수 (100점 만점) = 배정→예약(15) + 예약→방문(20) + 방문→클로징(25) + DB→클로징(40)</div></div>
+      <div class="sec-sub">활동지수 = 클로징×5 + 방문완료/랑숭/비디오콜 각 1점 · 한달 KPI 목표 100점</div></div>
     </div>
     <div class="rank-wrap" id="rank-wrap"></div>
   </div>
@@ -1823,17 +1823,20 @@ const TARGETS = {
   dc: 12,   // DB→클로징 12% (DB 대비 클로징율) ⭐ 최종 핵심 목표
 };
 
-// 활동지수 100점 만점 — 4가지 KPI 달성률 가중 평균
-// 가중치: DB→클로징(최종 결과) 40 / 방문→클로징 25 / 예약→방문 20 / 배정→예약 15
-// 각 KPI는 (실제율/목표율)*100 으로 환산하여 100점에서 캡
+// 활동지수 — 클로징 5점, 방문완료/랑숭/비디오콜 각 1점
+// 한달 KPI 목표 = 100점
+const MONTHLY_KPI_TARGET = 100;
 function calcActivityIndex(s){
-  if(!s || (s.db||0) === 0) return 0;
-  const cap = v => Math.min(100, Math.max(0, v));
-  const ds = cap((s.r_ds||0) / TARGETS.ds * 100);
-  const sv = cap((s.r_sv||0) / TARGETS.sv * 100);
-  const vc = cap((s.r_vc||0) / TARGETS.vc * 100);
-  const dc = cap((s.r_dc||0) / TARGETS.dc * 100);
-  return Math.round(ds*0.15 + sv*0.20 + vc*0.25 + dc*0.40);
+  if(!s) return 0;
+  return (s.cl||0)*5 + (s.d||0) + (s.ls||0) + (s.vc||0);
+}
+// 현재 기간(일수) 기반으로 KPI 목표를 비례 조정 — 한달 기준 100점
+function periodKpiTarget(){
+  const f = new Date((curFrom||'').replace(/-/g,'/'));
+  const t = new Date((curTo||'').replace(/-/g,'/'));
+  if(!isFinite(f) || !isFinite(t)) return MONTHLY_KPI_TARGET;
+  const days = Math.max(1, Math.round((t-f)/(1000*60*60*24)) + 1);
+  return Math.max(1, Math.round(MONTHLY_KPI_TARGET * days / 30));
 }
 
 function targetStatus(actual, target){
@@ -3229,7 +3232,8 @@ function renderStats(){
 
 // ── 랭킹 & 배틀 ─────────────────────────────────────────
 function renderRank(){
-  // 에이전트별 활동지수 사전 계산 (100점 만점)
+  const kpiTarget = periodKpiTarget();  // 기간 비례 KPI 목표
+  // 에이전트별 활동지수 사전 계산 (클로징×5 + 완료/랑숭/비디오 ×1)
   const allAgents = Object.keys(D.agent_total);
   const agentStats = {};
   allAgents.forEach(a=>{
@@ -3237,7 +3241,7 @@ function renderRank(){
     const meta = D.agent_meta[a]||{};
     agentStats[a] = {
       a, db:s.db||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0,
-      r_ds:s.r_ds||0, r_sv:s.r_sv||0, r_vc:s.r_vc||0, r_dc:s.r_dc||0,
+      r_dc:s.r_dc||0,
       actIdx: calcActivityIndex(s),
       team:meta.team, ini:meta.initials
     };
@@ -3261,22 +3265,24 @@ function renderRank(){
   let bh='';
   sorted.forEach(({t,s,headcount,sumIdx,avgIdx,mvp},i)=>{
     const cls = i===0?'top1':i===1?'top2':'top3';
-    const grade = avgIdx>=80?'A':avgIdx>=60?'B':avgIdx>=40?'C':'D';
-    const gradeColor = avgIdx>=80?'#16a34a':avgIdx>=60?'#2563eb':avgIdx>=40?'#d97706':'#dc2626';
-    const idxPct = Math.min(100, Math.round(avgIdx));
+    // KPI 달성률 (기간 비례 목표 대비)
+    const achPct = kpiTarget>0 ? avgIdx/kpiTarget*100 : 0;
+    const grade = achPct>=100?'A':achPct>=80?'B':achPct>=50?'C':'D';
+    const gradeColor = achPct>=100?'#16a34a':achPct>=80?'#2563eb':achPct>=50?'#d97706':'#dc2626';
+    const barPct = Math.min(100, Math.round(achPct));
     const mvpHtml = mvp
       ? `<div class="bc-mvp" onclick="openMem('${mvp.a}','d')" title="팀 MVP 회원 목록"><span class="bc-mvp-lbl">🔥 팀 MVP</span><span class="bc-mvp-name">${(D.agent_meta[mvp.a]||{}).short||mvp.a}</span><span class="bc-mvp-score" style="color:${TC[t]}">${mvp.actIdx}점</span></div>`
       : '';
     bh+=`<div class="bcard ${cls}" style="border-top:4px solid ${TC[t]}">
       <div class="bc-name" style="color:${TC[t]}">${teamShortName(t)}</div>
-      <span class="bc-grade" style="background:${gradeColor}">${grade}등급</span>
+      <span class="bc-grade" style="background:${gradeColor}">${grade}등급 · KPI ${Math.round(achPct)}%</span>
       <div class="bc-idx-block">
-        <div class="bc-idx-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}<small>/100</small></div>
-        <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명)</small></div>
-        <div class="bc-idx-bar"><div class="bc-idx-fill" style="width:${idxPct}%;background:${TC[t]}"></div></div>
+        <div class="bc-idx-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}<small>/${kpiTarget}</small></div>
+        <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명 · 기간 KPI ${kpiTarget}점)</small></div>
+        <div class="bc-idx-bar"><div class="bc-idx-fill" style="width:${barPct}%;background:${TC[t]}"></div></div>
       </div>
       <div class="bc-sum-row">
-        <span class="bc-sum-lbl">합계</span>
+        <span class="bc-sum-lbl">팀 합계</span>
         <span class="bc-sum-val" style="color:${TC[t]}">${f(Math.round(sumIdx))}점</span>
       </div>
       <div class="bc-kpis">
@@ -3290,7 +3296,7 @@ function renderRank(){
   });
   document.getElementById('battle-wrap').innerHTML = bh;
 
-  // ── 에이전트 랭킹: 활동지수(100점 만점) 기준 정렬 ──
+  // ── 에이전트 랭킹: 활동지수 기준 정렬 ──
   const agents = curTeam==='ALL' ? allAgents : (D.team_members[curTeam]||[]);
   const list = agents.map(a=>agentStats[a]).filter(x=>x && x.db>0).sort((a,b)=>b.actIdx-a.actIdx);
   const medals=['🥇','🥈','🥉'];
@@ -3298,7 +3304,9 @@ function renderRank(){
   let rh='';
   list.forEach((x,i)=>{
     const {a,actIdx,d,ls,vc,cl,r_dc,team,ini} = x;
-    const pct = Math.min(100, Math.round(actIdx));  // 활동지수 자체가 0-100
+    // KPI 달성률 (기간 비례 목표 대비)
+    const achPct = kpiTarget>0 ? actIdx/kpiTarget*100 : 0;
+    const barPct = Math.min(100, Math.round(achPct));
     const meta = D.agent_meta[a]||{};
     const short = meta.short || a;
     const isTop3 = i<3;
@@ -3312,9 +3320,9 @@ function renderRank(){
     } else {
       motivate = `<span class="rk-motivate tied">= ${i}위와 동점</span>`;
     }
-    // 등급
-    const grade = actIdx>=80?'A':actIdx>=60?'B':actIdx>=40?'C':'D';
-    const gradeColor = actIdx>=80?'#16a34a':actIdx>=60?'#2563eb':actIdx>=40?'#d97706':'#dc2626';
+    // 등급 (KPI 달성률 기반)
+    const grade = achPct>=100?'A':achPct>=80?'B':achPct>=50?'C':'D';
+    const gradeColor = achPct>=100?'#16a34a':achPct>=80?'#2563eb':achPct>=50?'#d97706':'#dc2626';
     const rankBadge = isTop3
       ? `<div class="rnum rnum-medal rnum-${i+1}">${medals[i]}</div>`
       : `<div class="rnum"><span class="rnum-plain">${i+1}</span></div>`;
@@ -3328,15 +3336,15 @@ function renderRank(){
           ${i===0?'<span class="fire-tag">🔥 TOP</span>':''}
           ${motivate}
         </div>
-        <div class="rteam">${team} · DB→클로징 <b>${r_dc}%</b></div>
-        <div class="rbar-bg"><div class="rbar" style="width:${pct}%;background:${TC[team]}"></div></div>
+        <div class="rteam">${team} · DB→클로징 <b>${r_dc}%</b> · KPI 달성 <b>${Math.round(achPct)}%</b></div>
+        <div class="rbar-bg"><div class="rbar" style="width:${barPct}%;background:${TC[team]}"></div></div>
       </div>
       <div class="rstats">
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','d')"><div class="rstat-v" style="color:#16a34a">${d}</div><div class="rstat-l">완료</div></div>
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','vc')"><div class="rstat-v" style="color:#6d28d9">${vc}</div><div class="rstat-l">비디오</div></div>
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','ls')"><div class="rstat-v" style="color:#1e293b">${ls}</div><div class="rstat-l">랑숭</div></div>
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','cl')"><div class="rstat-v" style="color:#dc2626">${cl}</div><div class="rstat-l">클로징</div></div>
-        <div class="score-badge act-idx">${actIdx}<small>/100</small></div>
+        <div class="score-badge act-idx">${actIdx}<small>/${kpiTarget}</small></div>
       </div></div>`;
   });
   if(!rh) rh = '<div class="rk-empty">활동한 에이전트가 없습니다</div>';
