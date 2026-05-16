@@ -238,14 +238,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .ms-idle{background:linear-gradient(135deg,#d97706,#f59e0b)}
 .ms-cancel{background:linear-gradient(135deg,#dc2626,#ef4444)}
 .mgmt-legend{display:flex;gap:6px;margin-top:auto}
-.mgmt-leg{flex:1;display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:6px;background:#fafafa;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s;border:1px solid transparent}
-.mgmt-leg:hover{background:#fefce8;transform:translateY(-1px)}
+.mgmt-leg{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border-radius:8px;background:#fafafa;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s;border:1px solid transparent;text-align:center}
+.mgmt-leg:hover{background:#fefce8;transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.mgmt-leg .ml-row{display:flex;align-items:center;gap:5px;justify-content:center}
 .mgmt-leg .ml-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .mgmt-leg.ml-active .ml-dot{background:#16a34a}
 .mgmt-leg.ml-idle .ml-dot{background:#d97706}
 .mgmt-leg.ml-cancel .ml-dot{background:#dc2626}
-.mgmt-leg .ml-lbl{flex:1;color:#666;font-size:10.5px}
-.mgmt-leg b{font-size:13px;font-weight:900;color:#1a1a1a;letter-spacing:-.3px}
+.mgmt-leg .ml-lbl{color:#475569;font-size:11px;font-weight:700;letter-spacing:-.2px;line-height:1.1}
+.mgmt-leg b{font-size:20px;font-weight:900;color:#1a1a1a;letter-spacing:-.5px;line-height:1}
 .mgmt-leg.ml-active b{color:#15803d}
 .mgmt-leg.ml-idle b{color:#a16207}
 .mgmt-leg.ml-cancel b{color:#b91c1c}
@@ -1980,24 +1981,21 @@ function renderDBSummary(){
         </div>
       </div>
       <div class="mgmt-stack-bar" title="진행됨 / 미진행 / 취소">
-        ${active>0?`<div class="ms-seg ms-active" style="width:${pct(active)}%" onclick="openMemStatus('active')" title="진행됨 ${active}건">${pct(active)>=10?'✅ '+pct(active)+'%':''}</div>`:''}
-        ${idle>0?`<div class="ms-seg ms-idle" style="width:${pct(idle)}%" onclick="openMemStatus('idle')" title="미진행 ${idle}건">${pct(idle)>=10?'⏳ '+pct(idle)+'%':''}</div>`:''}
-        ${cancelled>0?`<div class="ms-seg ms-cancel" style="width:${pct(cancelled)}%" onclick="openMemStatus('cancel')" title="취소 ${cancelled}건">${pct(cancelled)>=10?'❌ '+pct(cancelled)+'%':''}</div>`:''}
+        ${active>0?`<div class="ms-seg ms-active" style="width:${pct(active)}%" onclick="openMemStatus('active')" title="진행됨 ${active}건">${pct(active)>=8?'✅ '+pct(active)+'%':pct(active)+'%'}</div>`:''}
+        ${idle>0?`<div class="ms-seg ms-idle" style="width:${pct(idle)}%" onclick="openMemStatus('idle')" title="미진행 ${idle}건">${pct(idle)>=8?'⏳ '+pct(idle)+'%':pct(idle)+'%'}</div>`:''}
+        ${cancelled>0?`<div class="ms-seg ms-cancel" style="width:${pct(cancelled)}%" onclick="openMemStatus('cancel')" title="취소 ${cancelled}건">${pct(cancelled)>=8?'❌ '+pct(cancelled)+'%':pct(cancelled)+'%'}</div>`:''}
       </div>
       <div class="mgmt-legend">
         <div class="mgmt-leg ml-active" onclick="openMemStatus('active')">
-          <span class="ml-dot"></span>
-          <span class="ml-lbl">${T('db_active')||'진행'}</span>
+          <div class="ml-row"><span class="ml-dot"></span><span class="ml-lbl">${T('db_active')||'진행'}</span></div>
           <b>${f(active)}</b>
         </div>
         <div class="mgmt-leg ml-idle" onclick="openMemStatus('idle')">
-          <span class="ml-dot"></span>
-          <span class="ml-lbl">${T('db_idle')||'미진행'}</span>
+          <div class="ml-row"><span class="ml-dot"></span><span class="ml-lbl">${T('db_idle')||'미진행'}</span></div>
           <b>${f(idle)}</b>
         </div>
         <div class="mgmt-leg ml-cancel" onclick="openMemStatus('cancel')">
-          <span class="ml-dot"></span>
-          <span class="ml-lbl">${T('db_cancel')||'취소'}</span>
+          <div class="ml-row"><span class="ml-dot"></span><span class="ml-lbl">${T('db_cancel')||'취소'}</span></div>
           <b>${f(cancelled)}</b>
         </div>
       </div>
