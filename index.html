@@ -3413,6 +3413,22 @@ function renderRank(){
     const mvpHtml = mvp
       ? `<div class="bc-mvp" onclick="openMem('${mvp.a}','d')" title="팀 MVP 회원 목록"><span class="bc-mvp-lbl">🔥 팀 MVP</span><span class="bc-mvp-name">${(D.agent_meta[mvp.a]||{}).short||mvp.a}</span><span class="bc-mvp-score" style="color:${TC[t]}">${mvp.actIdx}점</span></div>`
       : '';
+    // 전월 비교 라벨 (사전 계산 — 중첩 template literal 방지)
+    let prevLblHtml = '';
+    if(prevRange){
+      if(prevAvg > 0){
+        const diff = avgIdx - prevAvg;
+        const diffTxt = diff >= 0 ? ('✅ 초과 +' + diff.toFixed(1)) : ('⬇ ' + diff.toFixed(1));
+        const cls = beatPrev ? 'beat' : 'below';
+        prevLblHtml = '<div class="bc-prev-lbl '+cls+'">전월 '+prevAvg.toFixed(1)+'점 '+diffTxt+'</div>';
+      } else {
+        prevLblHtml = '<div class="bc-prev-lbl none">전월 데이터 없음</div>';
+      }
+    }
+    let prevMarkHtml = '';
+    if(prevAvg > 0){
+      prevMarkHtml = '<div class="bc-prev-mark '+(beatPrev?'beat':'below')+'" style="left:'+prevPct+'%" title="전월 평균 활동지수 '+prevAvg.toFixed(1)+'점"></div>';
+    }
     bh+=`<div class="bcard ${cls}" style="border-top:4px solid ${TC[t]}">
       <div class="bc-name" style="color:${TC[t]}">${teamShortName(t)}</div>
       <div class="bc-idx-block">
@@ -3420,10 +3436,10 @@ function renderRank(){
         <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명 · 한달 KPI ${kpiTarget}점)</small></div>
         <div class="bc-idx-bar">
           <div class="bc-idx-fill" style="width:${barPct}%;background:${TC[t]}"></div>
-          ${prevAvg>0?`<div class="bc-prev-mark ${beatPrev?'beat':'below'}" style="left:${prevPct}%" title="전월 평균 활동지수 ${prevAvg.toFixed(1)}점"></div>`:''}
+          ${prevMarkHtml}
           ${pacePct!==null?`<div class="bc-pace-mark" style="left:${pacePct}%" title="오늘 ${D.today} · 페이스 ${pacePct}%"></div>`:''}
         </div>
-        ${prevAvg>0?`<div class="bc-prev-lbl ${beatPrev?'beat':'below'}">전월 ${prevAvg.toFixed(1)}점 ${beatPrev?'✅ 초과':'⬆ -'+(prevAvg-avgIdx).toFixed(1)+'점'}</div>`:''}
+        ${prevLblHtml}
       </div>
       <div class="bc-sum-row">
         <span class="bc-sum-lbl">팀 합계</span>
