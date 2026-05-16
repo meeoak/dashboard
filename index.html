@@ -1927,8 +1927,16 @@ function buildCalAgentButtons(){
   });
   teamWrap.innerHTML = teamHtml;
   // ── 하단: 팀의 에이전트 단추 (팀 미선택 시 빈 영역) ──
+  // 인사이트 탭에서는 긴급 관리 대상이 0건인 에이전트는 단추 숨김
+  // (단, 현재 선택된 에이전트는 항상 표시해야 해제 가능)
+  const isInsightTab = curTab === 'team_insight' || curTab === 'agent_insight';
+  const todayStr = D.today;
   let agentHtml = '';
   agents.forEach(a=>{
+    if(isInsightTab && curAgent !== a){
+      const urgent = findUrgentForAgent(a, todayStr);
+      if(urgent.length === 0) return;
+    }
     const meta = D.agent_meta[a]||{};
     const short = meta.short || a;
     const safeA = a.replace(/'/g,"\\'");
@@ -3301,6 +3309,8 @@ function switchTab(tab){
   });
   curTab = tab;
   renderTab();
+  // 탭 전환 시 에이전트 단추도 다시 그림 (인사이트 탭에서 긴급 0건 숨김 적용)
+  if(typeof updateCalControls==='function') updateCalControls();
 }
 
 // 상단 빠른 이동: 포커스 모드로 전환 (상단 요약 섹션 숨김 + 해당 탭만 표시)
