@@ -2886,7 +2886,11 @@ function renderUrgentBanner(){
   const banner = document.getElementById('urgent-banner');
   if(!banner)return;
   const todayStr = D.today;
-  const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
+  // 에이전트 필터가 활성화되어 있으면 그 에이전트만, 아니면 팀/전체 단위로 집계
+  let agents;
+  if(curAgent !== 'ALL') agents = [curAgent];
+  else if(curTeam !== 'ALL') agents = D.team_members[curTeam] || [];
+  else agents = Object.keys(D.agent_total||{});
   // 모든 활동 에이전트의 긴급 건수 집계
   const totals = {overdue:0, wait:0, idle:0, soon:0, byAgent:{}, total:0};
   agents.forEach(a=>{
@@ -2913,11 +2917,14 @@ function renderUrgentBanner(){
   // 에이전트별 긴급 건수 (TOP 5)
   const topAgents = Object.entries(totals.byAgent).sort((a,b)=>b[1]-a[1]).slice(0,5);
 
+  const scopeLbl = curAgent !== 'ALL'
+    ? ((D.agent_meta[curAgent]||{}).short || curAgent)
+    : (curTeam !== 'ALL' ? teamShortName(curTeam) : '전체');
   banner.innerHTML = `<div class="urgent-banner-alert">
     <div class="ub-hd">
       <span class="ub-flame">🚨</span>
       <div class="ub-hd-text">
-        <div class="ub-title">긴급 관리 필요 ${totals.total}건</div>
+        <div class="ub-title">긴급 관리 필요 ${totals.total}건 <span style="font-size:12px;font-weight:700;background:rgba(127,29,29,.12);color:#7f1d1d;padding:2px 9px;border-radius:6px;margin-left:6px">${scopeLbl}</span></div>
         <div class="ub-sub">배정 후 2주 이내 · 이관 임박 · 매일 자동 업데이트 (오늘 ${todayStr})</div>
       </div>
       <div class="ub-actions">
@@ -2931,14 +2938,14 @@ function renderUrgentBanner(){
       ${totals.wait>0?`<div class="ub-stat ub-stat-orange" onclick="openUrgentByType('wait')" title="일정대기 누적 회원 목록"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>`:''}
       ${totals.soon>0?`<div class="ub-stat ub-stat-blue" onclick="openUrgentByType('soon')" title="방문 임박 회원 목록"><b>${totals.soon}</b><span>📅 방문 임박</span></div>`:''}
     </div>
-    <div class="ub-agents">
+    ${curAgent==='ALL' && topAgents.length ? `<div class="ub-agents">
       <div class="ub-agents-lbl">긴급 건수 TOP 에이전트:</div>
       ${topAgents.map(([a,n])=>{
         const meta = D.agent_meta[a]||{};
         const tcol = TC[meta.team]||'#888';
         return `<span class="ub-ag-chip" style="border-color:${tcol}" onclick="openMem('${a}','db')"><b>${n}</b> ${meta.short||a}</span>`;
       }).join('')}
-    </div>
+    </div>` : ''}
   </div>`;
 }
 
@@ -2952,7 +2959,10 @@ function openUrgentByType(kind){
   };
   const info = typeMap[kind] || typeMap.overdue;
   const todayStr = D.today;
-  const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
+  let agents;
+  if(curAgent !== 'ALL') agents = [curAgent];
+  else if(curTeam !== 'ALL') agents = D.team_members[curTeam] || [];
+  else agents = Object.keys(D.agent_total||{});
   const recs = [];
   agents.forEach(a=>{
     const urgent = findUrgentForAgent(a, todayStr);
@@ -3166,8 +3176,13 @@ function openUrgentReport(lang){
   lang = lang || 'ko';
   const t = _reportT(lang);
   const todayStr = D.today;
-  const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
-  const teamLabel = curTeam==='ALL' ? t.all_teams : teamShortName(curTeam);
+  let agents;
+  if(curAgent !== 'ALL') agents = [curAgent];
+  else if(curTeam !== 'ALL') agents = D.team_members[curTeam] || [];
+  else agents = Object.keys(D.agent_total||{});
+  const teamLabel = curAgent !== 'ALL'
+    ? ((D.agent_meta[curAgent]||{}).short || curAgent)
+    : (curTeam==='ALL' ? t.all_teams : teamShortName(curTeam));
 
   // 에이전트별 긴급 목록 수집
   const agentUrgent = [];
@@ -3399,6 +3414,19 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 .ag-kpi-card.good .ag-kpi-diff{background:linear-gradient(135deg,#16a34a,#22c55e)}
 .ag-kpi-card.bad .ag-kpi-diff{background:linear-gradient(135deg,#dc2626,#ef4444)}
 /* 긴급 관리 */
+.urg-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.urg-sum-card{border:2px solid;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.urg-sum-card.overdue{border-color:#dc2626;background:linear-gradient(135deg,#fee2e2,#fef2f2)}
+.urg-sum-card.idle{border-color:#dc2626;background:linear-gradient(135deg,#fee2e2,#fef2f2)}
+.urg-sum-card.wait{border-color:#2563eb;background:linear-gradient(135deg,#dbeafe,#eff6ff)}
+.urg-sum-card.soon{border-color:#fbbf24;background:linear-gradient(135deg,#fef3c7,#fffbeb)}
+.urg-sum-card.empty{border-color:#cbd5e1;background:#f8fafc;opacity:.5}
+.urg-sum-num{font-size:24px;font-weight:900;line-height:1;letter-spacing:-.8px;min-width:36px;text-align:center}
+.urg-sum-card.overdue .urg-sum-num,.urg-sum-card.idle .urg-sum-num{color:#7f1d1d}
+.urg-sum-card.wait .urg-sum-num{color:#1e3a8a}
+.urg-sum-card.soon .urg-sum-num{color:#854d0e}
+.urg-sum-card.empty .urg-sum-num{color:#94a3b8}
+.urg-sum-lbl{font-size:11.5px;font-weight:900;color:#0f172a;letter-spacing:-.2px;line-height:1.2}
 .urg-tbl{width:100%;border-collapse:collapse;font-size:11px;border:1.5px solid #fca5a5;border-radius:8px;overflow:hidden}
 .urg-tbl th{background:#fef2f2;padding:7px 9px;text-align:left;font-size:10.5px;font-weight:800;color:#7f1d1d;border-bottom:1.5px solid #fca5a5;white-space:nowrap}
 .urg-tbl td{padding:7px 9px;border-bottom:1px solid #fee2e2;vertical-align:top;font-weight:600}
@@ -3453,7 +3481,7 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 @media print{
   .rpt-print-btn{display:none}
   body{padding:0;background:#fff;font-size:10.5px}
-  .ag-rpt,.ag-rpt-hd,.ag-rpt-range,.ag-funnel,.f-rate,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip,.ag-kpi-card.good,.ag-kpi-card.bad,.ag-kpi-card.final,.ag-kpi-diff,.ag-kpi-card.final::before,.ag-sf-stage.up,.ag-sf-stage.wait,.ag-sf-stage.urgent,.ag-db-card.total,.ag-db-card.active,.ag-db-card.idle,.ag-db-card.cancel,.cal-dow-cell,.cal-day-cell.today,.cal-event.scheduled,.cal-event.completed,.cal-event.video,.cal-event.langsung,.cal-event.waiting{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ag-rpt,.ag-rpt-hd,.ag-rpt-range,.ag-funnel,.f-rate,.urg-tbl tr.sev-3,.urg-tbl tr.sev-2,.urg-tbl tr.sev-1,.dday,.ins-col.good,.ins-col.bad,.ins-col.tip,.ag-kpi-card.good,.ag-kpi-card.bad,.ag-kpi-card.final,.ag-kpi-diff,.ag-kpi-card.final::before,.ag-sf-stage.up,.ag-sf-stage.wait,.ag-sf-stage.urgent,.ag-db-card.total,.ag-db-card.active,.ag-db-card.idle,.ag-db-card.cancel,.cal-section-h.up,.cal-section-h.done,.cal-dow-cell,.cal-day-cell.today,.cal-event.scheduled,.cal-event.completed,.cal-event.video,.cal-event.langsung,.cal-event.waiting,.urg-sum-card.overdue,.urg-sum-card.idle,.urg-sum-card.wait,.urg-sum-card.soon{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 `;
 }
@@ -3658,6 +3686,24 @@ function _buildAgentReportSection(agent, rank, lang){
     <div class="ag-rpt-section">
       <div class="ag-rpt-h">${esc(t.urgent_title)} ${urgent.length>0?`<span style="background:#dc2626;color:#fff;font-size:11px;padding:2px 9px;border-radius:5px;margin-left:6px">${urgent.length}${esc(t.count_unit)}</span>`:''}</div>
       ${urgent.length === 0 ? `<div class="urg-empty">${esc(t.urgent_empty_inline)}</div>` : `
+      <div class="urg-summary">
+        <div class="urg-sum-card ${urgent.filter(u=>u.urgentIcon==='⚠️').length>0?'overdue':'empty'}">
+          <div class="urg-sum-num">${urgent.filter(u=>u.urgentIcon==='⚠️').length}</div>
+          <div class="urg-sum-lbl">⚠️ ${esc(t.type_overdue)}</div>
+        </div>
+        <div class="urg-sum-card ${urgent.filter(u=>u.urgentIcon==='🚨').length>0?'idle':'empty'}">
+          <div class="urg-sum-num">${urgent.filter(u=>u.urgentIcon==='🚨').length}</div>
+          <div class="urg-sum-lbl">🚨 ${esc(t.type_idle)}</div>
+        </div>
+        <div class="urg-sum-card ${urgent.filter(u=>u.urgentIcon==='⏳').length>0?'wait':'empty'}">
+          <div class="urg-sum-num">${urgent.filter(u=>u.urgentIcon==='⏳').length}</div>
+          <div class="urg-sum-lbl">⏳ ${esc(t.type_wait)}</div>
+        </div>
+        <div class="urg-sum-card ${urgent.filter(u=>u.urgentIcon==='📅').length>0?'soon':'empty'}">
+          <div class="urg-sum-num">${urgent.filter(u=>u.urgentIcon==='📅').length}</div>
+          <div class="urg-sum-lbl">📅 ${esc(t.type_soon)}</div>
+        </div>
+      </div>
       <table class="urg-tbl">
         <thead><tr>
           <th style="width:55px">${esc(t.col_dday)}</th>
