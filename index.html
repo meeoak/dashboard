@@ -1452,10 +1452,10 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 
 <!-- 스코프 탭 (2행): 팀별 -->
 <div class="team-bar"><div class="scope-in" id="team-bar">
-  <button class="scope-home-btn" onclick="goAllDashboard()" title="전체 대시보드로 돌아가기">🏠 전체 대시보드</button>
-  <button class="scope-btn team-dash-btn" data-scope="TIM_GIAR"  onclick="selectScope('TIM_GIAR')"><span class="scope-dot" style="background:#1a73e8"></span>GIAR 대시보드</button>
-  <button class="scope-btn team-dash-btn" data-scope="TIM_TINA"  onclick="selectScope('TIM_TINA')"><span class="scope-dot" style="background:#16a34a"></span>TINA 대시보드</button>
-  <button class="scope-btn team-dash-btn" data-scope="TIM_LIDIA" onclick="selectScope('TIM_LIDIA')"><span class="scope-dot" style="background:#ea4335"></span>LIDIA 대시보드</button>
+  <button class="scope-home-btn" onclick="goAllDashboard()" title="전체 대시보드로 돌아가기" data-t-title="nav_home_title" data-t="nav_home">🏠 전체 대시보드</button>
+  <button class="scope-btn team-dash-btn" data-scope="TIM_GIAR"  onclick="selectScope('TIM_GIAR')"><span class="scope-dot" style="background:#1a73e8"></span><span data-t="nav_giar">GIAR 대시보드</span></button>
+  <button class="scope-btn team-dash-btn" data-scope="TIM_TINA"  onclick="selectScope('TIM_TINA')"><span class="scope-dot" style="background:#16a34a"></span><span data-t="nav_tina">TINA 대시보드</span></button>
+  <button class="scope-btn team-dash-btn" data-scope="TIM_LIDIA" onclick="selectScope('TIM_LIDIA')"><span class="scope-dot" style="background:#ea4335"></span><span data-t="nav_lidia">LIDIA 대시보드</span></button>
   <select class="fsel team-bar-agent" id="fsel-agent" onchange="onFilter()"></select>
 </div></div>
 
@@ -1487,12 +1487,12 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 
 <!-- 빠른 이동 탭 (필터 바 아래로 이동) — 클릭 시 그 화면만 보임 -->
 <div class="quick-nav-bar"><div class="quick-nav-in">
-  <span class="quick-nav-lbl">📂 빠른 이동:</span>
-  <button class="quick-nav-btn" onclick="jumpToTab('cal')" data-qnav="cal">방문 캘린더</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats">에이전트 현황</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank">에이전트 활동지수</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('team_insight')" data-qnav="team_insight">긴급관리</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight">에이전트별 토탈관리</button>
+  <span class="quick-nav-lbl" data-t="quick_nav">📂 빠른 이동:</span>
+  <button class="quick-nav-btn" onclick="jumpToTab('cal')" data-qnav="cal" data-t="tab_cal">방문 캘린더</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats" data-t="tab_stats">에이전트 현황</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank" data-t="tab_rank">에이전트 활동지수</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('team_insight')" data-qnav="team_insight" data-t="tab_insight">긴급관리</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight" data-t="tab_agent_insight">에이전트별 토탈관리</button>
 </div></div>
 
 <!-- 3개월 트렌드는 KPI 카드 안에 sparkbars로 통합됨 (별도 섹션 제거) -->
@@ -1574,17 +1574,17 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <button class="tab on"  id="tab-cal"     onclick="switchTab('cal')"     data-t="tab_cal">방문 캘린더</button>
   <button class="tab"     id="tab-stats"   onclick="switchTab('stats')"   data-t="tab_stats">에이전트 현황</button>
   <button class="tab"     id="tab-rank"    onclick="switchTab('rank')"    data-t="tab_rank">에이전트 활동지수</button>
-  <button class="tab"     id="tab-team_insight"  onclick="switchTab('team_insight')">긴급관리</button>
-  <button class="tab"     id="tab-agent_insight" onclick="switchTab('agent_insight')">에이전트별 토탈관리</button>
+  <button class="tab"     id="tab-team_insight"  onclick="switchTab('team_insight')" data-t="tab_insight">긴급관리</button>
+  <button class="tab"     id="tab-agent_insight" onclick="switchTab('agent_insight')" data-t="tab_agent_insight">에이전트별 토탈관리</button>
 </div></div>
 
 <div class="tab-content">
   <!-- 모든 탭에서 공유되는 빠른 컨트롤바: 월이동 / 팀 / 에이전트 -->
   <div class="cal-controls">
     <div class="cal-month-nav">
-      <button class="cal-nav-btn" onclick="calPrevMonth()" title="이전 월">◀</button>
+      <button class="cal-nav-btn" onclick="calPrevMonth()" title="이전 월" data-t-title="prev_month">◀</button>
       <span class="cal-month-label" id="cal-month-label">5월</span>
-      <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월">▶</button>
+      <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월" data-t-title="next_month">▶</button>
     </div>
     <div class="cal-team-tabs" id="cal-team-tabs"></div>
     <div class="cal-agent-tabs" id="cal-agent-tabs"></div>
@@ -1656,15 +1656,15 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     <div id="ai-report-header" style="display:none"></div>
     <!-- 섹션 1: 📊 DB 배정 분석 (선택 에이전트) -->
     <div class="sec-hd" id="ai-sec-db" style="background:linear-gradient(180deg,#eff6ff 0%,#fff 100%)">
-      <div><div class="sec-title">📊 DB 배정 분석</div>
-      <div class="sec-sub">선택한 에이전트의 DB 종류 · 활동 상태 분포</div></div>
+      <div><div class="sec-title">📊 <span data-t="sec_db">DB 배정 분석</span></div>
+      <div class="sec-sub" data-t="sec_db_agent_sub">선택한 에이전트의 DB 종류 · 활동 상태 분포</div></div>
     </div>
     <div class="db-grid" id="ai-db-grid"></div>
 
     <!-- 섹션 2: 🏆 활동지수 -->
     <div class="sec-hd" id="ai-sec-rank" style="background:linear-gradient(180deg,#fefce8 0%,#fff 100%);margin-top:14px">
-      <div><div class="sec-title">🏆 활동지수</div>
-      <div class="sec-sub">한달 KPI 목표 100점 · 📍 오늘 기준 페이스</div></div>
+      <div><div class="sec-title" data-t="sec_activity">🏆 활동지수</div>
+      <div class="sec-sub" data-t="sec_activity_sub">한달 KPI 목표 100점 · 📍 오늘 기준 페이스</div></div>
       <div id="ai-rank-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="battle-wrap" id="ai-battle-wrap"></div>
@@ -1672,8 +1672,8 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 
     <!-- 섹션 3: 👤 에이전트별 상세 분석 (펀널 + 미션) -->
     <div class="sec-hd" id="ai-sec-detail" style="background:linear-gradient(180deg,#fef3c7 0%,#fff 100%);margin-top:14px">
-      <div><div class="sec-title">📊 펀널 분석 + 🎯 목표</div>
-      <div class="sec-sub">미션 카드 + 펀널 + 보조지표</div></div>
+      <div><div class="sec-title" data-t="sec_funnel">📊 펀널 분석 + 🎯 목표</div>
+      <div class="sec-sub" data-t="sec_funnel_sub">미션 카드 + 펀널 + 보조지표</div></div>
       <div id="ai-sec-detail-actions" style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap">
         <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
         <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('ko')" title="전체 에이전트 한국어 일괄 PDF" style="padding:8px 14px;font-size:12px">📄 전체 · KR</button>
@@ -1684,23 +1684,23 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 
     <!-- 섹션 4: 📊 에이전트 현황 -->
     <div class="sec-hd" style="background:linear-gradient(180deg,#f5f3ff 0%,#fff 100%);margin-top:14px">
-      <div><div class="sec-title">📊 에이전트 현황</div>
-      <div class="sec-sub">숫자 클릭 → 회원 목록 · 배정일 기준</div></div>
+      <div><div class="sec-title" data-t="sec_agent_status">📊 에이전트 현황</div>
+      <div class="sec-sub" data-t="sec_agent_status_sub">숫자 클릭 → 회원 목록 · 배정일 기준</div></div>
     </div>
     <div style="overflow-x:auto"><table class="month-tbl" id="ai-stats-tbl"></table></div>
 
     <!-- 섹션 5: 🚨 긴급 회원 관리 -->
     <div class="sec-hd" style="background:linear-gradient(180deg,#fef2f2 0%,#fff 100%);margin-top:14px">
-      <div><div class="sec-title">🚨 긴급 회원 관리</div>
-      <div class="sec-sub">배정 후 2주 이내 · 즉시 액션 필요</div></div>
+      <div><div class="sec-title" data-t="sec_urgent">🚨 긴급 회원 관리</div>
+      <div class="sec-sub" data-t="sec_urgent_sub">배정 후 2주 이내 · 즉시 액션 필요</div></div>
     </div>
     <div id="ai-urgent-banner"></div>
     <div class="r3d-grid" id="ai-urgent-grid"></div>
 
     <!-- 섹션 6: 📅 방문 캘린더 (맨 아래) -->
     <div class="sec-hd" style="background:linear-gradient(180deg,#f0fdf4 0%,#fff 100%);margin-top:14px">
-      <div><div class="sec-title">📅 방문 캘린더</div>
-      <div class="sec-sub">기간 내 일별 방문 일정 (예약/완료/비디오/랑숭)</div></div>
+      <div><div class="sec-title" data-t="sec_calendar">📅 방문 캘린더</div>
+      <div class="sec-sub" data-t="sec_calendar_sub">기간 내 일별 방문 일정 (예약/완료/비디오/랑숭)</div></div>
     </div>
     <div class="cal-wrap" id="ai-cal-wrap"></div>
   </div>
@@ -1886,6 +1886,25 @@ const LANG = {
     dow_mon:'Mon', dow_tue:'Tue', dow_wed:'Wed', dow_thu:'Thu', dow_fri:'Fri', dow_sat:'Sat', dow_sun:'Sun',
     // Other
     final_kpi:'⭐ 최종', main_kpi_label:'최종 KPI',
+    // 추가 — Bahasa 전환 시 누락 항목
+    tab_agent_insight:'에이전트별 토탈관리',
+    quick_nav:'📂 빠른 이동:',
+    all_agents_btn:'👥 전체 에이전트',
+    sec_db_agent_sub:'선택한 에이전트의 DB 종류 · 활동 상태 분포',
+    sec_activity:'🏆 활동지수', sec_activity_sub:'한달 KPI 목표 100점 · 📍 오늘 기준 페이스',
+    sec_funnel:'📊 펀널 분석 + 🎯 목표', sec_funnel_sub:'미션 카드 + 펀널 + 보조지표',
+    sec_agent_status:'📊 에이전트 현황', sec_agent_status_sub:'숫자 클릭 → 회원 목록 · 배정일 기준',
+    sec_urgent:'🚨 긴급 회원 관리', sec_urgent_sub:'배정 후 2주 이내 · 즉시 액션 필요',
+    sec_calendar:'📅 방문 캘린더', sec_calendar_sub:'기간 내 일별 방문 일정 (예약/완료/비디오/랑숭)',
+    report_title_suffix:'의 회원관리 보고서',
+    report_btn_kr:'📄 KR 보고서', report_btn_id:'📄 ID 보고서', report_btn_print:'🖨️ 인쇄',
+    report_btn_kr_title:'한국어 인쇄/PDF', report_btn_id_title:'Bahasa 인쇄/PDF',
+    report_btn_print_title:'현재 언어 그대로 인쇄',
+    report_activity_lbl:'🏆 활동지수', report_db_unit:'건',
+    mgmt_active:'진행됨', mgmt_no_memo:'상담기록없음', mgmt_no_resp:'응답없음', mgmt_cancel:'부적합',
+    prev_month:'이전 월', next_month:'다음 월',
+    nav_home:'🏠 전체 대시보드', nav_giar:'GIAR 대시보드', nav_tina:'TINA 대시보드', nav_lidia:'LIDIA 대시보드',
+    nav_home_title:'전체 대시보드로 돌아가기',
   },
   id: {
     title:'Dashboard Penjualan Terpadu', subtitle:'Status Penjualan Kunjungan Real-time',
@@ -1964,6 +1983,25 @@ const LANG = {
     dow_mon:'Mon', dow_tue:'Tue', dow_wed:'Wed', dow_thu:'Thu', dow_fri:'Fri', dow_sat:'Sat', dow_sun:'Sun',
     // Other
     final_kpi:'⭐ Akhir', main_kpi_label:'KPI Akhir',
+    // Tambahan — item yang tertinggal saat ganti bahasa
+    tab_agent_insight:'Manajemen Total per Agen',
+    quick_nav:'📂 Navigasi Cepat:',
+    all_agents_btn:'👥 Semua Agen',
+    sec_db_agent_sub:'Distribusi Jenis DB & Status Aktivitas Agen Terpilih',
+    sec_activity:'🏆 Indeks Aktivitas', sec_activity_sub:'Target KPI Bulanan 100 poin · 📍 Pace per Hari Ini',
+    sec_funnel:'📊 Analisis Funnel + 🎯 Target', sec_funnel_sub:'Kartu Misi + Funnel + Indikator Pendukung',
+    sec_agent_status:'📊 Status Agen', sec_agent_status_sub:'Klik angka → Daftar Member · Berdasarkan Tgl Alokasi',
+    sec_urgent:'🚨 Manajemen Member Mendesak', sec_urgent_sub:'Dalam 2 minggu setelah alokasi · Perlu aksi segera',
+    sec_calendar:'📅 Kalender Kunjungan', sec_calendar_sub:'Jadwal kunjungan harian dalam periode (Jadwal/Selesai/Video/Langsung)',
+    report_title_suffix:' - Laporan Manajemen Member',
+    report_btn_kr:'📄 Laporan KR', report_btn_id:'📄 Laporan ID', report_btn_print:'🖨️ Cetak',
+    report_btn_kr_title:'Cetak/PDF Bahasa Korea', report_btn_id_title:'Cetak/PDF Bahasa Indonesia',
+    report_btn_print_title:'Cetak dengan bahasa saat ini',
+    report_activity_lbl:'🏆 Indeks Aktivitas', report_db_unit:'',
+    mgmt_active:'Diproses', mgmt_no_memo:'Tanpa Catatan', mgmt_no_resp:'Tidak Respons', mgmt_cancel:'Tidak Sesuai',
+    prev_month:'Bulan Sebelumnya', next_month:'Bulan Berikutnya',
+    nav_home:'🏠 Dashboard Utama', nav_giar:'Dashboard GIAR', nav_tina:'Dashboard TINA', nav_lidia:'Dashboard LIDIA',
+    nav_home_title:'Kembali ke Dashboard Utama',
   }
 };
 
@@ -1993,6 +2031,10 @@ function refreshLang(){
   // data-t 속성 가진 요소 자동 번역
   document.querySelectorAll('[data-t]').forEach(el=>{
     el.textContent = T(el.dataset.t);
+  });
+  // data-t-title: title 속성만 번역 (텍스트는 그대로 유지)
+  document.querySelectorAll('[data-t-title]').forEach(el=>{
+    el.setAttribute('title', T(el.dataset.tTitle));
   });
   // last_n_X 템플릿 처리 (최근 N일)
   document.querySelectorAll('[data-t-tpl]').forEach(el=>{
@@ -2281,7 +2323,7 @@ function buildCalAgentButtons(){
   const agents = isAll ? [] : (D.team_members[curTeam]||[]);
   const tcol = isAll ? '#1e293b' : (TC[curTeam] || '#888');
   // ── 상단(월 옆): 전체 에이전트 + 팀 단추 3개 ──
-  let teamHtml = `<button class="cal-at-btn ${curAgent==='ALL' && isAll ?'on':''}" data-agent="ALL" onclick="setCalTeamQuick('ALL')">👥 전체 에이전트</button>`;
+  let teamHtml = `<button class="cal-at-btn ${curAgent==='ALL' && isAll ?'on':''}" data-agent="ALL" onclick="setCalTeamQuick('ALL')">${T('all_agents_btn')}</button>`;
   ['TIM_GIAR','TIM_TINA','TIM_LIDIA'].forEach(t=>{
     const isOn = curTeam === t;
     const c = TC[t];
@@ -2760,27 +2802,27 @@ function renderDBSummary(){
         ${cancelled>0?`<div class="ms-seg ms-cancel" style="width:${pct(cancelled)}%" onclick="openMemStatus('cancel')" title="부적합 ${cancelled}건">${pct(cancelled)>=8?'⛔ '+pct(cancelled)+'%':pct(cancelled)+'%'}</div>`:''}
       </div>
       <div class="mgmt-detail">
-        <div class="mgmt-detail-row mgmt-row-active" onclick="openMemStatus('active')" title="진행됨 — 예약/방문/클로 진행">
+        <div class="mgmt-detail-row mgmt-row-active" onclick="openMemStatus('active')" title="${T('mgmt_active')}">
           <span class="mgmt-detail-icon">✅</span>
-          <span class="mgmt-detail-name">진행됨</span>
+          <span class="mgmt-detail-name">${T('mgmt_active')}</span>
           <b>${f(active)}</b>
           <span class="mgmt-detail-pct">${pct(active)}%</span>
         </div>
-        <div class="mgmt-detail-row mgmt-row-noMemo" onclick="openMemStatus('idle_noMemo')" title="상담기록 없음 — 즉시 관리 필요">
+        <div class="mgmt-detail-row mgmt-row-noMemo" onclick="openMemStatus('idle_noMemo')" title="${T('mgmt_no_memo')}">
           <span class="mgmt-detail-icon">📝</span>
-          <span class="mgmt-detail-name">상담기록없음</span>
+          <span class="mgmt-detail-name">${T('mgmt_no_memo')}</span>
           <b>${f(idleNoMemo)}</b>
           <span class="mgmt-detail-pct">${pct(idleNoMemo)}%</span>
         </div>
-        <div class="mgmt-detail-row mgmt-row-noResp" onclick="openMemStatus('idle_noResp')" title="상담기록 있지만 옵션 미선택 — 응답없음">
+        <div class="mgmt-detail-row mgmt-row-noResp" onclick="openMemStatus('idle_noResp')" title="${T('mgmt_no_resp')}">
           <span class="mgmt-detail-icon">🚨</span>
-          <span class="mgmt-detail-name">응답없음</span>
+          <span class="mgmt-detail-name">${T('mgmt_no_resp')}</span>
           <b>${f(idleNoResp)}</b>
           <span class="mgmt-detail-pct">${pct(idleNoResp)}%</span>
         </div>
-        <div class="mgmt-detail-row mgmt-row-cancel" onclick="openMemStatus('cancel')" title="부적합 DB">
+        <div class="mgmt-detail-row mgmt-row-cancel" onclick="openMemStatus('cancel')" title="${T('mgmt_cancel')}">
           <span class="mgmt-detail-icon">⛔</span>
-          <span class="mgmt-detail-name">부적합</span>
+          <span class="mgmt-detail-name">${T('mgmt_cancel')}</span>
           <b>${f(cancelled)}</b>
           <span class="mgmt-detail-pct">${pct(cancelled)}%</span>
         </div>
@@ -5604,18 +5646,18 @@ function renderAgentInsightOnly(){
       reportHd.style.display = '';
       reportHd.innerHTML = `<div class="ai-rpt-hd">
         <div class="ai-rpt-title-row">
-          <h1 class="ai-rpt-title">📑 <span class="ai-rpt-name">${safeName}</span>의 회원관리 보고서</h1>
+          <h1 class="ai-rpt-title">📑 <span class="ai-rpt-name">${safeName}</span>${T('report_title_suffix')}</h1>
           <div class="ai-rpt-actions">
-            <button class="ai-rpt-btn" onclick="printAgentReport('ko')" title="한국어 인쇄/PDF">📄 KR 보고서</button>
-            <button class="ai-rpt-btn" onclick="printAgentReport('id')" title="Bahasa Print/PDF">📄 ID 보고서</button>
-            <button class="ai-rpt-btn ai-rpt-btn-print" onclick="printAgentReport()" title="현재 언어 그대로 인쇄">🖨️ 인쇄</button>
+            <button class="ai-rpt-btn" onclick="printAgentReport('ko')" title="${T('report_btn_kr_title')}">${T('report_btn_kr')}</button>
+            <button class="ai-rpt-btn" onclick="printAgentReport('id')" title="${T('report_btn_id_title')}">${T('report_btn_id')}</button>
+            <button class="ai-rpt-btn ai-rpt-btn-print" onclick="printAgentReport()" title="${T('report_btn_print_title')}">${T('report_btn_print')}</button>
           </div>
         </div>
         <div class="ai-rpt-meta">
           <span class="ai-rpt-team" style="background:${tcol}">${teamLbl}</span>
           <span class="ai-rpt-period">📅 ${curFrom} ~ ${curTo}</span>
-          <span class="ai-rpt-db">📋 DB ${dbCount}건</span>
-          <span class="ai-rpt-idx">🏆 활동지수 ${idx}/100</span>
+          <span class="ai-rpt-db">📋 DB ${dbCount}${T('report_db_unit')}</span>
+          <span class="ai-rpt-idx">${T('report_activity_lbl')} ${idx}/100</span>
         </div>
       </div>`;
     }
