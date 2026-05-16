@@ -681,29 +681,45 @@ body.focus-mode #detail-section-hd{display:none!important}
 /* ─ 인사이트 ─ */
 .insight-grid{padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .ins-team-grid{padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
-/* 📊 최근 3일 업데이트 — 팀별 카드 */
-.r3d-grid{padding:14px 20px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;background:#fafbfc;border-bottom:6px solid #f5f5f5}
-.r3d-team-card{background:#fff;border:1.5px solid #cbd5e1;border-left:5px solid;border-radius:11px;padding:14px 16px;box-shadow:0 2px 6px rgba(0,0,0,.05);transition:transform .12s,box-shadow .12s}
-.r3d-team-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.1)}
-.r3d-team-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;flex-wrap:wrap;gap:6px}
-.r3d-team-name{font-size:17px;font-weight:900;letter-spacing:-.5px;line-height:1}
-.r3d-team-total{font-size:11.5px;font-weight:800;color:#475569;background:#f1f5f9;border:1px solid #cbd5e1;padding:3px 9px;border-radius:6px;letter-spacing:-.2px}
-.r3d-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.r3d-stat{display:flex;align-items:center;gap:9px;padding:8px 11px;background:linear-gradient(135deg,#fafbfc,#fff);border:1.5px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:all .12s}
-.r3d-stat:hover{border-color:#1e3a8a;background:linear-gradient(135deg,#eff6ff,#fff);transform:translateY(-1px);box-shadow:0 2px 6px rgba(30,58,138,.12)}
-.r3d-stat b{font-size:22px;font-weight:900;letter-spacing:-.8px;min-width:30px;text-align:center;line-height:1;color:#0f172a}
-.r3d-stat.assign b{color:#1e3a8a}
-.r3d-stat.visit b{color:#16a34a}
-.r3d-stat.vc b{color:#7c3aed}
-.r3d-stat.cl b{color:#dc2626}
-.r3d-stat span{font-size:11px;font-weight:800;color:#475569;letter-spacing:-.2px;line-height:1.2}
+/* 📊 최근 7일 업데이트 — 팀별 상세 테이블 */
+.r3d-grid{padding:14px 20px 18px;display:flex;flex-direction:column;gap:14px;background:#fafbfc;border-bottom:6px solid #f5f5f5}
+.r3d-team-card{background:#fff;border:1.5px solid #cbd5e1;border-left:5px solid;border-radius:11px;padding:0;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.r3d-team-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(180deg,#fafbfc,#fff);border-bottom:1px solid #e5e7eb;flex-wrap:wrap;gap:6px}
+.r3d-team-name{font-size:18px;font-weight:900;letter-spacing:-.5px;line-height:1}
+.r3d-team-total{font-size:11.5px;font-weight:800;color:#475569;background:#fff;border:1.5px solid #cbd5e1;padding:4px 10px;border-radius:7px;letter-spacing:-.2px}
+.r3d-detail-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.r3d-detail-tbl th{background:#f8fafc;padding:7px 10px;text-align:left;font-size:10.5px;font-weight:800;color:#475569;border-bottom:1.5px solid #cbd5e1;letter-spacing:-.2px;white-space:nowrap}
+.r3d-detail-tbl td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top;font-weight:600}
+.r3d-detail-tbl tr:last-child td{border-bottom:none}
+.r3d-detail-tbl tr:hover td{background:#fef9c3}
+.r3d-detail-tbl .r3d-d{font-weight:800;color:#1e293b;font-size:11.5px;white-space:nowrap;width:64px}
+.r3d-detail-tbl .r3d-m{font-size:12px}
+.r3d-detail-tbl .r3d-m b{font-weight:900;color:#0f172a}
+.r3d-detail-tbl .r3d-m small{display:block;color:#64748b;font-size:10.5px;font-weight:600;margin-top:1px}
+.r3d-detail-tbl .r3d-ag{font-size:11.5px;color:#475569;font-weight:700;font-style:italic;white-space:nowrap}
+.r3d-detail-tbl .r3d-st{font-size:11.5px;font-weight:800;white-space:nowrap}
+.r3d-detail-tbl .r3d-st .r3d-pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10.5px;font-weight:900;letter-spacing:-.2px}
+.r3d-detail-tbl .r3d-st .r3d-pill.s{background:#dbeafe;color:#1e3a8a}
+.r3d-detail-tbl .r3d-st .r3d-pill.d{background:#dcfce7;color:#14532d}
+.r3d-detail-tbl .r3d-st .r3d-pill.ls{background:#f1f5f9;color:#1e293b}
+.r3d-detail-tbl .r3d-st .r3d-pill.vc{background:#ede9fe;color:#4c1d95}
+.r3d-detail-tbl .r3d-st .r3d-pill.w{background:#fef3c7;color:#854d0e}
+.r3d-detail-tbl .r3d-st .r3d-pill.x{background:#fee2e2;color:#7f1d1d}
+.r3d-detail-tbl .r3d-st .r3d-pill.none{background:#f1f5f9;color:#64748b}
+.r3d-detail-tbl .r3d-st .r3d-pill.cl{background:linear-gradient(135deg,#dc2626,#fbbf24);color:#fff}
+.r3d-detail-tbl .r3d-memo{font-size:11px;color:#475569;font-weight:600;line-height:1.4;max-width:280px}
+.r3d-detail-tbl .r3d-memo.empty{color:#cbd5e1;font-style:italic}
+.r3d-more-btn{display:block;width:100%;background:#f8fafc;border:none;border-top:1px solid #e5e7eb;padding:9px;text-align:center;font-size:12px;font-weight:800;color:#1e3a8a;cursor:pointer;letter-spacing:-.2px;transition:background .12s}
+.r3d-more-btn:hover{background:#eff6ff}
+.r3d-empty-team{padding:18px;text-align:center;color:#94a3b8;font-style:italic;font-size:12px}
 .r3d-empty{padding:24px;text-align:center;color:#94a3b8;font-style:italic;font-size:12px;background:#fff;border:1.5px dashed #cbd5e1;border-radius:10px}
 @media(max-width:640px){
-  .r3d-grid{padding:10px 12px;gap:10px;grid-template-columns:1fr}
-  .r3d-team-card{padding:12px 14px}
-  .r3d-stats{grid-template-columns:1fr 1fr;gap:6px}
-  .r3d-stat{padding:6px 9px;gap:7px}
-  .r3d-stat b{font-size:18px}
+  .r3d-grid{padding:10px 12px;gap:10px}
+  .r3d-team-hd{padding:10px 12px}
+  .r3d-detail-tbl{font-size:11px}
+  .r3d-detail-tbl th,.r3d-detail-tbl td{padding:6px 8px}
+  .r3d-detail-tbl .r3d-memo{max-width:140px;font-size:10.5px}
+  .r3d-detail-tbl .r3d-ag{font-size:10.5px}
 }
 .ins-team-card{background:#fff;border:1px solid #e2e8f0;border-left:5px solid #888;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .ins-tc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -1240,10 +1256,10 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <div id="content-team_insight" style="display:none">
     <!-- 🚨 전체 긴급 관리 배너 (배정 후 2주 이내) -->
     <div id="urgent-banner"></div>
-    <!-- 📊 최근 3일 업데이트 (팀별) -->
+    <!-- 📊 최근 7일 업데이트 (팀별 상세) -->
     <div class="sec-hd">
-      <div><div class="sec-title">📊 팀별 최근 3일 업데이트</div>
-      <div class="sec-sub">신규 배정 · 방문 완료 · 비디오콜 · 클로징 (시트 동기화 기반)</div></div>
+      <div><div class="sec-title">📊 팀별 최근 7일 업데이트</div>
+      <div class="sec-sub">에이전트별 회원·상태·상담기록 (시트 동기화 기반)</div></div>
       <div id="r3d-range-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="r3d-grid" id="ins-recent-3d-grid"></div>
@@ -4156,97 +4172,110 @@ function analyzeAgent(s){
   return {strengths, weaknesses, advices};
 }
 
-// 팀 인사이트 탭 — 긴급 배너 + 최근 3일 업데이트 + 팀별 카드
+// 팀 인사이트 탭 — 긴급 배너 + 최근 7일 업데이트 + 팀별 카드
 function renderTeamInsightOnly(){
   renderUrgentBanner();
-  renderRecent3DaysByTeam();
+  renderRecent7DaysByTeam();
   renderTeamCardsOnly();
 }
 
-// 📊 최근 3일 업데이트 (팀별)
-function renderRecent3DaysByTeam(){
+// 📊 최근 7일 업데이트 (팀별 상세) — 에이전트별 회원·상태·상담기록
+function renderRecent7DaysByTeam(){
   const wrap = document.getElementById('ins-recent-3d-grid');
   const rangeLbl = document.getElementById('r3d-range-lbl');
   if(!wrap) return;
   const todayDate = new Date(D.today);
   const fromDate = new Date(todayDate);
-  fromDate.setDate(fromDate.getDate() - 2); // 오늘 포함 최근 3일
+  fromDate.setDate(fromDate.getDate() - 6); // 오늘 포함 최근 7일
   const fromStr = fromDate.toISOString().slice(0,10);
   if(rangeLbl) rangeLbl.textContent = fromStr + ' ~ ' + D.today;
+
+  const esc = (s)=>(s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const stPill = (r)=>{
+    if(r.cl === 1) return `<span class="r3d-pill cl">🏆 ${esc(r.cl_type||'클로징')}</span>`;
+    const map = {
+      s:{cls:'s',  txt:'📅 방문예약'},
+      d:{cls:'d',  txt:'✅ 방문완료'},
+      ls:{cls:'ls',txt:'⬜ 랑숭비짓'},
+      vc:{cls:'vc',txt:'📹 비디오콜'},
+      w:{cls:'w', txt:'⏳ 일정대기'},
+      x:{cls:'x', txt:'❌ 취소'},
+      none:{cls:'none', txt:'⚪ 미진행'},
+    };
+    const m = map[r.st] || {cls:'none', txt:r.st};
+    return `<span class="r3d-pill ${m.cls}">${m.txt}</span>`;
+  };
 
   const teams = curTeam==='ALL' ? ['TIM_GIAR','TIM_TINA','TIM_LIDIA'] : [curTeam];
   let html = '';
   teams.forEach(t=>{
-    const recs = (D.records||[]).filter(r=> r.t === t);
-    // 신규 배정: 배정일이 최근 3일 내
-    const newAssign = recs.filter(r=> r.ad >= fromStr).length;
-    // 방문 완료(d/ls): 방문일이 최근 3일 내
-    const newVisit = recs.filter(r=> r.vd && r.vd >= fromStr && (r.st==='d' || r.st==='ls')).length;
-    // 비디오콜(vc): 방문일(없으면 배정일) 최근 3일 내
-    const newVc = recs.filter(r=>{
-      if(r.st !== 'vc') return false;
-      const d = r.vd || r.ad;
-      return d && d >= fromStr;
-    }).length;
-    // 클로징: cl=1 + (방문일 또는 배정일이 최근 3일 내)
-    const newCl = recs.filter(r=> r.cl === 1 && ((r.vd && r.vd >= fromStr) || r.ad >= fromStr)).length;
-    const total = newAssign + newVisit + newVc + newCl;
+    // 최근 7일 내 활동: 배정일 OR 방문일이 fromStr 이후
+    const recs = (D.records||[]).filter(r=> r.t === t && ((r.ad && r.ad >= fromStr) || (r.vd && r.vd >= fromStr)));
+    // 최신순 정렬 (vd 또는 ad의 최대값 기준)
+    recs.sort((a,b)=>{
+      const dA = (a.vd && a.vd >= fromStr) ? a.vd : a.ad;
+      const dB = (b.vd && b.vd >= fromStr) ? b.vd : b.ad;
+      return (dB||'').localeCompare(dA||'');
+    });
+    const total = recs.length;
     const color = TC[t] || '#888';
     const name = teamShortName(t);
+
+    const initialShown = 15;
+    const visibleRecs = recs.slice(0, initialShown);
+    const rows = visibleRecs.map(r=>{
+      const updateDate = (r.vd && r.vd >= fromStr) ? r.vd : r.ad;
+      const dateShort = (updateDate||'').slice(5).replace('-','/');
+      const agentShort = (D.agent_meta[r.a]||{}).short || r.a;
+      const memo = (r.memo||'').trim();
+      const memoCell = memo
+        ? `<td class="r3d-memo" title="${esc(memo)}">${esc(memo.slice(0,60))}${memo.length>60?'…':''}</td>`
+        : `<td class="r3d-memo empty">메모 없음</td>`;
+      return `<tr>
+        <td class="r3d-d">${dateShort}</td>
+        <td class="r3d-m"><b>${esc(r.nm||'-')}</b>${r.pa?`<small>${esc(r.pa)}</small>`:''}</td>
+        <td class="r3d-ag">${esc(agentShort)}</td>
+        <td class="r3d-st">${stPill(r)}</td>
+        ${memoCell}
+      </tr>`;
+    }).join('');
+
     html += `
     <div class="r3d-team-card" style="border-left-color:${color}">
       <div class="r3d-team-hd">
         <span class="r3d-team-name" style="color:${color}">${name}</span>
-        <span class="r3d-team-total">합계 ${total}건</span>
+        <span class="r3d-team-total">총 ${total}건 업데이트</span>
       </div>
-      <div class="r3d-stats">
-        <div class="r3d-stat assign" onclick="openRecent3D('${t}','assign','${fromStr}')" title="최근 3일 신규 배정 회원">
-          <b>${newAssign}</b><span>📋 신규<br>배정</span>
-        </div>
-        <div class="r3d-stat visit" onclick="openRecent3D('${t}','visit','${fromStr}')" title="최근 3일 방문 완료 회원">
-          <b>${newVisit}</b><span>✅ 방문<br>완료</span>
-        </div>
-        <div class="r3d-stat vc" onclick="openRecent3D('${t}','vc','${fromStr}')" title="최근 3일 비디오콜">
-          <b>${newVc}</b><span>📹 비디오<br>콜</span>
-        </div>
-        <div class="r3d-stat cl" onclick="openRecent3D('${t}','cl','${fromStr}')" title="최근 3일 클로징">
-          <b>${newCl}</b><span>🏆 클로<br>징</span>
-        </div>
-      </div>
+      ${total === 0
+        ? '<div class="r3d-empty-team">최근 7일 업데이트 없음</div>'
+        : `<table class="r3d-detail-tbl">
+            <thead><tr><th>날짜</th><th>회원명 (후원자)</th><th>에이전트</th><th>상태/옵션</th><th>📝 상담기록</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          ${total > initialShown ? `<button class="r3d-more-btn" onclick="openRecent7DTeam('${t}','${fromStr}')">+${total-initialShown}건 더 보기 →</button>` : ''}`
+      }
     </div>`;
   });
   if(!html) html = '<div class="r3d-empty">팀이 선택되지 않았습니다</div>';
   wrap.innerHTML = html;
 }
 
-// 최근 3일 카드 클릭 → 회원 목록
-function openRecent3D(team, kind, fromStr){
-  let recs = (D.records||[]).filter(r=> r.t === team);
-  let label = '';
-  if(kind === 'assign'){
-    recs = recs.filter(r=> r.ad >= fromStr);
-    label = '📋 신규 배정';
-  } else if(kind === 'visit'){
-    recs = recs.filter(r=> r.vd && r.vd >= fromStr && (r.st==='d' || r.st==='ls'));
-    label = '✅ 방문 완료';
-  } else if(kind === 'vc'){
-    recs = recs.filter(r=>{
-      if(r.st !== 'vc') return false;
-      const d = r.vd || r.ad;
-      return d && d >= fromStr;
-    });
-    label = '📹 비디오콜';
-  } else if(kind === 'cl'){
-    recs = recs.filter(r=> r.cl === 1 && ((r.vd && r.vd >= fromStr) || r.ad >= fromStr));
-    label = '🏆 클로징';
-  }
+// 최근 7일 더 보기 — 팀 전체 회원 목록
+function openRecent7DTeam(team, fromStr){
+  const recs = (D.records||[]).filter(r=> r.t === team && ((r.ad && r.ad >= fromStr) || (r.vd && r.vd >= fromStr)));
+  // 최신순 정렬
+  recs.sort((a,b)=>{
+    const dA = (a.vd && a.vd >= fromStr) ? a.vd : a.ad;
+    const dB = (b.vd && b.vd >= fromStr) ? b.vd : b.ad;
+    return (dB||'').localeCompare(dA||'');
+  });
   memCache = recs;
   const tcol = TC[team] || '#888';
   const tName = teamShortName(team);
   document.getElementById('mem-header').innerHTML = `
     <div class="mem-av" style="background:${tcol}">${tName.charAt(0)}</div>
-    <div class="mem-info"><h2>${tName} — ${label}</h2><p>${fromStr} ~ ${D.today} (최근 3일)</p>
-      <span class="mem-pill" style="background:#dbeafe;color:#1e3a8a">${label} ${recs.length}건</span></div>
+    <div class="mem-info"><h2>${tName} — 최근 7일 업데이트</h2><p>${fromStr} ~ ${D.today}</p>
+      <span class="mem-pill" style="background:#dbeafe;color:#1e3a8a">최근 7일 ${recs.length}건</span></div>
     <div style="margin-left:auto;text-align:right">
       <div class="mem-count">${recs.length}</div>
       <div style="font-size:11px;color:#aaa">건</div></div>`;
