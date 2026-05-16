@@ -818,17 +818,16 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-agent-stat.urg{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
 .r3d-agent-stat.zero{background:#fafafa;color:#94a3b8;border-color:#f1f5f9}
 /* 요약 칩 행 */
-.r3d-urg-summary{padding:11px 14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:linear-gradient(180deg,#fef2f2,#fff5f5);border-top:2px solid #fecaca;border-bottom:2px solid #fecaca;position:relative}
-.r3d-urg-summary::before{content:'🚨 긴급관리';display:inline-flex;align-items:center;background:#dc2626;color:#fff;font-size:11.5px;font-weight:900;padding:4px 10px;border-radius:7px;letter-spacing:-.3px;box-shadow:0 1px 3px rgba(220,38,38,.3);margin-right:4px}
-.r3d-urg-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:9px;font-weight:900;border:2px solid;letter-spacing:-.2px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.r3d-urg-chip b{font-size:18px;font-weight:900;line-height:1}
-.r3d-urg-chip span{font-size:11px;font-weight:800;letter-spacing:-.2px;line-height:1.1}
-.r3d-urg-chip.zero{opacity:.32;border-style:dashed;box-shadow:none}
-.r3d-urg-chip.c-noMemo{color:#92400e;border-color:#d97706}
-.r3d-urg-chip.c-overdue{color:#7f1d1d;border-color:#dc2626}
-.r3d-urg-chip.c-idle{color:#7f1d1d;border-color:#dc2626}
-.r3d-urg-chip.c-wait{color:#1e3a8a;border-color:#2563eb}
-.r3d-urg-chip.c-soon{color:#1e3a8a;border-color:#2563eb}
+.r3d-urg-summary{padding:9px 14px;display:flex;align-items:center;flex-wrap:wrap;gap:7px;background:#fafbfc;border-top:1px solid #e5e7eb;border-bottom:1px dashed #e5e7eb}
+.r3d-urg-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-weight:900;border:1.5px solid;letter-spacing:-.2px;background:#fff;cursor:pointer;transition:transform .1s,box-shadow .1s}
+.r3d-urg-chip:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.1)}
+.r3d-urg-chip b{font-size:16px;font-weight:900;line-height:1}
+.r3d-urg-chip span{font-size:10.5px;font-weight:800;letter-spacing:-.2px;line-height:1.1}
+.r3d-urg-chip.c-noMemo{color:#92400e;border-color:#fbbf24;background:#fffbeb}
+.r3d-urg-chip.c-overdue{color:#7f1d1d;border-color:#f87171;background:#fef2f2}
+.r3d-urg-chip.c-idle{color:#7f1d1d;border-color:#f87171;background:#fef2f2}
+.r3d-urg-chip.c-wait{color:#1e3a8a;border-color:#60a5fa;background:#eff6ff}
+.r3d-urg-chip.c-soon{color:#1e3a8a;border-color:#60a5fa;background:#eff6ff}
 .r3d-urg-toggle{cursor:pointer;background:#fff;border:2px solid #cbd5e1;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:900;color:#475569;margin-left:auto;display:flex;align-items:center;gap:5px;transition:all .12s}
 .r3d-urg-toggle:hover{background:#1e3a8a;border-color:#1e3a8a;color:#fff}
 .r3d-urg-list-wrap{display:none}
@@ -875,9 +874,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-action-hint.warn{background:#d97706;color:#fff}
 @keyframes hintBlink{0%,100%{opacity:1}50%{opacity:.55}}
 /* 요약 칩 글씨 키움 */
-.r3d-urg-chip{padding:6px 12px}
-.r3d-urg-chip b{font-size:19px}
-.r3d-urg-chip span{font-size:11.5px}
+.r3d-urg-chip{padding:5px 11px}
+.r3d-urg-chip b{font-size:17px}
+.r3d-urg-chip span{font-size:11px}
 .r3d-urg-toggle{font-size:12.5px;padding:5px 14px}
 @media(max-width:640px){
   .r3d-grid{padding:10px 12px;gap:10px}
@@ -3537,7 +3536,7 @@ function renderUrgentBanner(){
 }
 
 // ===== 긴급 유형별 회원 목록 (배너 stat 카드 클릭) =====
-function openUrgentByType(kind){
+function openUrgentByType(kind, agentOverride){
   const typeMap = {
     overdue: {icon:'⚠️', label:'방문일 지남', bg:'#fee2e2', color:'#7f1d1d'},
     idle:    {icon:'🚨', label:'응답없음 (상담기록·옵션 있음)', bg:'#fee2e2', color:'#7f1d1d'},
@@ -3548,7 +3547,8 @@ function openUrgentByType(kind){
   const info = typeMap[kind] || typeMap.overdue;
   const todayStr = D.today;
   let agents;
-  if(curAgent !== 'ALL') agents = [curAgent];
+  if(agentOverride) agents = [agentOverride];
+  else if(curAgent !== 'ALL') agents = [curAgent];
   else if(curTeam !== 'ALL') agents = D.team_members[curTeam] || [];
   else agents = Object.keys(D.agent_total||{});
   const recs = [];
@@ -3568,11 +3568,16 @@ function openUrgentByType(kind){
     });
   });
   memCache = recs;
-  const teamLabel = curTeam==='ALL' ? '전체' : teamShortName(curTeam);
-  const tcol = curTeam==='ALL' ? '#dc2626' : (TC[curTeam]||'#dc2626');
+  const agentMeta = agentOverride ? (D.agent_meta[agentOverride]||{}) : null;
+  const scopeLabel = agentOverride
+    ? (agentMeta.short || agentOverride)
+    : (curTeam==='ALL' ? '전체' : teamShortName(curTeam));
+  const tcol = agentOverride
+    ? (TC[agentMeta.team]||'#dc2626')
+    : (curTeam==='ALL' ? '#dc2626' : (TC[curTeam]||'#dc2626'));
   document.getElementById('mem-header').innerHTML = `
     <div class="mem-av" style="background:${tcol}">🚨</div>
-    <div class="mem-info"><h2>${info.icon} ${info.label}</h2><p>${teamLabel} · 배정 후 2주 이내 · 오늘 기준 ${todayStr}</p>
+    <div class="mem-info"><h2>${info.icon} ${info.label}</h2><p>${scopeLabel} · 배정 후 2주 이내 · 오늘 기준 ${todayStr}</p>
       <span class="mem-pill" style="background:${info.bg};color:${info.color}">${info.label} ${recs.length}건</span></div>
     <div style="margin-left:auto;text-align:right">
       <div class="mem-count">${recs.length}</div>
@@ -4828,8 +4833,17 @@ function renderRecent7DaysByTeam(){
     const teamLbl = teamShortName(tm);
     const sev = sevClass(d.urgentTotal);
     const sevCardCls = (idx===0 && d.urgentTotal>=15) ? 'rank-top' : (sev==='sev-red' ? 'sev-red-card' : '');
-    const chip = (cls, icon, lbl, n)=>
-      `<span class="r3d-urg-chip ${cls} ${n===0?'zero':''}" title="${lbl}"><b>${n}</b><span>${icon} ${lbl}</span></span>`;
+    const chip = (cls, icon, lbl, n, kind)=>{
+      if(n === 0) return '';
+      return `<span class="r3d-urg-chip ${cls}" title="${lbl} — 클릭 → 회원 목록" onclick="event.stopPropagation();openUrgentByType('${kind}','${a}')"><b>${n}</b><span>${icon} ${lbl}</span></span>`;
+    };
+    const chips = [
+      chip('c-noMemo','📝','상담기록없음',d.cNoMemo,'noMemo'),
+      chip('c-overdue','⚠️','방문일 지남',d.cOverdue,'overdue'),
+      chip('c-idle','🚨','응답없음',d.cIdle,'idle'),
+      chip('c-wait','⏳','일정대기',d.cWait,'wait'),
+      chip('c-soon','📅','방문 임박',d.cSoon,'soon'),
+    ].filter(Boolean).join('');
     html += `
     <div class="r3d-agent-card ${sevCardCls}" style="border-left-color:${color}">
       <div class="r3d-agent-hd">
@@ -4843,11 +4857,7 @@ function renderRecent7DaysByTeam(){
         </div>
       </div>
       <div class="r3d-urg-summary">
-        ${chip('c-noMemo','📝','상담기록없음',d.cNoMemo)}
-        ${chip('c-overdue','⚠️','방문일 지남',d.cOverdue)}
-        ${chip('c-idle','🚨','응답없음',d.cIdle)}
-        ${chip('c-wait','⏳','일정대기 누적',d.cWait)}
-        ${chip('c-soon','📅','방문 임박',d.cSoon)}
+        ${chips}
         <button class="r3d-urg-toggle" onclick="toggleAgentUrgent(this)">▼ 펼치기</button>
       </div>
       <div class="r3d-urg-list-wrap">
