@@ -978,7 +978,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
       <div class="sec-sub">📊 펀널 + ✅ 강점 + ⚠️ 약점/병목 + 💡 팀리더 코칭 액션 (활동 있는 에이전트만)</div></div>
       <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
         <div id="insight-agent-lbl" style="font-size:11px;color:#bbb"></div>
-        <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport()" title="현재 팀의 활동 중인 모든 에이전트 보고서를 한 PDF로" style="padding:8px 14px;font-size:12px">📄 전체 일괄 PDF</button>
+        <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('ko')" title="전체 에이전트 한국어 일괄 PDF" style="padding:8px 14px;font-size:12px">📄 전체 · KR</button>
+        <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('id')" title="Semua agen Laporan Bahasa PDF" style="padding:8px 14px;font-size:12px">📄 전체 · ID</button>
       </div>
     </div>
     <div class="ins-agent-wrap" id="ins-agent-wrap"></div>
@@ -2858,7 +2859,8 @@ function renderUrgentBanner(){
         <div class="ub-sub">배정 후 2주 이내 · 이관 임박 · 매일 자동 업데이트 (오늘 ${todayStr})</div>
       </div>
       <div class="ub-actions">
-        <button class="ub-pdf-btn" onclick="openUrgentReport()" title="긴급 관리 회원 전체 목록을 PDF로 저장/인쇄">📄 PDF 보고서</button>
+        <button class="ub-pdf-btn" onclick="openUrgentReport('ko')" title="긴급 관리 회원 전체 목록을 한국어 PDF로 저장/인쇄">📄 PDF · KR</button>
+        <button class="ub-pdf-btn" onclick="openUrgentReport('id')" title="Daftar lengkap member manajemen mendesak ke PDF Bahasa">📄 PDF · ID</button>
       </div>
     </div>
     <div class="ub-stats">
@@ -2912,11 +2914,176 @@ function openUrgentByType(kind){
   window.scrollTo(0,0);
 }
 
+// ===== PDF 보고서 번역 사전 (한국어 / Bahasa Indonesia) =====
+function _reportT(lang){
+  if(lang === 'id'){
+    return {
+      save_pdf_btn: '📄 Simpan PDF · Cetak',
+      footer_generated: 'Dibuat pada',
+      footer_print_hint: 'Dalam dialog cetak, pilih "Tujuan → Simpan sebagai PDF" untuk menyimpan sebagai PDF',
+      all_teams: 'Semua Tim',
+      // Urgent banner
+      urgent_doc_title: 'Laporan Manajemen Mendesak Harian',
+      urgent_main_title: '🚨 Laporan Harian Manajemen Mendesak',
+      urgent_subtitle: (team, today, total)=>`${team} · per ${today} · ${total} member berisiko transfer (dalam 2 minggu setelah penugasan)`,
+      urgent_overdue: '⚠️ Lewat Tanggal Kunjungan',
+      urgent_idle: '🚨 Tidak Respons',
+      urgent_wait: '⏳ Akumulasi Menunggu',
+      urgent_soon: '📅 Kunjungan Segera',
+      urgent_empty_title: 'Tidak Ada Manajemen Mendesak',
+      urgent_empty_sub: 'Semua member dalam manajemen normal. Selamat bekerja!',
+      footer_priority: '· Prioritas: D-day terdekat + tingkat keparahan tinggi',
+      footer_dday: '· D-day: hari tersisa sebelum transfer (14 hari setelah penugasan)',
+      // Agent report
+      agent_doc_title: (name, today)=>`${name} Laporan Harian - ${today}`,
+      target_achieved_count: (n)=>`Target ${n}/4 tercapai`,
+      db_count: (n)=>`DB ${n}`,
+      grade_score: (g, s)=>`${g} · ${s} poin`,
+      agent_data_range: 'per',
+      agent_data_range_label: 'Rentang data',
+      funnel_title: '📊 Funnel Manajemen',
+      stage_db: '📋 DB',
+      stage_sched: '📅 Konsultasi',
+      stage_visit: '✅ Kunjungan',
+      stage_close: '🏆 Closing',
+      rate_ds: 'Rate Konsultasi',
+      rate_sv: 'Rate Kunjungan',
+      rate_vc: 'Rate Closing',
+      target_title: '🎯 Target vs Aktual',
+      kpi_ds_lbl: 'Rate Konsultasi',
+      kpi_sv_lbl: 'Rate Kunjungan',
+      kpi_vc_lbl: 'Rate Closing',
+      kpi_dc_lbl: 'DB→Closing',
+      kpi_target_label: (n)=>`Target ${n}%`,
+      kpi_achieved: 'Tercapai +',
+      kpi_missed: 'Belum −',
+      final_kpi_ribbon: '⭐ KPI Final',
+      cal_title: '📅 Kalender Jadwal',
+      cal_upcoming: '📅 Konsultasi Terjadwal',
+      cal_completed: '✅ Kunjungan Selesai',
+      cal_empty_up: 'Tidak ada konsultasi terjadwal',
+      cal_empty_done: 'Tidak ada kunjungan selesai',
+      cal_today: 'Hari ini',
+      cal_count_suffix: '',
+      cl_pill: '🏆 Closing',
+      day_names: ['Min','Sen','Sel','Rab','Kam','Jum','Sab'],
+      urgent_title: '🚨 Manajemen Mendesak Diperlukan',
+      urgent_empty_inline: '✅ Tidak ada manajemen mendesak (risiko transfer 0)',
+      col_dday: 'D-day',
+      col_member: 'Member (Sponsor)',
+      col_type: 'Tipe',
+      col_reason: 'Alasan',
+      col_ad: 'Penugasan',
+      col_phone: 'Kontak',
+      col_channel: 'Kanal',
+      type_overdue: 'Lewat tanggal',
+      type_idle: 'Tidak respons',
+      type_wait: 'Akumulasi menunggu',
+      type_soon: 'Kunjungan segera',
+      bulk_doc_title: (team)=>`${team} Laporan Harian Agen`,
+      bulk_cover_title: (team)=>`📊 ${team} Laporan Harian Agen`,
+      bulk_cover_sub: (today, count)=>`per ${today} · Materi Coaching Manager · ${count} agen aktif`,
+      bulk_stat_active: 'aktif',
+      bulk_stat_db: 'DB',
+      bulk_stat_cl: 'Closing',
+      bulk_footer_order: '· Urutan: dari skor tertinggi',
+      count_unit: '',
+    };
+  }
+  // Korean default
+  return {
+    save_pdf_btn: '📄 PDF로 저장 · 인쇄',
+    footer_generated: '생성 시각',
+    footer_print_hint: '인쇄 대화상자에서 "대상 → PDF로 저장"을 선택하면 PDF 파일로 저장됩니다',
+    all_teams: '전체 팀',
+    urgent_doc_title: '긴급 관리 일일 보고서',
+    urgent_main_title: '🚨 긴급 관리 일일 보고서',
+    urgent_subtitle: (team, today, total)=>`${team} · ${today} 기준 · 배정 후 2주 이내 이관 임박 회원 ${total}건`,
+    urgent_overdue: '⚠️ 방문일 지남',
+    urgent_idle: '🚨 미진행 응답없음',
+    urgent_wait: '⏳ 일정대기 누적',
+    urgent_soon: '📅 방문 임박',
+    urgent_empty_title: '긴급 관리 대상 없음',
+    urgent_empty_sub: '모든 회원이 정상 관리 중입니다. 좋은 하루 되세요!',
+    footer_priority: '· 우선순위: D-day 임박 + 심각도 높음 순으로 정렬',
+    footer_dday: '· D-day: 배정 후 14일이 되어 다른 에이전트로 이관되기까지 남은 일수',
+    agent_doc_title: (name, today)=>`${name} 일일 보고서 - ${today}`,
+    target_achieved_count: (n)=>`목표 ${n}/4 달성`,
+    db_count: (n)=>`DB ${n}건`,
+    grade_score: (g, s)=>`${g} · ${s}점`,
+    agent_data_range: '기준',
+    agent_data_range_label: '데이터 범위',
+    funnel_title: '📊 관리 펀널',
+    stage_db: '📋 DB',
+    stage_sched: '📅 예약',
+    stage_visit: '✅ 방문',
+    stage_close: '🏆 클로',
+    rate_ds: '예약율',
+    rate_sv: '방문율',
+    rate_vc: '클로율',
+    target_title: '🎯 목표 대비 실적',
+    kpi_ds_lbl: '예약율',
+    kpi_sv_lbl: '방문율',
+    kpi_vc_lbl: '클로율',
+    kpi_dc_lbl: 'DB→클로',
+    kpi_target_label: (n)=>`목표 ${n}%`,
+    kpi_achieved: '달성 +',
+    kpi_missed: '미달 −',
+    final_kpi_ribbon: '⭐ 최종 KPI',
+    cal_title: '📅 일정 캘린더',
+    cal_upcoming: '📅 방문예약',
+    cal_completed: '✅ 방문완료',
+    cal_empty_up: '예약된 방문 없음',
+    cal_empty_done: '완료된 방문 없음',
+    cal_today: '오늘',
+    cal_count_suffix: '건',
+    cl_pill: '🏆 클로',
+    day_names: ['일','월','화','수','목','금','토'],
+    urgent_title: '🚨 긴급 관리 필요',
+    urgent_empty_inline: '✅ 긴급 관리 대상 없음 (이관 위험 0건)',
+    col_dday: 'D-day',
+    col_member: '회원명 (후원자)',
+    col_type: '유형',
+    col_reason: '사유',
+    col_ad: '배정일',
+    col_phone: '연락처',
+    col_channel: '채널',
+    type_overdue: '방문일 지남',
+    type_idle: '미진행 응답없음',
+    type_wait: '일정대기 누적',
+    type_soon: '방문 임박',
+    bulk_doc_title: (team)=>`${team} 에이전트 일일 보고서`,
+    bulk_cover_title: (team)=>`📊 ${team} 에이전트 일일 보고서`,
+    bulk_cover_sub: (today, count)=>`${today} 기준 · 매니저 코칭 자료 · 활동 중인 ${count}명`,
+    bulk_stat_active: '명 활동',
+    bulk_stat_db: 'DB',
+    bulk_stat_cl: '클로',
+    bulk_footer_order: '· 보고서 순서: 점수 높은 에이전트부터',
+    count_unit: '건',
+  };
+}
+
+// urgent reason 을 lang 에 맞춰 재생성 (저장된 한국어 reason 에서 일수를 추출해 인니어로 변환)
+function _formatUrgentReason(u, lang){
+  if(lang !== 'id') return u.reason;
+  const m = u.reason.match(/(\d+)일|D-(\d+)/);
+  const days = m ? (m[1] || m[2]) : '?';
+  switch(u.urgentIcon){
+    case '⚠️': return `Lewat ${days} hari kunjungan - segera periksa`;
+    case '🚨': return `Tidak progres ${days} hari (tidak respons)`;
+    case '⏳': return `Akumulasi menunggu jadwal ${days} hari`;
+    case '📅': return `Kunjungan D-${days} - perlu pengingat`;
+    default:   return u.reason;
+  }
+}
+
 // ===== 긴급 관리 PDF 보고서 (인쇄용 새 창) =====
-function openUrgentReport(){
+function openUrgentReport(lang){
+  lang = lang || 'ko';
+  const t = _reportT(lang);
   const todayStr = D.today;
   const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
-  const teamLabel = curTeam==='ALL' ? '전체 팀' : curTeam.replace('TIM_','');
+  const teamLabel = curTeam==='ALL' ? t.all_teams : curTeam.replace('TIM_','');
 
   // 에이전트별 긴급 목록 수집
   const agentUrgent = [];
@@ -2937,16 +3104,16 @@ function openUrgentReport(){
   // 긴급 건수 많은 에이전트부터
   agentUrgent.sort((a,b)=>b.urgent.length - a.urgent.length);
 
-  const typeLabel = (icon)=>({
-    '⚠️':'방문일 지남','🚨':'미진행 응답없음','⏳':'일정대기 누적','📅':'방문 임박'
-  })[icon] || '';
+  const typeLabelMap = {'⚠️': t.type_overdue, '🚨': t.type_idle, '⏳': t.type_wait, '📅': t.type_soon};
   const esc = (s)=>(s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const langDocLocale = lang === 'id' ? 'id-ID' : 'ko-KR';
+  const urgentLabel = lang === 'id' ? 'Urgent' : '긴급';
 
   const reportHtml = `<!DOCTYPE html>
-<html lang="ko">
+<html lang="${lang}">
 <head>
 <meta charset="utf-8">
-<title>긴급 관리 일일 보고서 - ${todayStr}</title>
+<title>${esc(t.urgent_doc_title)} - ${todayStr}</title>
 <style>
 @page { size: A4; margin: 12mm 10mm; }
 *{box-sizing:border-box}
@@ -3000,22 +3167,22 @@ table.rpt-tbl{width:100%;border-collapse:collapse;font-size:11px}
 </style>
 </head>
 <body>
-<button class="rpt-print-btn" onclick="window.print()">📄 PDF로 저장 · 인쇄</button>
+<button class="rpt-print-btn" onclick="window.print()">${esc(t.save_pdf_btn)}</button>
 <div class="rpt-hd">
-  <div class="rpt-title">🚨 긴급 관리 일일 보고서</div>
-  <div class="rpt-sub">${esc(teamLabel)} · ${esc(todayStr)} 기준 · 배정 후 2주 이내 이관 임박 회원 ${totalUrgent}건</div>
+  <div class="rpt-title">${esc(t.urgent_main_title)}</div>
+  <div class="rpt-sub">${esc(t.urgent_subtitle(teamLabel, todayStr, totalUrgent))}</div>
 </div>
 ${totalUrgent === 0 ? `
 <div class="rpt-empty">
   <div class="rpt-empty-emo">✅</div>
-  <div class="rpt-empty-title">긴급 관리 대상 없음</div>
-  <div>모든 회원이 정상 관리 중입니다. 좋은 하루 되세요!</div>
+  <div class="rpt-empty-title">${esc(t.urgent_empty_title)}</div>
+  <div>${esc(t.urgent_empty_sub)}</div>
 </div>` : `
 <div class="rpt-summary">
-  <div class="rpt-stat red"><div class="rpt-stat-num">${totalOverdue}</div><div class="rpt-stat-lbl">⚠️ 방문일 지남</div></div>
-  <div class="rpt-stat red"><div class="rpt-stat-num">${totalIdle}</div><div class="rpt-stat-lbl">🚨 미진행 응답없음</div></div>
-  <div class="rpt-stat blue"><div class="rpt-stat-num">${totalWait}</div><div class="rpt-stat-lbl">⏳ 일정대기 누적</div></div>
-  <div class="rpt-stat yellow"><div class="rpt-stat-num">${totalSoon}</div><div class="rpt-stat-lbl">📅 방문 임박</div></div>
+  <div class="rpt-stat red"><div class="rpt-stat-num">${totalOverdue}</div><div class="rpt-stat-lbl">${esc(t.urgent_overdue)}</div></div>
+  <div class="rpt-stat red"><div class="rpt-stat-num">${totalIdle}</div><div class="rpt-stat-lbl">${esc(t.urgent_idle)}</div></div>
+  <div class="rpt-stat blue"><div class="rpt-stat-num">${totalWait}</div><div class="rpt-stat-lbl">${esc(t.urgent_wait)}</div></div>
+  <div class="rpt-stat yellow"><div class="rpt-stat-num">${totalSoon}</div><div class="rpt-stat-lbl">${esc(t.urgent_soon)}</div></div>
 </div>
 ${agentUrgent.map(({agent, short, team, urgent})=>{
   const tcol = TC[team] || '#888';
@@ -3025,18 +3192,18 @@ ${agentUrgent.map(({agent, short, team, urgent})=>{
       <span class="rpt-agent-dot" style="background:${tcol}"></span>
       <span class="rpt-agent-name">${esc(short)}</span>
       <span class="rpt-agent-team" style="border-color:${tcol};color:${tcol}">${esc(team.replace('TIM_',''))}</span>
-      <span class="rpt-agent-count">긴급 ${urgent.length}건</span>
+      <span class="rpt-agent-count">${esc(urgentLabel)} ${urgent.length}</span>
     </div>
     <table class="rpt-tbl">
       <thead><tr>
-        <th style="width:55px">D-day</th>
+        <th style="width:55px">${esc(t.col_dday)}</th>
         <th style="width:24px"></th>
-        <th>회원명 (후원자)</th>
-        <th style="width:110px">유형</th>
-        <th>사유</th>
-        <th style="width:88px">배정일</th>
-        <th style="width:100px">연락처</th>
-        <th style="width:65px">채널</th>
+        <th>${esc(t.col_member)}</th>
+        <th style="width:110px">${esc(t.col_type)}</th>
+        <th>${esc(t.col_reason)}</th>
+        <th style="width:88px">${esc(t.col_ad)}</th>
+        <th style="width:100px">${esc(t.col_phone)}</th>
+        <th style="width:65px">${esc(t.col_channel)}</th>
       </tr></thead>
       <tbody>
         ${urgent.map(u=>`
@@ -3044,8 +3211,8 @@ ${agentUrgent.map(({agent, short, team, urgent})=>{
             <td><span class="dday dday-${u.severity}">D-${u.daysLeft}</span></td>
             <td class="uicon">${u.urgentIcon}</td>
             <td><div class="member-name">${esc(u.nm||'-')}</div>${u.pa?`<div class="parent-name">(${esc(u.pa)})</div>`:''}</td>
-            <td>${esc(typeLabel(u.urgentIcon))}</td>
-            <td class="reason">${esc(u.reason)}</td>
+            <td>${esc(typeLabelMap[u.urgentIcon]||'')}</td>
+            <td class="reason">${esc(_formatUrgentReason(u, lang))}</td>
             <td>${esc(u.ad||'-')}</td>
             <td class="phone">${esc(u.ph||'-')}</td>
             <td>${u.ch?`<span class="channel-pill">${esc(u.ch)}</span>`:'-'}</td>
@@ -3055,10 +3222,10 @@ ${agentUrgent.map(({agent, short, team, urgent})=>{
   </div>`;
 }).join('')}`}
 <div class="rpt-footer">
-  · 우선순위: D-day 임박 + 심각도 높음 순으로 정렬<br>
-  · D-day: 배정 후 14일이 되어 다른 에이전트로 이관되기까지 남은 일수<br>
-  · 생성 시각: ${new Date().toLocaleString('ko-KR')}<br>
-  · 인쇄 대화상자에서 "대상 → PDF로 저장"을 선택하면 PDF 파일로 저장됩니다
+  ${esc(t.footer_priority)}<br>
+  ${esc(t.footer_dday)}<br>
+  · ${esc(t.footer_generated)}: ${new Date().toLocaleString(langDocLocale)}<br>
+  · ${esc(t.footer_print_hint)}
 </div>
 </body>
 </html>`;
@@ -3169,7 +3336,9 @@ body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',
 `;
 }
 
-function _buildAgentReportSection(agent, rank){
+function _buildAgentReportSection(agent, rank, lang){
+  lang = lang || 'ko';
+  const t = _reportT(lang);
   const s = statsRange(curFrom, curTo, null, agent);
   const meta = D.agent_meta[agent] || {};
   const x = {a: agent, ...s, meta};
@@ -3186,27 +3355,27 @@ function _buildAgentReportSection(agent, rank){
   const r_ds_ok = r_ds >= TARGETS.ds, r_sv_ok = r_sv >= TARGETS.sv, r_vc_ok = r_vc >= TARGETS.vc, r_dc_ok = r_dc >= TARGETS.dc;
   const achievedCount = [r_ds_ok, r_sv_ok, r_vc_ok, r_dc_ok].filter(Boolean).length;
   const esc = (s)=>(s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const typeLabel = (icon)=>({'⚠️':'방문일 지남','🚨':'미진행 응답없음','⏳':'일정대기 누적','📅':'방문 임박'})[icon] || '';
+  const typeLabelMap = {'⚠️': t.type_overdue, '🚨': t.type_idle, '⏳': t.type_wait, '📅': t.type_soon};
   const diffTxt = (v,tgt)=>{
     const ok = v >= tgt;
     const d = (v - tgt).toFixed(1);
-    return `${ok?'달성 +':'미달 −'}${Math.abs(d)}%p`;
+    return `${ok? t.kpi_achieved : t.kpi_missed}${Math.abs(d)}%p`;
   };
   const kpiCard = (emo, lbl, val, tgt, isFinal)=>{
     const ok = val >= tgt;
     return `<div class="ag-kpi-card ${ok?'good':'bad'}${isFinal?' final':''}">
       <div class="ag-kpi-emo">${emo}</div>
-      <div class="ag-kpi-lbl">${lbl}</div>
+      <div class="ag-kpi-lbl">${esc(lbl)}</div>
       <div class="ag-kpi-val">${val}%</div>
-      <div class="ag-kpi-tgt">목표 ${tgt}%</div>
-      <div class="ag-kpi-diff">${diffTxt(val, tgt)}</div>
+      <div class="ag-kpi-tgt">${esc(t.kpi_target_label(tgt))}</div>
+      <div class="ag-kpi-diff">${esc(diffTxt(val, tgt))}</div>
     </div>`;
   };
 
   // 📅 캘린더용 일정 수집 — 현재 필터 범위(해당월)만
   const dayName = (dateStr)=>{
     const d = new Date(dateStr);
-    return ['일','월','화','수','목','금','토'][d.getDay()];
+    return t.day_names[d.getDay()];
   };
   const stIcon = {s:'📅', w:'⏳', d:'✅', vc:'📹', ls:'⬜'};
   const inRange = (vd)=> vd && vd >= curFrom && vd <= curTo;
@@ -3223,13 +3392,13 @@ function _buildAgentReportSection(agent, rank){
   const renderDayBlock = (date, items)=>{
     const isToday = date === D.today;
     return `<div class="cal-day">
-      <div class="cal-day-h${isToday?' is-today':''}">${date} <span class="cal-dow">(${dayName(date)}${isToday?' · 오늘':''})</span><span class="cal-day-cnt">${items.length}건</span></div>
+      <div class="cal-day-h${isToday?' is-today':''}">${date} <span class="cal-dow">(${dayName(date)}${isToday?' · '+esc(t.cal_today):''})</span><span class="cal-day-cnt">${items.length}${esc(t.cal_count_suffix)}</span></div>
       ${items.map(r=>`
         <div class="cal-item">
           <span class="cal-icon">${stIcon[r.st]||'❓'}</span>
           <span class="cal-name">${esc(r.nm||'-')}</span>
           ${r.pa?`<span class="cal-pa">(${esc(r.pa)})</span>`:''}
-          ${r.cl===1?`<span class="cal-cl-pill">🏆 클로</span>`:''}
+          ${r.cl===1?`<span class="cal-cl-pill">${esc(t.cl_pill)}</span>`:''}
         </div>`).join('')}
     </div>`;
   };
@@ -3243,65 +3412,65 @@ function _buildAgentReportSection(agent, rank){
       <div class="ag-rpt-name">
         ${esc(meta.short||agent)}
         <span class="ag-rpt-pill" style="background:${tcol}">${esc(tlbl)}</span>
-        <span class="ag-rpt-grade" style="background:${gradeColor}">${grade} · ${x.score||0}점</span>
-        <span class="ag-rpt-pill">DB ${db}건</span>
-        <span class="ag-rpt-pill" style="background:${achievedCount>=3?'#16a34a':achievedCount>=2?'#fbbf24':'#dc2626'}">목표 ${achievedCount}/4 달성</span>
+        <span class="ag-rpt-grade" style="background:${gradeColor}">${esc(t.grade_score(grade, x.score||0))}</span>
+        <span class="ag-rpt-pill">${esc(t.db_count(db))}</span>
+        <span class="ag-rpt-pill" style="background:${achievedCount>=3?'#16a34a':achievedCount>=2?'#fbbf24':'#dc2626'}">${esc(t.target_achieved_count(achievedCount))}</span>
       </div>
-      <div class="ag-rpt-sub">${esc(D.today)} 기준 · 데이터 범위: ${esc(curFrom)} ~ ${esc(curTo)}</div>
+      <div class="ag-rpt-sub">${esc(D.today)} ${esc(t.agent_data_range)} · ${esc(t.agent_data_range_label)}: ${esc(curFrom)} ~ ${esc(curTo)}</div>
     </div>
   </div>
   <div class="ag-rpt-body">
     <!-- 펀널 -->
     <div class="ag-rpt-section">
-      <div class="ag-rpt-h">📊 관리 펀널</div>
+      <div class="ag-rpt-h">${esc(t.funnel_title)}</div>
       <div class="ag-funnel">
-        <div class="f-stage"><div class="f-num" style="color:#475569">${db}</div><div class="f-lbl">📋 DB</div></div>
-        <div class="f-arrow"><div class="f-rate ${r_ds_ok?'good':'bad'}">${r_ds}%<small>예약율</small></div></div>
-        <div class="f-stage"><div class="f-num" style="color:#2563eb">${sched}</div><div class="f-lbl">📅 예약</div></div>
-        <div class="f-arrow"><div class="f-rate ${r_sv_ok?'good':'bad'}">${r_sv}%<small>방문율</small></div></div>
-        <div class="f-stage"><div class="f-num" style="color:#16a34a">${visit}</div><div class="f-lbl">✅ 방문</div></div>
-        <div class="f-arrow"><div class="f-rate ${r_vc_ok?'good':'bad'}">${r_vc}%<small>클로율</small></div></div>
-        <div class="f-stage"><div class="f-num" style="color:#dc2626">${cl}</div><div class="f-lbl">🏆 클로</div></div>
+        <div class="f-stage"><div class="f-num" style="color:#475569">${db}</div><div class="f-lbl">${esc(t.stage_db)}</div></div>
+        <div class="f-arrow"><div class="f-rate ${r_ds_ok?'good':'bad'}">${r_ds}%<small>${esc(t.rate_ds)}</small></div></div>
+        <div class="f-stage"><div class="f-num" style="color:#2563eb">${sched}</div><div class="f-lbl">${esc(t.stage_sched)}</div></div>
+        <div class="f-arrow"><div class="f-rate ${r_sv_ok?'good':'bad'}">${r_sv}%<small>${esc(t.rate_sv)}</small></div></div>
+        <div class="f-stage"><div class="f-num" style="color:#16a34a">${visit}</div><div class="f-lbl">${esc(t.stage_visit)}</div></div>
+        <div class="f-arrow"><div class="f-rate ${r_vc_ok?'good':'bad'}">${r_vc}%<small>${esc(t.rate_vc)}</small></div></div>
+        <div class="f-stage"><div class="f-num" style="color:#dc2626">${cl}</div><div class="f-lbl">${esc(t.stage_close)}</div></div>
       </div>
     </div>
     <!-- 🎯 목표 대비 실적 (강조) -->
     <div class="ag-rpt-section">
-      <div class="ag-rpt-h">🎯 목표 대비 실적</div>
+      <div class="ag-rpt-h">${esc(t.target_title)}</div>
       <div class="ag-kpi-cards">
-        ${kpiCard('📅','예약율', r_ds, TARGETS.ds, false)}
-        ${kpiCard('✅','방문율', r_sv, TARGETS.sv, false)}
-        ${kpiCard('🏆','클로율', r_vc, TARGETS.vc, false)}
-        ${kpiCard('💰','DB→클로', r_dc, TARGETS.dc, true)}
+        ${kpiCard('📅', t.kpi_ds_lbl, r_ds, TARGETS.ds, false)}
+        ${kpiCard('✅', t.kpi_sv_lbl, r_sv, TARGETS.sv, false)}
+        ${kpiCard('🏆', t.kpi_vc_lbl, r_vc, TARGETS.vc, false)}
+        ${kpiCard('💰', t.kpi_dc_lbl, r_dc, TARGETS.dc, true)}
       </div>
     </div>
     <!-- 📅 일정 캘린더 (해당월 필터) -->
     <div class="ag-rpt-section">
-      <div class="ag-rpt-h">📅 일정 캘린더 <span style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:0">${esc(curFrom)} ~ ${esc(curTo)}</span></div>
+      <div class="ag-rpt-h">${esc(t.cal_title)} <span style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:0">${esc(curFrom)} ~ ${esc(curTo)}</span></div>
       <div class="cal-grid">
         <div class="cal-block">
-          <div class="cal-block-h cal-up">📅 방문예약<span class="cal-block-cnt">${upcoming.length}건</span></div>
-          ${upGroups.length ? upGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">예약된 방문 없음</div>'}
+          <div class="cal-block-h cal-up">${esc(t.cal_upcoming)}<span class="cal-block-cnt">${upcoming.length}${esc(t.cal_count_suffix)}</span></div>
+          ${upGroups.length ? upGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">'+esc(t.cal_empty_up)+'</div>'}
         </div>
         <div class="cal-block">
-          <div class="cal-block-h cal-done">✅ 방문완료<span class="cal-block-cnt">${completed.length}건</span></div>
-          ${doneGroups.length ? doneGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">완료된 방문 없음</div>'}
+          <div class="cal-block-h cal-done">${esc(t.cal_completed)}<span class="cal-block-cnt">${completed.length}${esc(t.cal_count_suffix)}</span></div>
+          ${doneGroups.length ? doneGroups.map(([d, items])=>renderDayBlock(d, items)).join('') : '<div class="cal-empty">'+esc(t.cal_empty_done)+'</div>'}
         </div>
       </div>
     </div>
     <!-- 🚨 긴급 관리 -->
     <div class="ag-rpt-section">
-      <div class="ag-rpt-h">🚨 긴급 관리 필요 ${urgent.length>0?`<span style="background:#dc2626;color:#fff;font-size:11px;padding:2px 9px;border-radius:5px;margin-left:6px">${urgent.length}건</span>`:''}</div>
-      ${urgent.length === 0 ? `<div class="urg-empty">✅ 긴급 관리 대상 없음 (이관 위험 0건)</div>` : `
+      <div class="ag-rpt-h">${esc(t.urgent_title)} ${urgent.length>0?`<span style="background:#dc2626;color:#fff;font-size:11px;padding:2px 9px;border-radius:5px;margin-left:6px">${urgent.length}${esc(t.count_unit)}</span>`:''}</div>
+      ${urgent.length === 0 ? `<div class="urg-empty">${esc(t.urgent_empty_inline)}</div>` : `
       <table class="urg-tbl">
         <thead><tr>
-          <th style="width:55px">D-day</th>
+          <th style="width:55px">${esc(t.col_dday)}</th>
           <th style="width:24px"></th>
-          <th>회원명 (후원자)</th>
-          <th style="width:110px">유형</th>
-          <th>사유</th>
-          <th style="width:88px">배정일</th>
-          <th style="width:100px">연락처</th>
-          <th style="width:65px">채널</th>
+          <th>${esc(t.col_member)}</th>
+          <th style="width:110px">${esc(t.col_type)}</th>
+          <th>${esc(t.col_reason)}</th>
+          <th style="width:88px">${esc(t.col_ad)}</th>
+          <th style="width:100px">${esc(t.col_phone)}</th>
+          <th style="width:65px">${esc(t.col_channel)}</th>
         </tr></thead>
         <tbody>
           ${urgent.map(u=>`
@@ -3309,8 +3478,8 @@ function _buildAgentReportSection(agent, rank){
               <td><span class="dday dday-${u.severity}">D-${u.daysLeft}</span></td>
               <td style="font-size:14px;text-align:center">${u.urgentIcon}</td>
               <td><b>${esc(u.nm||'-')}</b>${u.pa?`<div style="color:#64748b;font-size:10.5px;font-weight:600">(${esc(u.pa)})</div>`:''}</td>
-              <td>${esc(typeLabel(u.urgentIcon))}</td>
-              <td>${esc(u.reason)}</td>
+              <td>${esc(typeLabelMap[u.urgentIcon]||'')}</td>
+              <td>${esc(_formatUrgentReason(u, lang))}</td>
               <td>${esc(u.ad||'-')}</td>
               <td style="font-family:'Courier New',monospace;font-size:10.5px;font-weight:700">${esc(u.ph||'-')}</td>
               <td>${u.ch?`<span style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;color:#475569;border:1px solid #cbd5e1">${esc(u.ch)}</span>`:'-'}</td>
@@ -3322,21 +3491,25 @@ function _buildAgentReportSection(agent, rank){
 </div>`;
 }
 
-function openAgentReport(agent){
+function openAgentReport(agent, lang){
+  lang = lang || 'ko';
+  const t = _reportT(lang);
   const meta = D.agent_meta[agent] || {};
+  const esc = (s)=>(s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const langLocale = lang === 'id' ? 'id-ID' : 'ko-KR';
   const reportHtml = `<!DOCTYPE html>
-<html lang="ko">
+<html lang="${lang}">
 <head>
 <meta charset="utf-8">
-<title>${(meta.short||agent)} 일일 보고서 - ${D.today}</title>
+<title>${esc(t.agent_doc_title(meta.short||agent, D.today))}</title>
 <style>${_agentReportCSS()}</style>
 </head>
 <body>
-<button class="rpt-print-btn" onclick="window.print()">📄 PDF로 저장 · 인쇄</button>
-${_buildAgentReportSection(agent, null)}
+<button class="rpt-print-btn" onclick="window.print()">${esc(t.save_pdf_btn)}</button>
+${_buildAgentReportSection(agent, null, lang)}
 <div class="rpt-footer">
-  · 생성 시각: ${new Date().toLocaleString('ko-KR')}<br>
-  · 인쇄 대화상자에서 "대상 → PDF로 저장"을 선택하면 PDF 파일로 저장됩니다
+  · ${esc(t.footer_generated)}: ${new Date().toLocaleString(langLocale)}<br>
+  · ${esc(t.footer_print_hint)}
 </div>
 </body>
 </html>`;
@@ -3347,21 +3520,27 @@ ${_buildAgentReportSection(agent, null)}
   w.document.close();
 }
 
-function openAllAgentsReport(){
-  const teamLabel = curTeam==='ALL' ? '전체 팀' : curTeam.replace('TIM_','');
+function openAllAgentsReport(lang){
+  lang = lang || 'ko';
+  const t = _reportT(lang);
+  const teamLabel = curTeam==='ALL' ? t.all_teams : curTeam.replace('TIM_','');
   const agents = curTeam==='ALL' ? Object.keys(D.agent_total||{}) : (D.team_members[curTeam]||[]);
   const list = agents.map(a=>{
     const s = statsRange(curFrom, curTo, null, a);
     return {a, ...s};
   }).filter(x=>(x.db||0)>0).sort((a,b)=>(b.score||0)-(a.score||0));
   if(list.length === 0){ alert('활동 중인 에이전트가 없습니다.'); return; }
+  const esc = (s)=>(s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const langLocale = lang === 'id' ? 'id-ID' : 'ko-KR';
 
-  const sections = list.map((x,i)=>_buildAgentReportSection(x.a, i)).join('');
+  const sections = list.map((x,i)=>_buildAgentReportSection(x.a, i, lang)).join('');
+  const totalDb = list.reduce((s,x)=>s+(x.db||0),0);
+  const totalCl = list.reduce((s,x)=>s+(x.cl||0),0);
   const reportHtml = `<!DOCTYPE html>
-<html lang="ko">
+<html lang="${lang}">
 <head>
 <meta charset="utf-8">
-<title>${teamLabel} 에이전트 일일 보고서 - ${D.today}</title>
+<title>${esc(t.bulk_doc_title(teamLabel))} - ${D.today}</title>
 <style>${_agentReportCSS()}
 .cover{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:40px 30px;border-radius:14px;margin-bottom:18px;text-align:center;page-break-after:always}
 .cover h1{font-size:32px;font-weight:900;margin:0 0 10px;letter-spacing:-1px}
@@ -3371,21 +3550,21 @@ function openAllAgentsReport(){
 </style>
 </head>
 <body>
-<button class="rpt-print-btn" onclick="window.print()">📄 PDF로 저장 · 인쇄</button>
+<button class="rpt-print-btn" onclick="window.print()">${esc(t.save_pdf_btn)}</button>
 <div class="cover">
-  <h1>📊 ${teamLabel} 에이전트 일일 보고서</h1>
-  <div class="sub">${D.today} 기준 · 매니저 코칭 자료 · 활동 중인 ${list.length}명</div>
+  <h1>${esc(t.bulk_cover_title(teamLabel))}</h1>
+  <div class="sub">${esc(t.bulk_cover_sub(D.today, list.length))}</div>
   <div class="stats">
-    <div><b>${list.length}</b>명 활동</div>
-    <div><b>${list.reduce((s,x)=>s+(x.db||0),0)}</b> DB</div>
-    <div><b>${list.reduce((s,x)=>s+(x.cl||0),0)}</b> 클로</div>
+    <div><b>${list.length}</b> ${esc(t.bulk_stat_active)}</div>
+    <div><b>${totalDb}</b> ${esc(t.bulk_stat_db)}</div>
+    <div><b>${totalCl}</b> ${esc(t.bulk_stat_cl)}</div>
   </div>
 </div>
 ${sections}
 <div class="rpt-footer">
-  · 보고서 순서: 점수 높은 에이전트부터<br>
-  · 생성 시각: ${new Date().toLocaleString('ko-KR')}<br>
-  · 인쇄 대화상자에서 "대상 → PDF로 저장"을 선택하면 PDF 파일로 저장됩니다
+  ${esc(t.bulk_footer_order)}<br>
+  · ${esc(t.footer_generated)}: ${new Date().toLocaleString(langLocale)}<br>
+  · ${esc(t.footer_print_hint)}
 </div>
 </body>
 </html>`;
@@ -3571,7 +3750,8 @@ function renderTeamAgentInsight(){
           </div>
         </div>
         <div class="ins-ag-d-btns">
-          <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}')" title="이 에이전트의 일일 보고서 PDF 출력">📄 PDF 보고서</button>
+          <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}','ko')" title="한국어 일일 보고서 PDF">📄 KR</button>
+          <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAgentReport('${x.a}','id')" title="Laporan Harian PDF (Bahasa)">📄 ID</button>
           <button class="ins-ag-d-btn" onclick="openMem('${x.a}','db')" title="회원 목록 보기">📋 회원 목록</button>
         </div>
       </div>
