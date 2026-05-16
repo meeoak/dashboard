@@ -4496,13 +4496,27 @@ function renderAgentCardsOnly(){
   const agentWrap = document.getElementById('ins-agent-wrap');
   const agentLbl = document.getElementById('insight-agent-lbl');
 
-  const agents = curTeam==='ALL' ? Object.keys(D.agent_total) : (D.team_members[curTeam]||[]);
+  let agents;
+  if(curAgent !== 'ALL'){
+    agents = [curAgent];
+  } else if(curTeam !== 'ALL'){
+    agents = D.team_members[curTeam] || [];
+  } else {
+    agents = Object.keys(D.agent_total);
+  }
   const list = agents.map(a=>{
     const s = statsRange(curFrom, curTo, null, a);
     return {a, ...s, meta: D.agent_meta[a]||{}};
   }).filter(x=>(x.db||0)>0).sort((a,b)=>(b.score||0)-(a.score||0));
 
-  if(agentLbl) agentLbl.textContent = `${list.length}명 활동 중 · 팀리더 코칭 분석`;
+  if(agentLbl){
+    if(curAgent !== 'ALL'){
+      const short = (D.agent_meta[curAgent]||{}).short || curAgent;
+      agentLbl.textContent = `${short} · 에이전트 상세 분석`;
+    } else {
+      agentLbl.textContent = `${list.length}명 활동 중 · 팀리더 코칭 분석`;
+    }
+  }
 
   if(list.length===0){
     agentWrap.innerHTML = '<div style="color:#999;padding:30px;text-align:center">기간 내 활동 에이전트 없음</div>';
