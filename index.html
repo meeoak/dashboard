@@ -54,7 +54,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
   .section-sub{font-size:10.5px}
   /* DB 배정 분석 */
   .db-grid{grid-template-columns:1fr!important;gap:10px}
-  .db-total .db-card-val{font-size:48px}
+  .db-total .db-card-val{font-size:36px}
   .db-card{padding:14px 14px}
   /* KPI 목표 카드 */
   .kpi-targets{grid-template-columns:1fr 1fr;gap:8px}
@@ -318,15 +318,15 @@ body.focus-mode #detail-section-hd{display:none!important}
 .db-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px #00000010;border-color:#e5d8c7}
 .db-card-lbl{font-size:11px;font-weight:800;color:#999;letter-spacing:.5px;margin-bottom:12px;text-transform:uppercase}
 /* 전체 DB 카드 - HERO (찐한 남색 + 흰색) */
-.db-total{background:linear-gradient(135deg,#0a1845 0%,#0f2a5e 50%,#1a3a7a 100%);color:#fff;border:none;position:relative;overflow:hidden;justify-content:center;transition:all .25s}
+.db-total{background:linear-gradient(135deg,#0a1845 0%,#0f2a5e 50%,#1a3a7a 100%);color:#fff;border:none;position:relative;overflow:hidden;justify-content:center;transition:all .25s;padding:14px 16px}
 .db-total:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(10,24,69,.35)}
 .db-total::before{content:'';position:absolute;top:-50%;right:-30%;width:200%;height:200%;background:radial-gradient(circle,rgba(96,165,250,.18) 0%,transparent 50%);pointer-events:none;animation:dbPulse 4s ease-in-out infinite}
 @keyframes dbPulse{0%,100%{opacity:.6}50%{opacity:1}}
-.db-total .db-card-lbl{color:#93c5fd;position:relative;font-size:12px;letter-spacing:.8px;font-weight:800;margin-bottom:6px}
-.db-total .db-card-val{font-size:64px;font-weight:900;letter-spacing:-3px;line-height:1;color:#fff;position:relative;cursor:pointer;transition:all .2s;text-shadow:0 2px 16px rgba(96,165,250,.4);display:inline-block}
+.db-total .db-card-lbl{color:#93c5fd;position:relative;font-size:11.5px;letter-spacing:.5px;font-weight:800;margin-bottom:4px}
+.db-total .db-card-val{font-size:44px;font-weight:900;letter-spacing:-2px;line-height:1;color:#fff;position:relative;cursor:pointer;transition:all .2s;text-shadow:0 2px 12px rgba(96,165,250,.4);display:inline-block}
 .db-total .db-card-val:hover{transform:scale(1.03);text-shadow:0 4px 20px rgba(255,255,255,.5)}
-.db-total .db-card-val::after{content:'👆';font-size:14px;margin-left:8px;opacity:.5;text-shadow:none;-webkit-text-fill-color:initial;vertical-align:middle}
-.db-total .db-card-sub{font-size:11.5px;color:#cbd5e1;margin-top:10px;font-weight:600;position:relative;letter-spacing:.3px}
+.db-total .db-card-val::after{content:'👆';font-size:12px;margin-left:6px;opacity:.5;text-shadow:none;-webkit-text-fill-color:initial;vertical-align:middle}
+.db-total .db-card-sub{font-size:11px;color:#cbd5e1;margin-top:6px;font-weight:600;position:relative;letter-spacing:.3px}
 /* OFF vs MKT 도넛 차트 */
 .db-donut-wrap{display:flex;align-items:center;gap:14px;flex:1}
 .db-donut{flex-shrink:0;filter:drop-shadow(0 2px 6px #0001a)}
@@ -2664,10 +2664,6 @@ function renderDBSummary(){
         <div class="mgmt-leg ml-active" onclick="openMemStatus('active')">
           <div class="ml-row"><span class="ml-dot"></span><span class="ml-lbl">${T('db_active')||'진행'}</span></div>
           <b>${f(active)}</b>
-        </div>
-        <div class="mgmt-leg ml-idle" onclick="openMemStatus('idle')">
-          <div class="ml-row"><span class="ml-dot"></span><span class="ml-lbl">${T('db_idle')||'미진행'}</span></div>
-          <b>${f(idle)}</b>
         </div>
         <div class="mgmt-leg ml-cancel" onclick="openMemStatus('cancel')">
           <div class="ml-row"><span class="ml-dot"></span><span class="ml-lbl">⛔ 부적합</span></div>
