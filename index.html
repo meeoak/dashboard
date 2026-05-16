@@ -845,6 +845,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-urg-tbl tr.kind-idle td:first-child{border-left-color:#dc2626}
 .r3d-urg-tbl tr.kind-wait td:first-child{border-left-color:#2563eb}
 .r3d-urg-tbl tr.kind-soon td:first-child{border-left-color:#2563eb}
+.r3d-urg-no{font-size:11.5px;font-weight:900;color:#94a3b8;width:34px;text-align:right;padding-right:8px;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
 .r3d-urg-band{display:inline-flex;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:900;padding:4px 8px;border-radius:6px;white-space:nowrap;letter-spacing:-.3px;border:1.5px solid;min-width:96px;line-height:1.1}
 .r3d-urg-tbl tr.kind-noMemo .r3d-urg-band{background:#fef3c7;color:#92400e;border-color:#fde68a}
 .r3d-urg-tbl tr.kind-overdue .r3d-urg-band{background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
@@ -4753,12 +4754,13 @@ function renderRecent7DaysByTeam(){
   };
   const renderUrgRows = (urgent, agentName)=>{
     if(!urgent.length) return `<div class="r3d-urg-empty">긴급 관리 대상 없음</div>`;
-    return `<table class="r3d-urg-tbl">${urgent.map(u=>{
+    return `<table class="r3d-urg-tbl">${urgent.map((u,i)=>{
       const ddayCls = u.daysLeft<=3 ? '' : (u.daysLeft<=7 ? 'warn' : 'ok');
       const recKey = esc(JSON.stringify({a:u.a, nm:u.nm||'', ad:u.ad||''}));
       const kindCls = 'kind-' + classifyUrgent(u);
       const band = kindBandMap[kindCls];
       return `<tr class="${kindCls}" data-rec="${recKey}" onclick="openRecent7DMember(this)" title="회원 상세 보기">
+        <td class="r3d-urg-no">${i+1}</td>
         <td><span class="r3d-urg-band">${band.icon} ${esc(band.lbl)}</span></td>
         <td class="r3d-urg-nm"><b>${esc(u.nm||'-')}</b>${u.pa?`<small>${esc(u.pa)}</small>`:''}</td>
         <td class="r3d-urg-reason">${esc(u.reason||'-')}</td>
