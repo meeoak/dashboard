@@ -641,10 +641,15 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cstat:hover{transform:translateY(-3px);box-shadow:0 6px 16px #0002}
 .cstat .cs-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .cstat .cs-lbl{font-size:13px;font-weight:800;color:#1a1a1a;display:flex;align-items:center;gap:5px}
-.cstat .cs-pct{font-size:10.5px;font-weight:800;color:#888;padding:1px 6px;background:#fff8;border-radius:99px}
-.cstat .cs-num{font-size:42px;font-weight:900;line-height:1;letter-spacing:-1.5px;margin:4px 0 6px;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.cstat .cs-bar{height:5px;border-radius:99px;background:#fff;overflow:hidden}
-.cstat .cs-bar-fill{height:100%;border-radius:99px;transition:width .4s ease}
+.cstat .cs-num{font-size:42px;font-weight:900;line-height:1;letter-spacing:-1.5px;margin:4px 0 8px;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cstat .cs-metrics{display:flex;flex-direction:column;gap:3px;padding-top:8px;border-top:1px solid rgba(0,0,0,.06)}
+.cstat .cs-m{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;font-weight:700}
+.cstat .cs-m-lbl{color:#888;letter-spacing:.2px}
+.cstat .cs-m-val{color:#1a1a1a;font-weight:800;font-size:11px}
+.cstat .cs-m-val.up{color:#16a34a}
+.cstat .cs-m-val.down{color:#dc2626}
+.cstat .cs-m-val.same{color:#9ca3af}
+.cstat .cs-m-top{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cstat.cs-s{background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%)}
 .cstat.cs-s::before{background:linear-gradient(180deg,#3b82f6,#1d4ed8)}
 .cstat.cs-s::after{background:#1d4ed8}
@@ -683,9 +688,11 @@ body.focus-mode #detail-section-hd{display:none!important}
   .cal-report-title{font-size:16px}
   .cal-stat-cards{grid-template-columns:repeat(2,1fr);gap:6px}
   .cstat{padding:10px 10px 10px 14px}
-  .cstat .cs-num{font-size:30px}
+  .cstat .cs-num{font-size:30px;margin:2px 0 6px}
   .cstat .cs-lbl{font-size:11.5px}
-  .cstat .cs-pct{font-size:9.5px}
+  .cstat .cs-m{font-size:10px}
+  .cstat .cs-m-val{font-size:10.5px}
+  .cstat .cs-m-top{max-width:60px}
   .cal-report-legend{font-size:10.5px;gap:8px}
 }
 
@@ -2837,25 +2844,73 @@ function renderCal(){
   const pendN = totals.s + totals.w;
   document.getElementById('cal-s-sub').textContent =
     `${T('cal_total')} ${pendN+doneN}${u}`;
-  // 보고서 헤더의 카운트 카드 (상태별 큰 숫자)
+  // 보고서 헤더의 카운트 카드 (상태별 큰 숫자 + 4가지 메트릭)
   const cardsEl = document.getElementById('cal-stat-cards');
   if(cardsEl){
-    const grand = totals.s + totals.w + totals.d + totals.vc + totals.ls;
+    // 전월 totals
+    const prevMonth = (()=>{
+      const [py,pm] = month.split('-').map(Number);
+      const dt = new Date(py, pm-2, 1);
+      return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+    })();
+    const prevRecs = D.cal_recs.filter(r=>{
+      if(!r.vd.startsWith(prevMonth)) return false;
+      if(!types.includes(r.st)) return false;
+      if(curTeam!=='ALL' && r.t!==curTeam) return false;
+      if(curAgent!=='ALL' && r.a!==curAgent) return false;
+      if((curDbKind==='OFF' || curDbKind==='MKT') && r.dk!==curDbKind) return false;
+      return true;
+    });
+    const prevTotals = {d:0,ls:0,vc:0,s:0,w:0};
+    prevRecs.forEach(r=>{ if(prevTotals[r.st]!==undefined) prevTotals[r.st]++; });
+    // 이번주 범위 (오늘 기준 월~일)
+    const tDate = new Date((D.today||'').replace(/-/g,'/'));
+    const tDow = isFinite(tDate) ? (tDate.getDay()+6)%7 : -1;
+    let wsStr='', weStr='';
+    if(tDow>=0){
+      const ws = new Date(tDate); ws.setDate(tDate.getDate()-tDow);
+      const we = new Date(ws); we.setDate(ws.getDate()+6);
+      const fmt = d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      wsStr = fmt(ws); weStr = fmt(we);
+    }
+    const weekTotals = {d:0,ls:0,vc:0,s:0,w:0};
+    if(wsStr) recs.forEach(r=>{ if(r.vd>=wsStr && r.vd<=weStr && weekTotals[r.st]!==undefined) weekTotals[r.st]++; });
+    // TOP 에이전트
+    const topByStatus = {s:null,w:null,d:null,vc:null,ls:null};
+    types.forEach(st=>{
+      const cnt = {};
+      recs.forEach(r=>{ if(r.st===st) cnt[r.a]=(cnt[r.a]||0)+1; });
+      let top=null,tc=0;
+      Object.entries(cnt).forEach(([a,c])=>{ if(c>tc){ top=a; tc=c; }});
+      topByStatus[st] = top ? {name:top.split(' ')[0], count:tc} : null;
+    });
+    const daysIn = calData.days_in || 30;
+    const deltaFmt = (cur,prev)=>{
+      const d = cur - prev;
+      if(d>0) return `<span class="cs-m-val up">▲ ${d}</span>`;
+      if(d<0) return `<span class="cs-m-val down">▼ ${-d}</span>`;
+      return `<span class="cs-m-val same">· 0</span>`;
+    };
     cardsEl.innerHTML = [
-      ['s','📅', T('cal_label_book'),  totals.s],
-      ['w','⏳', T('cal_label_wait'),  totals.w],
-      ['d','✅', T('cal_label_done'),  totals.d],
-      ['vc','📹',T('cal_label_video'), totals.vc],
-      ['ls','⬜',T('cal_label_langsung'), totals.ls],
-    ].map(([k,icon,lbl,n])=>{
-      const pct = grand > 0 ? Math.round(n/grand*100) : 0;
+      ['s','📅', T('cal_label_book'),     totals.s,  prevTotals.s,  weekTotals.s,  topByStatus.s],
+      ['w','⏳', T('cal_label_wait'),     totals.w,  prevTotals.w,  weekTotals.w,  topByStatus.w],
+      ['d','✅', T('cal_label_done'),     totals.d,  prevTotals.d,  weekTotals.d,  topByStatus.d],
+      ['vc','📹',T('cal_label_video'),    totals.vc, prevTotals.vc, weekTotals.vc, topByStatus.vc],
+      ['ls','⬜',T('cal_label_langsung'), totals.ls, prevTotals.ls, weekTotals.ls, topByStatus.ls],
+    ].map(([k,icon,lbl,n,pn,wn,top])=>{
+      const avg = (n/daysIn).toFixed(1);
+      const topTxt = top ? `🥇 ${top.name}` : '<span class="cs-m-val same">-</span>';
       return `<div class="cstat cs-${k}">
         <div class="cs-head">
           <div class="cs-lbl">${icon} ${lbl}</div>
-          <div class="cs-pct">${pct}%</div>
         </div>
         <div class="cs-num">${n}</div>
-        <div class="cs-bar"><div class="cs-bar-fill" style="width:${pct}%"></div></div>
+        <div class="cs-metrics">
+          <div class="cs-m"><span class="cs-m-lbl">전월</span>${deltaFmt(n,pn)}</div>
+          <div class="cs-m"><span class="cs-m-lbl">이번주</span><span class="cs-m-val">${wn}건</span></div>
+          <div class="cs-m"><span class="cs-m-lbl">일평균</span><span class="cs-m-val">${avg}</span></div>
+          <div class="cs-m"><span class="cs-m-lbl">TOP</span><span class="cs-m-val cs-m-top">${topTxt}</span></div>
+        </div>
       </div>`;
     }).join('');
   }
