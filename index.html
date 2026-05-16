@@ -1839,7 +1839,19 @@ function initFilters(){
 }
 function buildAgentSelect(){
   const sa = document.getElementById('fsel-agent');
-  const agents = curTeam==='ALL' ? Object.keys(D.agent_total) : D.team_members[curTeam];
+  const baseAgents = curTeam==='ALL' ? Object.keys(D.agent_total) : (D.team_members[curTeam]||[]);
+  // 현재 기간(curFrom~curTo)에 배정 또는 방문 활동이 있는 에이전트만 노출
+  const inRange = (d) => d && d >= curFrom && d <= curTo;
+  const activeSet = new Set();
+  (D.records||[]).forEach(r=>{
+    if(!r.a) return;
+    if(inRange(r.ad) || inRange(r.vd)) activeSet.add(r.a);
+  });
+  let agents = baseAgents.filter(a => activeSet.has(a));
+  // 활동 0이어도 사용자가 명시적으로 선택한 에이전트는 유지 (해제 가능하도록)
+  if(curAgent !== 'ALL' && baseAgents.includes(curAgent) && !agents.includes(curAgent)){
+    agents = [curAgent, ...agents];
+  }
   sa.innerHTML = `<option value="ALL">${T('all_agents')}</option>` +
     agents.map(a=>`<option value="${a}">${D.agent_meta[a].short}</option>`).join('');
   if(curAgent!=='ALL' && !agents.includes(curAgent)) curAgent='ALL';
@@ -5248,7 +5260,7 @@ function renderAgentCardsOnly(){
   </div>`;
   agentWrap.innerHTML = agHtml;
 }
-function renderAll(){ invalidateStatsCache(); renderMode(); renderDBSummary(); render3MonthTrend(); renderTargets(); renderGaps(); renderKPI(); renderTab(); if(typeof updateCalControls==='function') updateCalControls(); }
+function renderAll(){ invalidateStatsCache(); buildAgentSelect(); renderMode(); renderDBSummary(); render3MonthTrend(); renderTargets(); renderGaps(); renderKPI(); renderTab(); if(typeof updateCalControls==='function') updateCalControls(); }
 
 // ── 회원 ────────────────────────────────────────────────
 function openMem(agent, stype, month, labelOverride){
