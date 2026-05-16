@@ -1057,6 +1057,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 
 <script src="data.js"></script>
 <script>
+// 월 라벨·요일을 영어로 통일 (한국어/인니어 공통). data.js 가 한국어 값으로 들어와도 즉시 변환.
+(function(){
+  if(!window.D) return;
+  const _MN_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(D.mlabels){
+    Object.keys(D.mlabels).forEach(k=>{
+      const mo = parseInt((k||'').split('-')[1]);
+      if(mo>=1 && mo<=12) D.mlabels[k] = _MN_EN[mo-1];
+    });
+  }
+  // cal_summary[month].days[*].dow 도 영어로 변환 (인덱스는 dow_i: 0=Mon ... 6=Sun)
+  if(D.cal_summary){
+    const _DOW_EN = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    Object.keys(D.cal_summary).forEach(m=>{
+      const sum = D.cal_summary[m];
+      if(sum && Array.isArray(sum.days)){
+        sum.days.forEach(d=>{
+          if(d && typeof d.dow_i === 'number') d.dow = _DOW_EN[d.dow_i] || d.dow;
+        });
+      }
+    });
+  }
+})();
 const TC = {TIM_GIAR:'#1a73e8', TIM_TINA:'#16a34a', TIM_LIDIA:'#ea4335'};
 const TK = {TIM_GIAR:'G', TIM_TINA:'T', TIM_LIDIA:'L'};
 const TEAM_EMO  = {TIM_GIAR:'', TIM_TINA:'', TIM_LIDIA:''};  // 마스코트 제거
@@ -1134,7 +1157,7 @@ const LANG = {
     cal_total:'총', cal_unit:'건',
     cal_label_done:'완료', cal_label_video:'비디오', cal_label_langsung:'랑숭',
     cal_label_book:'예약', cal_label_wait:'대기',
-    dow_mon:'월', dow_tue:'화', dow_wed:'수', dow_thu:'목', dow_fri:'금', dow_sat:'토', dow_sun:'일',
+    dow_mon:'Mon', dow_tue:'Tue', dow_wed:'Wed', dow_thu:'Thu', dow_fri:'Fri', dow_sat:'Sat', dow_sun:'Sun',
     // Other
     final_kpi:'⭐ 최종', main_kpi_label:'최종 KPI',
   },
@@ -1211,7 +1234,7 @@ const LANG = {
     cal_total:'Total', cal_unit:'',
     cal_label_done:'Selesai', cal_label_video:'Video', cal_label_langsung:'Langsung',
     cal_label_book:'Jadwal', cal_label_wait:'Menunggu',
-    dow_mon:'Sen', dow_tue:'Sel', dow_wed:'Rab', dow_thu:'Kam', dow_fri:'Jum', dow_sat:'Sab', dow_sun:'Min',
+    dow_mon:'Mon', dow_tue:'Tue', dow_wed:'Wed', dow_thu:'Thu', dow_fri:'Fri', dow_sat:'Sat', dow_sun:'Sun',
     // Other
     final_kpi:'⭐ Akhir', main_kpi_label:'KPI Akhir',
   }
@@ -1318,7 +1341,7 @@ function initFilters(){
   const monthOpts = D.cal_months.map(m=>{
     const isFuture = !D.months.includes(m);
     const monthNum = m.slice(5).replace(/^0/,'');
-    const monthLbl = curLang==='ko' ? `${monthNum}월` : `Bulan ${monthNum}`;
+    const monthLbl = (D.mlabels && D.mlabels[m]) || m;
     const futTag = isFuture ? (curLang==='ko' ? ' (예정)' : ' (depan)') : '';
     return `<option value="${m}" ${m===curMonth?'selected':''}>${monthLbl}${futTag}</option>`;
   }).join('');
@@ -2036,9 +2059,7 @@ function render3MonthTrend(){
   monthStats.forEach((mo, i) => {
     const prev = i > 0 ? monthStats[i-1].stats : null;
     const isCurrent = (i === monthStats.length - 1);
-    const monthLbl = curLang==='ko'
-      ? mo.month.slice(5).replace(/^0/,'') + '월'
-      : 'Bulan ' + mo.month.slice(5).replace(/^0/,'');
+    const monthLbl = (D.mlabels && D.mlabels[mo.month]) || mo.month;
     const curBadge = isCurrent ? `<span style="background:#1e3a8a;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px">${curLang==='ko'?'현재':'Saat ini'}</span>` : '';
     h += `<div class="m-trend-card ${isCurrent?'current':''}">
       <div class="m-trend-month">${monthLbl} ${curBadge}</div>
@@ -2388,7 +2409,7 @@ function renderCal(kind){
   const subEl   = kind==='done' ? 'cal-d-sub'   : 'cal-s-sub';
   const gridEl  = kind==='done' ? 'cal-d-grid'  : 'cal-s-grid';
   const titleTxt= kind==='done' ? T('cal_title_done') : T('cal_title_sched');
-  const monthLbl = curLang==='ko' ? D.mlabels[month] : 'Bulan ' + month.slice(5).replace(/^0/,'');
+  const monthLbl = (D.mlabels && D.mlabels[month]) || month;
   document.getElementById(titleEl).textContent = monthLbl + ' ' + titleTxt;
   const u = T('cal_unit');
   document.getElementById(subEl).textContent = kind==='done'
@@ -2966,7 +2987,7 @@ function _reportT(lang){
       cal_today: 'Hari ini',
       cal_count_suffix: '',
       cl_pill: '🏆 Closing',
-      day_names: ['Min','Sen','Sel','Rab','Kam','Jum','Sab'],
+      day_names: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
       urgent_title: '🚨 Manajemen Mendesak Diperlukan',
       urgent_empty_inline: '✅ Tidak ada manajemen mendesak (risiko transfer 0)',
       col_dday: 'D-day',
@@ -3038,7 +3059,7 @@ function _reportT(lang){
     cal_today: '오늘',
     cal_count_suffix: '건',
     cl_pill: '🏆 클로',
-    day_names: ['일','월','화','수','목','금','토'],
+    day_names: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
     urgent_title: '🚨 긴급 관리 필요',
     urgent_empty_inline: '✅ 긴급 관리 대상 없음 (이관 위험 0건)',
     col_dday: 'D-day',
@@ -4268,7 +4289,8 @@ function buildD(records,today){
   for(const r of records)if(r.ad)monthsSet.add(r.ad.slice(0,7));
   D.months=[...monthsSet].sort();
   D.mlabels={};
-  for(const m of D.months){const mo=parseInt(m.split('-')[1]);D.mlabels[m]=mo+'월';}
+  const _MONTH_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for(const m of D.months){const mo=parseInt(m.split('-')[1]);D.mlabels[m]=_MONTH_EN[mo-1]||m;}
   D.teams=['TIM_GIAR','TIM_TINA','TIM_LIDIA'];
   D.team_members={TIM_GIAR:[],TIM_TINA:[],TIM_LIDIA:[]};
   D.a2t={};D.agent_meta={};
@@ -4344,7 +4366,7 @@ function buildD(records,today){
   D.cal_summary={};const calMonths=new Set(D.months);
   for(const r of D.cal_recs)if(r.vd)calMonths.add(r.vd.slice(0,7));
   D.cal_months=[...calMonths].sort();
-  const dows=['월','화','수','목','금','토','일'];
+  const dows=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   for(const month of D.cal_months){
     const [yr,mo]=month.split('-').map(Number);
     const days=[];const lastDay=new Date(yr,mo,0).getDate();
