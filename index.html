@@ -762,7 +762,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .rname{font-size:14px;font-weight:900;letter-spacing:-.3px;color:#0f172a}
 .rteam{font-size:11px;color:#64748b;font-weight:700}
 .rteam b{color:#0f172a;font-weight:900}
-.rbar-bg{height:5px;background:#f1f5f9;border-radius:3px;margin-top:6px;overflow:hidden}
+.rbar-bg{height:5px;background:#f1f5f9;border-radius:3px;margin-top:6px;overflow:visible;position:relative}
+.rbar-pace-mark{position:absolute;top:-2px;bottom:-2px;width:2px;background:#0f172a;transform:translateX(-1px);pointer-events:none}
+.rbar-pace-mark::after{content:'';position:absolute;top:-3px;left:-3px;width:8px;height:8px;background:#0f172a;border-radius:50%;border:1.5px solid #fff}
 .rbar{height:100%;border-radius:3px;transition:width .5s}
 .rstats{display:flex;gap:5px;flex-shrink:0;align-items:center}
 .rstat{text-align:center;min-width:36px;padding:3px 5px;border-radius:6px;transition:background .12s}
@@ -805,8 +807,10 @@ body.focus-mode #detail-section-hd{display:none!important}
 .bc-idx-num small{font-size:14px;font-weight:800;color:#94a3b8;letter-spacing:-.2px}
 .bc-idx-lbl{font-size:11px;font-weight:800;color:#64748b;letter-spacing:-.2px;margin-bottom:7px}
 .bc-idx-lbl small{font-weight:700;color:#94a3b8;font-size:10px}
-.bc-idx-bar{height:7px;background:#f1f5f9;border-radius:4px;overflow:hidden}
+.bc-idx-bar{height:7px;background:#f1f5f9;border-radius:4px;overflow:visible;position:relative}
 .bc-idx-fill{height:100%;border-radius:4px;transition:width .4s}
+.bc-pace-mark{position:absolute;top:-3px;bottom:-3px;width:2.5px;background:#0f172a;transform:translateX(-1.25px);pointer-events:none}
+.bc-pace-mark::before{content:'📍';position:absolute;top:-16px;left:-7px;font-size:12px;line-height:1}
 .bc-sum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#f8fafc;border-radius:6px;margin-bottom:10px}
 .bc-sum-lbl{font-size:10.5px;font-weight:800;color:#64748b;letter-spacing:-.2px}
 .bc-sum-val{font-size:14px;font-weight:900;letter-spacing:-.3px}
@@ -1497,7 +1501,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     <div class="battle-wrap" id="battle-wrap"></div>
     <div class="sec-hd" style="border-top:2px solid #f5f5f5">
       <div><div class="sec-title">🏆 에이전트 랭킹</div>
-      <div class="sec-sub">활동지수 = 클로징×5 + 방문완료/랑숭/비디오콜 각 1점 · 한달 KPI 목표 100점</div></div>
+      <div class="sec-sub">활동지수 = 클로징×5 + 방문완료/랑숭/비디오콜 각 1점 · 한달 KPI 100점 · 📍 오늘 기준 페이스</div></div>
     </div>
     <div class="rank-wrap" id="rank-wrap"></div>
   </div>
@@ -1859,6 +1863,19 @@ function calcActivityIndex(s){
 }
 function periodKpiTarget(){
   return MONTHLY_KPI_TARGET;
+}
+// 오늘 날짜 기준 KPI 진행 페이스 (0~100%)
+// 예: 5월 16일 / 31일 → 52% — 이 시점에 활동지수 52점이면 페이스 정시
+function paceMarkPct(){
+  if(!D.today || !curFrom || !curTo) return null;
+  if(D.today < curFrom) return 0;
+  if(D.today > curTo) return 100;
+  const fromMs = new Date(curFrom.replace(/-/g,'/')).getTime();
+  const toMs = new Date(curTo.replace(/-/g,'/')).getTime();
+  const todayMs = new Date(D.today.replace(/-/g,'/')).getTime();
+  const totalDays = (toMs - fromMs) / 86400000 + 1;
+  const elapsedDays = (todayMs - fromMs) / 86400000 + 1;
+  return Math.max(0, Math.min(100, Math.round(elapsedDays / totalDays * 100)));
 }
 
 function targetStatus(actual, target){
@@ -3306,6 +3323,7 @@ function renderStats(){
 // ── 랭킹 & 배틀 ─────────────────────────────────────────
 function renderRank(){
   const kpiTarget = periodKpiTarget();  // 한달 KPI 목표 100점 (고정)
+  const pacePct = paceMarkPct();        // 오늘 기준 페이스 (0~100), 기간 밖이면 null
   // 에이전트별 활동지수 사전 계산 (클로징×5 + 완료/랑숭/비디오 ×1)
   const allAgents = Object.keys(D.agent_total);
   const agentStats = {};
@@ -3352,7 +3370,10 @@ function renderRank(){
       <div class="bc-idx-block">
         <div class="bc-idx-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}<small>/${kpiTarget}</small></div>
         <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명 · 한달 KPI ${kpiTarget}점)</small></div>
-        <div class="bc-idx-bar"><div class="bc-idx-fill" style="width:${barPct}%;background:${TC[t]}"></div></div>
+        <div class="bc-idx-bar">
+          <div class="bc-idx-fill" style="width:${barPct}%;background:${TC[t]}"></div>
+          ${pacePct!==null?`<div class="bc-pace-mark" style="left:${pacePct}%" title="오늘(${D.today}) 기준 페이스 ${pacePct}%"></div>`:''}
+        </div>
       </div>
       <div class="bc-sum-row">
         <span class="bc-sum-lbl">팀 합계</span>
@@ -3410,7 +3431,10 @@ function renderRank(){
           ${motivate}
         </div>
         <div class="rteam">${team} · DB→클로징 <b>${r_dc}%</b> · KPI 달성 <b>${Math.round(achPct)}%</b></div>
-        <div class="rbar-bg"><div class="rbar" style="width:${barPct}%;background:${TC[team]}"></div></div>
+        <div class="rbar-bg">
+          <div class="rbar" style="width:${barPct}%;background:${TC[team]}"></div>
+          ${pacePct!==null?`<div class="rbar-pace-mark" style="left:${pacePct}%" title="오늘 기준 페이스 ${pacePct}%"></div>`:''}
+        </div>
       </div>
       <div class="rstats">
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','d')"><div class="rstat-v" style="color:#16a34a">${d}</div><div class="rstat-l">완료</div></div>
