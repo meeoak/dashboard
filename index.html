@@ -363,7 +363,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .kpi-tbl tbody tr:hover td{background:#fafafa}
 .kpi-tbl tbody tr.row-all td{background:linear-gradient(90deg,#eff6ff,#eff6ff)}
 .kpi-tbl tbody tr.row-all:hover td{background:linear-gradient(90deg,#fefce8,#eff6ff)}
-.kpi-tbl .team-cell{text-align:left;padding-left:18px;font-size:14px;font-weight:900;letter-spacing:-.3px;display:flex;align-items:center;gap:7px}
+.kpi-tbl .team-cell{text-align:left;padding-left:18px;font-size:14px;font-weight:900;letter-spacing:-.3px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:140px}
+.kpi-tbl .team-cell-row{display:flex;align-items:center;gap:7px;width:100%}
 .kpi-tbl .row-agent td{background:#fafbfc!important;border-bottom:1px dashed #e5e7eb;padding-top:8px;padding-bottom:8px}
 .kpi-tbl .row-agent:hover td{background:#fef3c7!important}
 .kpi-tbl .row-agent .agent-cell{font-style:italic;font-weight:600;font-size:12.5px;display:flex;align-items:center;gap:4px}
@@ -2304,11 +2305,11 @@ function kpiTblRow(label, emo, color, st, isAll, dataTeam){
   const isCollapsed = window.__teamCollapsed[dataTeam];
   const teamAgentCount = isTeamRow ? ((D.team_members[dataTeam]||[]).length) : 0;
   const chevron = isTeamRow
-    ? `<button class="team-chevron-btn" data-count="${teamAgentCount}" onclick="event.stopPropagation();toggleTeamRows('${dataTeam}')" title="${isCollapsed?'펼치기':'접기'}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 10px;font-size:14px;font-weight:900;cursor:pointer;margin-right:10px;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s">${isCollapsed?'▶ 펼치기':'▼ 접기'} · ${teamAgentCount}명</button>`
+    ? `<button class="team-chevron-btn" data-count="${teamAgentCount}" onclick="event.stopPropagation();toggleTeamRows('${dataTeam}')" title="${isCollapsed?'펼치기':'접기'}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 11px;font-size:13px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s;white-space:nowrap;letter-spacing:-.2px">${isCollapsed?'▶ 펼치기':'▼ 접기'} · ${teamAgentCount}명</button>`
     : '';
   const rowAttr = isTeamRow ? `data-team-row="${dataTeam}"` : '';
   return `<tr class="${isAll?'row-all':''}" data-team="${dataTeam}" ${rowAttr}>
-    <td class="team-cell" style="color:${color}">${teamBar}${chevron}${emoSpan}${label}</td>
+    <td class="team-cell" style="color:${color}"><div class="team-cell-row">${teamBar}${emoSpan}${label}</div>${chevron}</td>
     <td>${st.db ? `<span class="num-val col-db" onclick="kpiTblClick(event,'db','${dataTeam}')">${f(st.db)}</span>` : `<span class="num-val zero">-</span>`}</td>
     <td>${num(st.d,'d','#16a34a')}</td>
     <td>${num(st.ls,'ls','#1d4ed8')}</td>
