@@ -566,13 +566,14 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cal-nav-btn:hover{background:#0284c7;color:white;transform:scale(1.05)}
 .cal-nav-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
 .cal-month-label{font-size:18px;font-weight:900;min-width:90px;text-align:center;color:#0c4a6e;letter-spacing:-0.3px}
-.cal-team-tabs{display:flex;gap:6px;align-items:center}
-.cal-tt-btn{padding:7px 16px;border:2px solid #cbd5e1;background:white;border-radius:999px;cursor:pointer;font-size:13px;font-weight:700;color:#475569;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.cal-tt-btn:hover:not(.on){background:#f1f5f9;border-color:#94a3b8}
-.cal-tt-btn.on{background:#1e293b;color:white;border-color:#1e293b;box-shadow:0 2px 6px rgba(30,41,59,.25)}
-.cal-tt-btn.on[data-team="TIM_GIAR"]{background:#1a73e8;border-color:#1a73e8}
-.cal-tt-btn.on[data-team="TIM_TINA"]{background:#16a34a;border-color:#16a34a}
-.cal-tt-btn.on[data-team="TIM_LIDIA"]{background:#ea4335;border-color:#ea4335}
+.cal-team-tabs{display:flex;gap:7px;align-items:center;padding:3px;background:#f1f5f9;border-radius:12px;border:1.5px solid #cbd5e1}
+.cal-tt-btn{padding:8px 18px;border:none;background:transparent;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:900;color:#475569;display:inline-flex;align-items:center;gap:6px;transition:all .15s;letter-spacing:-.3px}
+.cal-tt-btn:hover:not(.on){background:#fff;color:#1e293b;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.cal-tt-btn.on{background:#1e293b;color:#fff;box-shadow:0 3px 8px rgba(30,41,59,.3)}
+.cal-tt-btn.on[data-team="TIM_GIAR"]{background:linear-gradient(135deg,#1a73e8,#1d4ed8);box-shadow:0 3px 10px rgba(26,115,232,.4)}
+.cal-tt-btn.on[data-team="TIM_TINA"]{background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 3px 10px rgba(22,163,74,.4)}
+.cal-tt-btn.on[data-team="TIM_LIDIA"]{background:linear-gradient(135deg,#ea4335,#dc2626);box-shadow:0 3px 10px rgba(234,67,53,.4)}
+.cal-tt-btn .cal-tt-dot{width:9px;height:9px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1.5px rgba(255,255,255,.6)}
 .cal-tt-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
 .cal-agent-sel{padding:8px 14px;border:2px solid #cbd5e1;border-radius:8px;background:white;font-size:13px;font-weight:600;color:#334155;cursor:pointer;min-width:160px}
 .cal-agent-sel:hover{border-color:#94a3b8}
@@ -1058,6 +1059,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <button class="scope-btn" data-scope="OFF" onclick="selectScope('OFF')"><span class="scope-dot" style="background:#a855f7"></span>OFF DB</button>
   <button class="scope-btn" data-scope="MKT" onclick="selectScope('MKT')"><span class="scope-dot" style="background:#06b6d4"></span>MKT DB</button>
   <div style="flex:1"></div>
+  <button class="scope-btn" data-scope="TEAM_ALL" onclick="selectScope('TEAM_ALL')">🌐 전체팀</button>
   <button class="scope-btn" data-scope="TIM_GIAR"  onclick="selectScope('TIM_GIAR')"><span class="scope-dot" style="background:#1a73e8"></span>TIM_GIAR</button>
   <button class="scope-btn" data-scope="TIM_TINA"  onclick="selectScope('TIM_TINA')"><span class="scope-dot" style="background:#16a34a"></span>TIM_TINA</button>
   <button class="scope-btn" data-scope="TIM_LIDIA" onclick="selectScope('TIM_LIDIA')"><span class="scope-dot" style="background:#ea4335"></span>TIM_LIDIA</button>
@@ -1198,12 +1200,6 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
       <button class="cal-nav-btn" onclick="calPrevMonth()" title="이전 월">◀</button>
       <span class="cal-month-label" id="cal-month-label">5월</span>
       <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월">▶</button>
-    </div>
-    <div class="cal-team-tabs">
-      <button class="cal-tt-btn on" data-team="ALL" onclick="setCalTeamQuick('ALL')">🌐 전체팀</button>
-      <button class="cal-tt-btn" data-team="TIM_GIAR" onclick="setCalTeamQuick('TIM_GIAR')"><span class="cal-tt-dot" style="background:#1a73e8"></span>GIAR</button>
-      <button class="cal-tt-btn" data-team="TIM_TINA" onclick="setCalTeamQuick('TIM_TINA')"><span class="cal-tt-dot" style="background:#16a34a"></span>TINA</button>
-      <button class="cal-tt-btn" data-team="TIM_LIDIA" onclick="setCalTeamQuick('TIM_LIDIA')"><span class="cal-tt-dot" style="background:#ea4335"></span>LIDIA</button>
     </div>
     <div class="cal-agent-tabs" id="cal-agent-tabs"></div>
   </div>
@@ -1833,10 +1829,12 @@ function buildCalAgentButtons(){
 }
 
 function selectScope(scope){
-  // scope: 'ALL' | 'TIM_GIAR' | 'TIM_TINA' | 'TIM_LIDIA' | 'OFF' | 'MKT'
+  // scope: 'ALL' | 'TEAM_ALL' | 'TIM_GIAR' | 'TIM_TINA' | 'TIM_LIDIA' | 'OFF' | 'MKT'
   if(scope === 'OFF' || scope === 'MKT'){
     curDbKind = scope;
     curTeam = 'ALL';
+  } else if(scope === 'TEAM_ALL'){
+    curTeam = 'ALL'; // 팀 필터만 해제 (DB 필터 유지)
   } else {
     curTeam = scope;
     curDbKind = 'ALL';
