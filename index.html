@@ -5533,6 +5533,21 @@ function printAgentReport(lang){
 }
 
 function renderAgentInsightOnly(){
+  // 에이전트 미선택 시: 모든 섹션 숨김 (상단 .cal-controls 의 팀/에이전트 단추만 보임)
+  const aiTab = document.getElementById('content-agent_insight');
+  if(curAgent === 'ALL'){
+    if(aiTab){
+      Array.from(aiTab.children).forEach(el=>{ el.style.display = 'none'; });
+      aiTab.classList.remove('ai-single');
+    }
+    return;
+  }
+  // 에이전트 선택됨: 모든 섹션 표시 (ai-report-header 는 아래 로직이 제어)
+  if(aiTab){
+    Array.from(aiTab.children).forEach(el=>{
+      if(el.id !== 'ai-report-header') el.style.display = '';
+    });
+  }
   // 1. 각 섹션을 원본 위치에 렌더 (다른 탭에 있는 DOM이지만 innerHTML 설정 가능)
   renderDBSummary();
   renderRank();
@@ -5567,7 +5582,6 @@ function renderAgentInsightOnly(){
   const detailActions = document.getElementById('ai-sec-detail-actions');
   if(detailActions) detailActions.style.display = singleAgent ? 'none' : '';
   // 컨테이너에 단일 모드 플래그 (CSS로 헤더 행 숨김 등 추가 처리)
-  const aiTab = document.getElementById('content-agent_insight');
   if(aiTab) aiTab.classList.toggle('ai-single', singleAgent);
   // 단일 에이전트: 긴급 카드 자동 펼침
   if(singleAgent){
