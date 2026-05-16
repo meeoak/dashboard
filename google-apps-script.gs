@@ -79,10 +79,29 @@ function doPost(e){
   }
 }
 
-// 간단한 health check
+// health check + 배포 진단
+// 브라우저로 직접 열어서 SPREADSHEET_ID / 시트 접근 가능 여부 확인 가능
 function doGet(){
+  const info = {
+    ok: true,
+    msg: 'webhook alive',
+    t: new Date().toISOString(),
+    spreadsheetId: SPREADSHEET_ID,
+    spreadsheetOk: false,
+    spreadsheetName: null,
+    tabs: null,
+    err: null
+  };
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    info.spreadsheetOk = true;
+    info.spreadsheetName = ss.getName();
+    info.tabs = ss.getSheets().map(function(s){return s.getName();});
+  } catch(err){
+    info.err = String(err);
+  }
   return ContentService
-    .createTextOutput(JSON.stringify({ok:true, msg:'webhook alive', t:new Date().toISOString()}))
+    .createTextOutput(JSON.stringify(info))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
