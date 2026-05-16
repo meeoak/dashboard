@@ -784,15 +784,15 @@ body.focus-mode #detail-section-hd{display:none!important}
 .rname-clickable:hover{color:#1e3a8a;border-bottom-color:#1e3a8a}
 .rteam{font-size:11px;color:#64748b;font-weight:700}
 .rteam b{color:#0f172a;font-weight:900}
-.rbar-bg{height:9px;background:#f1f5f9;border-radius:5px;margin-top:8px;overflow:visible;position:relative}
-.rbar{border-radius:5px}
-.rbar-pace-mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:#0f172a;transform:translateX(-1px);pointer-events:none;z-index:2;border-radius:2px}
-.r-dual-bar{display:flex;flex-direction:column;gap:4px;margin-top:6px}
-.r-dual-row{display:flex;align-items:center;gap:6px}
+.rbar-bg{height:20px;background:#f1f5f9;border-radius:10px;margin-top:8px;overflow:visible;position:relative;border:1px solid #e2e8f0}
+.rbar{border-radius:10px}
+.rbar-pace-mark{position:absolute;top:-3px;bottom:-3px;width:3px;background:#0f172a;transform:translateX(-1.5px);pointer-events:none;z-index:2;border-radius:2px}
+.r-dual-bar{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.r-dual-row{display:flex;align-items:center;gap:8px}
 .r-dual-row.r-dual-prev{opacity:.85}
-.r-dual-lbl{font-size:9.5px;font-weight:900;color:#64748b;letter-spacing:-.2px;min-width:24px;text-align:right}
+.r-dual-lbl{font-size:11px;font-weight:900;color:#64748b;letter-spacing:-.2px;min-width:30px;text-align:right}
 .r-dual-row .rbar-bg{flex:1;margin-top:0}
-.r-dual-val{font-size:10.5px;font-weight:900;letter-spacing:-.3px;min-width:26px;text-align:right}
+.r-dual-val{font-size:13px;font-weight:900;letter-spacing:-.3px;min-width:30px;text-align:right}
 .r-dual-prev .r-dual-val{color:#64748b}
 .rbar-prev-mark{position:absolute;top:-3px;bottom:-3px;width:2px;transform:translateX(-1px);pointer-events:none;z-index:1;border-radius:2px;background:#94a3b8}
 .rbar-prev-mark.beat{background:#16a34a}
@@ -800,7 +800,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 .rk-prev{display:inline-flex;align-items:center;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:7px;letter-spacing:-.2px;white-space:nowrap;line-height:1.4}
 .rk-prev.beat{background:#dcfce7;color:#15803d;border:1.5px solid #86efac}
 .rk-prev.below{background:#fef2f2;color:#b91c1c;border:1.5px solid #fecaca}
-.rbar{height:100%;border-radius:5px;transition:width .5s}
+.rbar{height:100%;border-radius:10px;transition:width .5s}
+.rstat-rate{background:#fef9c3;border:1px solid #fcd34d;border-radius:6px}
 .rstats{display:flex;gap:5px;flex-shrink:0;align-items:center}
 .rstat{text-align:center;min-width:36px;padding:3px 5px;border-radius:6px;transition:background .12s}
 .rstat:hover{background:#f1f5f9}
@@ -864,8 +865,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 .bc-idx-num small{font-size:14px;font-weight:800;color:#94a3b8;letter-spacing:-.2px}
 .bc-idx-lbl{font-size:11px;font-weight:800;color:#64748b;letter-spacing:-.2px;margin-bottom:7px}
 .bc-idx-lbl small{font-weight:700;color:#94a3b8;font-size:10px}
-.bc-idx-bar{height:11px;background:#f1f5f9;border-radius:6px;overflow:visible;position:relative}
-.bc-idx-fill{height:100%;border-radius:6px;transition:width .4s}
+.bc-idx-bar{height:22px;background:#f1f5f9;border-radius:11px;overflow:visible;position:relative;border:1px solid #e2e8f0}
+.bc-idx-fill{height:100%;border-radius:11px;transition:width .4s}
 .bc-pace-mark{position:absolute;top:-4px;bottom:-4px;width:3px;background:#0f172a;transform:translateX(-1.5px);pointer-events:none;z-index:2;border-radius:2px}
 .bc-prev-mark{position:absolute;top:-4px;bottom:-4px;width:3px;transform:translateX(-1.5px);pointer-events:none;z-index:1;border-radius:2px}
 .bc-prev-mark.beat{background:#16a34a}
@@ -3709,8 +3710,8 @@ function renderRank(){
     const s = statsRange(curFrom, curTo, null, a);
     const meta = D.agent_meta[a]||{};
     agentStats[a] = {
-      a, db:s.db||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0,
-      r_dc:s.r_dc||0,
+      a, db:s.db||0, sched:s.sched||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0,
+      r_dc:s.r_dc||0, r_vc:s.r_vc||0, r_sv:s.r_sv||0, r_ds:s.r_ds||0,
       actIdx: calcActivityIndex(s),
       team:meta.team, ini:meta.initials
     };
@@ -3794,7 +3795,7 @@ function renderRank(){
   const totalAgents = list.length;
   let rh='';
   list.forEach((x,i)=>{
-    const {a,actIdx,d,ls,vc,cl,r_dc,team,ini} = x;
+    const {a,actIdx,db,sched,d,ls,vc,cl,r_dc,r_vc,r_sv,r_ds,team,ini} = x;
     // KPI 달성률 (기간 비례 목표 대비)
     const achPct = kpiTarget>0 ? actIdx/kpiTarget*100 : 0;
     const barPct = Math.min(100, Math.round(achPct));
@@ -3853,10 +3854,13 @@ function renderRank(){
         </div>
       </div>
       <div class="rstats">
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','d')"><div class="rstat-v" style="color:#16a34a">${d}</div><div class="rstat-l">완료</div></div>
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','vc')"><div class="rstat-v" style="color:#6d28d9">${vc}</div><div class="rstat-l">비디오</div></div>
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','ls')"><div class="rstat-v" style="color:#1e293b">${ls}</div><div class="rstat-l">랑숭</div></div>
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','cl')"><div class="rstat-v" style="color:#dc2626">${cl}</div><div class="rstat-l">클로징</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','db')" title="DB 배정"><div class="rstat-v" style="color:#1e3a8a">${db}</div><div class="rstat-l">DB</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','s,d,vc,ls,cl')" title="상담예약 (sched)"><div class="rstat-v" style="color:#0891b2">${sched}</div><div class="rstat-l">예약</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','d')" title="방문완료"><div class="rstat-v" style="color:#16a34a">${d}</div><div class="rstat-l">완료</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','vc')" title="비디오콜"><div class="rstat-v" style="color:#6d28d9">${vc}</div><div class="rstat-l">비디오</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','ls')" title="랑숭비짓"><div class="rstat-v" style="color:#1e293b">${ls}</div><div class="rstat-l">랑숭</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','cl')" title="클로징"><div class="rstat-v" style="color:#dc2626">${cl}</div><div class="rstat-l">클로</div></div>
+        <div class="rstat rstat-rate" title="DB 대비 클로징율"><div class="rstat-v" style="color:#1e3a8a">${r_dc}%</div><div class="rstat-l">DB→cl</div></div>
         <div class="score-badge act-idx">${actIdx}<small>/${kpiTarget}</small></div>
       </div></div>`;
   });
