@@ -641,7 +641,9 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cstat:hover{transform:translateY(-3px);box-shadow:0 8px 20px #0002}
 .cstat .cs-top-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px;padding-bottom:2px}
 .cstat .cs-lbl{font-size:14.5px;font-weight:900;color:#0f172a;display:flex;align-items:center;gap:6px;padding-bottom:6px;flex:1;min-width:0}
-.cstat .cs-num{font-size:52px;font-weight:900;line-height:.9;letter-spacing:-2px;text-align:right;margin:0;flex-shrink:0;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cstat .cs-num{font-size:52px;font-weight:900;line-height:.9;letter-spacing:-2px;text-align:right;margin:0;flex-shrink:0;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;transition:transform .12s,filter .12s}
+.cstat .cs-num.clickable{cursor:pointer}
+.cstat .cs-num.clickable:hover{transform:scale(1.08);filter:brightness(1.15)}
 .cstat .cs-metrics{display:flex;flex-direction:column;gap:9px;padding-top:12px;border-top:2px solid rgba(0,0,0,.1)}
 .cstat .cs-m{display:flex;justify-content:space-between;align-items:center;padding:3px 0;min-height:24px}
 .cstat .cs-m-lbl{color:#374151;font-size:12.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase}
@@ -2981,18 +2983,20 @@ function renderCal(){
       ['s','📅', T('cal_label_book'),     totals.s,  prevTotals.s,  weekTotals.s,  topByStatus.s],
       ['w','⏳', T('cal_label_wait'),     totals.w,  prevTotals.w,  weekTotals.w,  topByStatus.w],
       ['d','✅', T('cal_label_done'),     totals.d,  prevTotals.d,  weekTotals.d,  topByStatus.d],
-      ['vc','📹',T('cal_label_video'),    totals.vc, prevTotals.vc, weekTotals.vc, topByStatus.vc],
       ['ls','⬜',T('cal_label_langsung'), totals.ls, prevTotals.ls, weekTotals.ls, topByStatus.ls],
+      ['vc','📹',T('cal_label_video'),    totals.vc, prevTotals.vc, weekTotals.vc, topByStatus.vc],
     ].map(([k,icon,lbl,n,pn,wn,top])=>{
       const avg = (n/daysIn).toFixed(1);
       const share = n>0 && top ? Math.round(top.count/n*100) : 0;
       const topHtml = top
         ? `<span class="cs-top-name">${top.name}</span><span class="cs-top-cnt">${top.count}건${share?` · ${share}%`:''}</span>`
         : `<span class="cs-m-val same">-</span>`;
+      const numClickable = n>0 ? ` clickable" onclick="openMonthType('${k}','${month}')` : '';
+      const numTitle = n>0 ? `title="${lbl} ${n}건 — 클릭 → 회원 목록"` : '';
       return `<div class="cstat cs-${k}">
         <div class="cs-top-row">
           <div class="cs-lbl">${icon} ${lbl}</div>
-          <div class="cs-num">${n}</div>
+          <div class="cs-num${numClickable}" ${numTitle}>${n}</div>
         </div>
         <div class="cs-metrics">
           <div class="cs-m"><span class="cs-m-lbl">전월 대비</span>${deltaFmt(n,pn)}</div>
@@ -5293,6 +5297,16 @@ function openMem(agent, stype, month, labelOverride){
 function openDayType(date, stype){
   const recs = D.cal_recs.filter(r=>r.vd===date && r.st===stype && (curTeam==='ALL'||r.t===curTeam) && (curAgent==='ALL'||r.a===curAgent));
   showMem(recs, null, stype, date.slice(0,7), date);
+}
+function openMonthType(stype, month){
+  const recs = D.cal_recs.filter(r =>
+    r.vd && r.vd.startsWith(month) &&
+    r.st === stype &&
+    (curTeam==='ALL' || r.t===curTeam) &&
+    (curAgent==='ALL' || r.a===curAgent) &&
+    !((curDbKind==='OFF' || curDbKind==='MKT') && r.dk!==curDbKind)
+  );
+  showMem(recs, null, stype, month, null);
 }
 function openDayDone(date){
   const done = new Set(['d','ls','vc']);
