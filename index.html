@@ -635,14 +635,41 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cal-report-title{font-size:20px;font-weight:900;color:#1a1a1a;margin:0;line-height:1.2}
 .cal-report-total{font-size:12px;color:#666;font-weight:700}
 .cal-stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
-.cstat{background:#fff;border:1px solid #eee;border-left:4px solid;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
-.cstat .cs-lbl{font-size:11px;font-weight:700;color:#666;display:flex;align-items:center;gap:5px}
-.cstat .cs-num{font-size:26px;font-weight:900;line-height:1.1}
-.cstat.cs-s{border-left-color:#1d4ed8;background:#f5f9ff}.cstat.cs-s .cs-num{color:#1d4ed8}
-.cstat.cs-w{border-left-color:#d97706;background:#fffbeb}.cstat.cs-w .cs-num{color:#92400e}
-.cstat.cs-d{border-left-color:#16a34a;background:#f0fdf4}.cstat.cs-d .cs-num{color:#16a34a}
-.cstat.cs-vc{border-left-color:#7c3aed;background:#faf5ff}.cstat.cs-vc .cs-num{color:#6d28d9}
-.cstat.cs-ls{border-left-color:#ea580c;background:#fff7ed}.cstat.cs-ls .cs-num{color:#9a3412}
+.cstat{position:relative;border:none;border-radius:12px;padding:12px 14px 12px 18px;display:flex;flex-direction:column;gap:3px;overflow:hidden;box-shadow:0 2px 6px #0001;transition:all .18s}
+.cstat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px}
+.cstat::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;opacity:.08;pointer-events:none}
+.cstat:hover{transform:translateY(-3px);box-shadow:0 6px 16px #0002}
+.cstat .cs-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.cstat .cs-lbl{font-size:13px;font-weight:800;color:#1a1a1a;display:flex;align-items:center;gap:5px}
+.cstat .cs-pct{font-size:10.5px;font-weight:800;color:#888;padding:1px 6px;background:#fff8;border-radius:99px}
+.cstat .cs-num{font-size:42px;font-weight:900;line-height:1;letter-spacing:-1.5px;margin:4px 0 6px;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cstat .cs-bar{height:5px;border-radius:99px;background:#fff;overflow:hidden}
+.cstat .cs-bar-fill{height:100%;border-radius:99px;transition:width .4s ease}
+.cstat.cs-s{background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%)}
+.cstat.cs-s::before{background:linear-gradient(180deg,#3b82f6,#1d4ed8)}
+.cstat.cs-s::after{background:#1d4ed8}
+.cstat.cs-s .cs-num{background-image:linear-gradient(135deg,#3b82f6,#1e40af);color:#1d4ed8}
+.cstat.cs-s .cs-bar-fill{background:linear-gradient(90deg,#3b82f6,#1d4ed8)}
+.cstat.cs-w{background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%)}
+.cstat.cs-w::before{background:linear-gradient(180deg,#f59e0b,#d97706)}
+.cstat.cs-w::after{background:#d97706}
+.cstat.cs-w .cs-num{background-image:linear-gradient(135deg,#f59e0b,#92400e);color:#92400e}
+.cstat.cs-w .cs-bar-fill{background:linear-gradient(90deg,#f59e0b,#d97706)}
+.cstat.cs-d{background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 100%)}
+.cstat.cs-d::before{background:linear-gradient(180deg,#22c55e,#15803d)}
+.cstat.cs-d::after{background:#16a34a}
+.cstat.cs-d .cs-num{background-image:linear-gradient(135deg,#22c55e,#15803d);color:#15803d}
+.cstat.cs-d .cs-bar-fill{background:linear-gradient(90deg,#22c55e,#15803d)}
+.cstat.cs-vc{background:linear-gradient(135deg,#faf5ff 0%,#ede9fe 100%)}
+.cstat.cs-vc::before{background:linear-gradient(180deg,#a855f7,#6d28d9)}
+.cstat.cs-vc::after{background:#7c3aed}
+.cstat.cs-vc .cs-num{background-image:linear-gradient(135deg,#a855f7,#6d28d9);color:#6d28d9}
+.cstat.cs-vc .cs-bar-fill{background:linear-gradient(90deg,#a855f7,#6d28d9)}
+.cstat.cs-ls{background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 100%)}
+.cstat.cs-ls::before{background:linear-gradient(180deg,#fb923c,#c2410c)}
+.cstat.cs-ls::after{background:#ea580c}
+.cstat.cs-ls .cs-num{background-image:linear-gradient(135deg,#fb923c,#9a3412);color:#9a3412}
+.cstat.cs-ls .cs-bar-fill{background:linear-gradient(90deg,#fb923c,#c2410c)}
 .cal-report-legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11.5px;font-weight:700;color:#555;padding-top:2px}
 .cleg-item{display:inline-flex;align-items:center;gap:5px}
 .cleg-item .ldot{width:11px;height:11px;border-radius:3px;display:inline-block}
@@ -655,9 +682,10 @@ body.focus-mode #detail-section-hd{display:none!important}
   .cal-report-header{padding:10px 12px 12px}
   .cal-report-title{font-size:16px}
   .cal-stat-cards{grid-template-columns:repeat(2,1fr);gap:6px}
-  .cstat{padding:8px 10px}
-  .cstat .cs-num{font-size:20px}
-  .cstat .cs-lbl{font-size:10.5px}
+  .cstat{padding:10px 10px 10px 14px}
+  .cstat .cs-num{font-size:30px}
+  .cstat .cs-lbl{font-size:11.5px}
+  .cstat .cs-pct{font-size:9.5px}
   .cal-report-legend{font-size:10.5px;gap:8px}
 }
 
@@ -1870,7 +1898,7 @@ function buildCalAgentButtons(){
   const agents = isAll ? [] : (D.team_members[curTeam]||[]);
   const tcol = isAll ? '#1e293b' : (TC[curTeam] || '#888');
   // ── 상단(월 옆): 전체 에이전트 + 팀 단추 3개 ──
-  let teamHtml = `<button class="cal-at-btn ${curAgent==='ALL' && isAll ?'on':''}" data-agent="ALL" onclick="setCalAgentQuick('ALL')">👥 전체 에이전트</button>`;
+  let teamHtml = `<button class="cal-at-btn ${curAgent==='ALL' && isAll ?'on':''}" data-agent="ALL" onclick="setCalTeamQuick('ALL')">👥 전체 에이전트</button>`;
   ['TIM_GIAR','TIM_TINA','TIM_LIDIA'].forEach(t=>{
     const isOn = curTeam === t;
     const c = TC[t];
@@ -2812,16 +2840,24 @@ function renderCal(){
   // 보고서 헤더의 카운트 카드 (상태별 큰 숫자)
   const cardsEl = document.getElementById('cal-stat-cards');
   if(cardsEl){
+    const grand = totals.s + totals.w + totals.d + totals.vc + totals.ls;
     cardsEl.innerHTML = [
       ['s','📅', T('cal_label_book'),  totals.s],
       ['w','⏳', T('cal_label_wait'),  totals.w],
       ['d','✅', T('cal_label_done'),  totals.d],
       ['vc','📹',T('cal_label_video'), totals.vc],
       ['ls','⬜',T('cal_label_langsung'), totals.ls],
-    ].map(([k,icon,lbl,n])=>`<div class="cstat cs-${k}">
-      <div class="cs-lbl">${icon} ${lbl}</div>
-      <div class="cs-num">${n}</div>
-    </div>`).join('');
+    ].map(([k,icon,lbl,n])=>{
+      const pct = grand > 0 ? Math.round(n/grand*100) : 0;
+      return `<div class="cstat cs-${k}">
+        <div class="cs-head">
+          <div class="cs-lbl">${icon} ${lbl}</div>
+          <div class="cs-pct">${pct}%</div>
+        </div>
+        <div class="cs-num">${n}</div>
+        <div class="cs-bar"><div class="cs-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
   }
 
   const dows = [T('dow_mon'),T('dow_tue'),T('dow_wed'),T('dow_thu'),T('dow_fri'),T('dow_sat'),T('dow_sun')];
