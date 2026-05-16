@@ -1652,16 +1652,6 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   </div>
   <!-- 👤 에이전트별 토탈관리 (대시보드 + 활동지수 + 긴급관리 + 상세분석) -->
   <div id="content-agent_insight" style="display:none">
-    <!-- 👤 에이전트 미선택 시 안내 placeholder -->
-    <div id="ai-placeholder" style="display:none;padding:64px 24px;text-align:center;background:linear-gradient(180deg,#f8fafc 0%,#fff 100%);border:2px dashed #cbd5e1;border-radius:14px;margin:18px 0">
-      <div style="font-size:56px;margin-bottom:18px">👤</div>
-      <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:10px">에이전트를 선택해주세요</div>
-      <div style="color:#64748b;font-size:14px;line-height:1.7">위의 <b>팀 단추</b>를 누른 뒤 <b>에이전트 이름</b>을 클릭하면<br>그 에이전트의 상세 보고서가 나타납니다.</div>
-      <div style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('ko')" title="전체 에이전트 한국어 일괄 PDF" style="padding:9px 16px;font-size:12px">📄 전체 에이전트 · KR</button>
-        <button class="ins-ag-d-btn ins-ag-d-btn-pdf" onclick="openAllAgentsReport('id')" title="Semua agen Laporan Bahasa PDF" style="padding:9px 16px;font-size:12px">📄 전체 에이전트 · ID</button>
-      </div>
-    </div>
     <!-- 📑 보고서 헤더 (단일 에이전트 선택 시만 표시) -->
     <div id="ai-report-header" style="display:none"></div>
     <!-- 섹션 1: 📊 DB 배정 분석 (선택 에이전트) -->
@@ -5543,25 +5533,19 @@ function printAgentReport(lang){
 }
 
 function renderAgentInsightOnly(){
-  // 에이전트 미선택 시: 안내 placeholder만 노출, 나머지 섹션 모두 숨김
-  // (사용자는 상단 .cal-controls 의 팀/에이전트 단추로 선택)
+  // 에이전트 미선택 시: 모든 섹션 숨김 (상단 .cal-controls 의 팀/에이전트 단추만 보임)
   const aiTab = document.getElementById('content-agent_insight');
-  const placeholder = document.getElementById('ai-placeholder');
   if(curAgent === 'ALL'){
-    if(placeholder) placeholder.style.display = '';
     if(aiTab){
-      Array.from(aiTab.children).forEach(el=>{
-        if(el.id !== 'ai-placeholder') el.style.display = 'none';
-      });
+      Array.from(aiTab.children).forEach(el=>{ el.style.display = 'none'; });
       aiTab.classList.remove('ai-single');
     }
     return;
   }
-  // 에이전트 선택됨: placeholder 숨기고 나머지 섹션 표시 (ai-report-header 는 아래 로직이 제어)
-  if(placeholder) placeholder.style.display = 'none';
+  // 에이전트 선택됨: 모든 섹션 표시 (ai-report-header 는 아래 로직이 제어)
   if(aiTab){
     Array.from(aiTab.children).forEach(el=>{
-      if(el.id !== 'ai-placeholder' && el.id !== 'ai-report-header') el.style.display = '';
+      if(el.id !== 'ai-report-header') el.style.display = '';
     });
   }
   // 1. 각 섹션을 원본 위치에 렌더 (다른 탭에 있는 DOM이지만 innerHTML 설정 가능)
