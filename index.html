@@ -5681,56 +5681,6 @@ function renderAgentCardsOnly(){
         </div>`:''}
       </div>
 
-      <!-- 🚨 긴급 관리 (배정 후 2주 이내) -->
-      ${(()=>{
-        const urgent = findUrgentForAgent(x.a, D.today);
-        if(urgent.length===0){
-          return `<div class="ins-urgent ok"><div class="ins-urgent-hd">🚨 긴급 관리 (배정 후 2주 이내)</div><div class="ins-urgent-empty">✅ 긴급 관리 대상 없음 (이관 위험 0건)</div></div>`;
-        }
-        // 4 카테고리 카운트
-        const c_overdue = urgent.filter(u=>u.urgentIcon==='⚠️').length;
-        const c_idle    = urgent.filter(u=>u.urgentIcon==='🚨').length;
-        const c_wait    = urgent.filter(u=>u.urgentIcon==='⏳').length;
-        const c_soon    = urgent.filter(u=>u.urgentIcon==='📅').length;
-        const sevColor = ['#94a3b8','#d97706','#1d4ed8','#dc2626'];
-        const urgItems = urgent.slice(0,5).map(u=>`
-          <div class="ins-urgent-item sev-${u.severity}" onclick="openMem('${u.a}','${u.st}')">
-            <span class="urg-dday" style="background:${sevColor[u.severity]}">D-${u.daysLeft}</span>
-            <span class="urg-icon">${u.urgentIcon}</span>
-            <span class="urg-name">${u.nm||'-'}</span>
-            <span class="urg-pa">(${u.pa||'-'})</span>
-            <span class="urg-reason">${u.reason}</span>
-            <span class="urg-ad">${u.ad}</span>
-          </div>
-        `).join('');
-        return `<div class="ins-urgent danger">
-          <div class="ins-urgent-hd">🚨 긴급 관리 필요 <span class="urg-count">${urgent.length}건</span> <small>(배정 후 2주 이내 · 이관 임박)</small></div>
-          <div class="ins-urg-cats">
-            <div class="ins-urg-cat ${c_overdue>0?'red':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','s_o')" title="방문일 지남 · 클릭→명단"><b>${c_overdue}</b><span>⚠️ 방문일 지남</span></div>
-            <div class="ins-urg-cat ${c_idle>0?'red':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','none')" title="응답없음 · 클릭→명단"><b>${c_idle}</b><span>🚨 응답없음</span></div>
-            <div class="ins-urg-cat ${c_wait>0?'blue':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','w')" title="일정대기 누적 · 클릭→명단"><b>${c_wait}</b><span>⏳ 일정대기 누적</span></div>
-            <div class="ins-urg-cat ${c_soon>0?'yellow':'empty'}" onclick="event.stopPropagation();openMem('${x.a}','s_f')" title="방문 임박 · 클릭→명단"><b>${c_soon}</b><span>📅 방문 임박</span></div>
-          </div>
-          ${urgItems}
-          ${urgent.length>5?`<div class="urg-more" onclick="openMem('${x.a}','db')">+${urgent.length-5}건 더 보기 →</div>`:''}
-        </div>`;
-      })()}
-
-      <!-- 분석 (강점/약점/코칭) 3열 -->
-      <div class="ins-ag-d-analysis">
-        <div class="ins-ag-d-col">
-          <div class="ins-ag-d-h good">✅ 강점</div>
-          ${analysis.strengths.length?analysis.strengths.map(s=>`<div class="ins-ag-d-item good">${s}</div>`).join(''):'<div class="ins-ag-d-empty">-</div>'}
-        </div>
-        <div class="ins-ag-d-col">
-          <div class="ins-ag-d-h bad">⚠️ 약점 / 병목</div>
-          ${analysis.weaknesses.length?analysis.weaknesses.map(w=>`<div class="ins-ag-d-item bad sev-${w.sev}"><b>${w.icon} ${w.text}</b><div class="ins-ag-d-detail">${w.detail}</div></div>`).join(''):'<div class="ins-ag-d-empty">-</div>'}
-        </div>
-        <div class="ins-ag-d-col">
-          <div class="ins-ag-d-h tip">💡 팀리더 코칭 액션</div>
-          ${analysis.advices.length?analysis.advices.map((a,j)=>`<div class="ins-ag-d-item tip"><b>${j+1}. ${a.icon}</b> ${a.text}</div>`).join(''):'<div class="ins-ag-d-empty">-</div>'}
-        </div>
-      </div>
     </div>`;
   });
   agHtml += '</div>';
