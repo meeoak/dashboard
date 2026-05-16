@@ -827,7 +827,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-urg-chip span{font-size:10.5px;font-weight:800;letter-spacing:-.2px;line-height:1.1}
 .r3d-urg-chip.c-noMemo{color:#92400e;border-color:#fbbf24;background:#fffbeb}
 .r3d-urg-chip.c-overdue{color:#7f1d1d;border-color:#f87171;background:#fef2f2}
-.r3d-urg-chip.c-idle{color:#7f1d1d;border-color:#f87171;background:#fef2f2}
+.r3d-urg-chip.c-idle{color:#7c2d12;border-color:#fb923c;background:#fff7ed}
 .r3d-urg-chip.c-wait{color:#1e3a8a;border-color:#60a5fa;background:#eff6ff}
 .r3d-urg-chip.c-soon{color:#1e3a8a;border-color:#60a5fa;background:#eff6ff}
 .r3d-urg-toggle{cursor:pointer;background:#fff;border:2px solid #cbd5e1;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:900;color:#475569;margin-left:auto;display:flex;align-items:center;gap:5px;transition:all .12s}
@@ -842,14 +842,14 @@ body.focus-mode #detail-section-hd{display:none!important}
 .r3d-urg-tbl tr td:first-child{border-left:5px solid transparent;padding-left:10px}
 .r3d-urg-tbl tr.kind-noMemo td:first-child{border-left-color:#d97706}
 .r3d-urg-tbl tr.kind-overdue td:first-child{border-left-color:#dc2626}
-.r3d-urg-tbl tr.kind-idle td:first-child{border-left-color:#dc2626}
+.r3d-urg-tbl tr.kind-idle td:first-child{border-left-color:#ea580c}
 .r3d-urg-tbl tr.kind-wait td:first-child{border-left-color:#2563eb}
 .r3d-urg-tbl tr.kind-soon td:first-child{border-left-color:#2563eb}
 .r3d-urg-no{font-size:11.5px;font-weight:900;color:#94a3b8;width:34px;text-align:right;padding-right:8px;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
 .r3d-urg-band{display:inline-flex;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:900;padding:4px 8px;border-radius:6px;white-space:nowrap;letter-spacing:-.3px;border:1.5px solid;min-width:96px;line-height:1.1}
 .r3d-urg-tbl tr.kind-noMemo .r3d-urg-band{background:#fef3c7;color:#92400e;border-color:#fde68a}
 .r3d-urg-tbl tr.kind-overdue .r3d-urg-band{background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
-.r3d-urg-tbl tr.kind-idle .r3d-urg-band{background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
+.r3d-urg-tbl tr.kind-idle .r3d-urg-band{background:#ffedd5;color:#7c2d12;border-color:#fed7aa}
 .r3d-urg-tbl tr.kind-wait .r3d-urg-band{background:#dbeafe;color:#1e3a8a;border-color:#bfdbfe}
 .r3d-urg-tbl tr.kind-soon .r3d-urg-band{background:#dbeafe;color:#1e3a8a;border-color:#bfdbfe}
 .r3d-urg-nm{font-weight:800;color:#0f172a}
@@ -1015,6 +1015,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 .ub-stat-orange{border-color:#1d4ed8}.ub-stat-orange b{color:#1d4ed8}.ub-stat-orange span{color:#0f172a}
 .ub-stat-blue{border-color:#2563eb}.ub-stat-blue b{color:#2563eb}.ub-stat-blue span{color:#1e3a8a}
 .ub-stat-amber{border-color:#d97706}.ub-stat-amber b{color:#d97706}.ub-stat-amber span{color:#92400e}
+.ub-stat-coral{border-color:#ea580c}.ub-stat-coral b{color:#ea580c}.ub-stat-coral span{color:#7c2d12}
 .ub-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
 .ub-pdf-btn{background:#1e3a8a;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 6px rgba(30,58,138,.3);transition:all .12s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;letter-spacing:-.2px}
 .ub-pdf-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(30,58,138,.4);background:#1d4ed8}
@@ -3533,7 +3534,7 @@ function renderUrgentBanner(){
     <div class="ub-stats">
       ${totals.noMemo>0?`<div class="ub-stat ub-stat-amber" onclick="openUrgentByType('noMemo')" title="상담기록도 없고 옵션도 선택 안된 회원 목록 (아무 액션도 기록 안 됨)"><b>${totals.noMemo}</b><span>📝 상담기록없음</span></div>`:''}
       ${totals.overdue>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('overdue')" title="방문일 지남 회원 목록"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>`:''}
-      ${totals.idle>0?`<div class="ub-stat ub-stat-red" onclick="openUrgentByType('idle')" title="상담기록 있고 옵션도 선택됐는데 회원 무응답"><b>${totals.idle}</b><span>🚨 응답없음</span></div>`:''}
+      ${totals.idle>0?`<div class="ub-stat ub-stat-coral" onclick="openUrgentByType('idle')" title="옵션 미선택 + 메모 있음 — 응답없음"><b>${totals.idle}</b><span>🚨 응답없음</span></div>`:''}
       ${totals.wait>0?`<div class="ub-stat ub-stat-orange" onclick="openUrgentByType('wait')" title="일정대기 누적 회원 목록"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>`:''}
       ${totals.soon>0?`<div class="ub-stat ub-stat-blue" onclick="openUrgentByType('soon')" title="방문 임박 회원 목록"><b>${totals.soon}</b><span>📅 방문 임박</span></div>`:''}
     </div>
@@ -4752,9 +4753,17 @@ function renderRecent7DaysByTeam(){
     'kind-wait':    {icon:'⏳', lbl:'일정대기'},
     'kind-soon':    {icon:'📅', lbl:'방문 임박'},
   };
+  // 카테고리 우선순위: 상담기록없음 → 방문일 지남 → 응답없음 → 일정대기 → 방문 임박
+  const kindOrder = {noMemo:0, overdue:1, idle:2, wait:3, soon:4};
   const renderUrgRows = (urgent, agentName)=>{
     if(!urgent.length) return `<div class="r3d-urg-empty">긴급 관리 대상 없음</div>`;
-    return `<table class="r3d-urg-tbl">${urgent.map((u,i)=>{
+    const sorted = [...urgent].sort((a,b)=>{
+      const ka = kindOrder[classifyUrgent(a)] ?? 99;
+      const kb = kindOrder[classifyUrgent(b)] ?? 99;
+      if(ka !== kb) return ka - kb;
+      return (b.severity - a.severity) || (a.daysLeft - b.daysLeft);
+    });
+    return `<table class="r3d-urg-tbl">${sorted.map((u,i)=>{
       const ddayCls = u.daysLeft<=3 ? '' : (u.daysLeft<=7 ? 'warn' : 'ok');
       const recKey = esc(JSON.stringify({a:u.a, nm:u.nm||'', ad:u.ad||''}));
       const kindCls = 'kind-' + classifyUrgent(u);
