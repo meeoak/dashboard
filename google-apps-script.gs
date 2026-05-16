@@ -30,8 +30,8 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-// ⚠️ 자신의 스프레드시트 ID로 교체
-const SPREADSHEET_ID = 'PASTE_YOUR_SPREADSHEET_ID_HERE';
+// 영업팀 통합 대시보드 시트
+const SPREADSHEET_ID = '1NykBzZVm5YF1Y6ifluP209jSxVsHA741OYTFCp7DEU4';
 
 // 시트 컬럼 헤더 (순서대로)
 const HEADERS = [
