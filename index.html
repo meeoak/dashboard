@@ -747,9 +747,13 @@ body.focus-mode #detail-section-hd{display:none!important}
 .rstat:hover{background:#f1f5f9}
 .rstat-v{font-size:14px;font-weight:900;letter-spacing:-.3px}
 .rstat-l{font-size:9.5px;color:#94a3b8;font-weight:800;letter-spacing:-.2px}
-.score-badge{background:linear-gradient(135deg,#fef3c7,#fefce8);color:#1e3a8a;font-size:16px;font-weight:900;border-radius:9px;padding:6px 12px;min-width:54px;text-align:center;border:1.5px solid #fbbf24;letter-spacing:-.4px;line-height:1}
+.score-badge{background:linear-gradient(135deg,#fef3c7,#fefce8);color:#1e3a8a;font-size:18px;font-weight:900;border-radius:9px;padding:6px 12px;min-width:64px;text-align:center;border:1.5px solid #fbbf24;letter-spacing:-.4px;line-height:1}
 .score-badge small{font-size:10px;font-weight:800;color:#92400e;letter-spacing:-.2px;margin-left:1px}
-.top3-row .score-badge{background:linear-gradient(135deg,#fde68a,#fef3c7);border-color:#f59e0b;font-size:17px;padding:7px 14px}
+.score-badge.act-idx{background:linear-gradient(135deg,#dbeafe,#eff6ff);color:#1e3a8a;border-color:#3b82f6}
+.score-badge.act-idx small{color:#3b82f6}
+.top3-row .score-badge{background:linear-gradient(135deg,#fde68a,#fef3c7);border-color:#f59e0b;font-size:19px;padding:7px 14px}
+.top3-row .score-badge.act-idx{background:linear-gradient(135deg,#bfdbfe,#dbeafe);border-color:#2563eb}
+.rk-grade{display:inline-flex;color:#fff;font-size:10px;font-weight:900;padding:1px 7px;border-radius:6px;letter-spacing:-.2px;line-height:1.4;box-shadow:0 1px 2px rgba(0,0,0,.1)}
 .fire-tag{display:inline-flex;background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;font-size:10px;font-weight:900;border-radius:9px;padding:2px 8px;letter-spacing:-.2px;box-shadow:0 1px 3px rgba(220,38,38,.3);animation:firePulse 1.8s ease-in-out infinite}
 @keyframes firePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .rk-motivate{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:7px;letter-spacing:-.2px;white-space:nowrap}
@@ -772,22 +776,18 @@ body.focus-mode #detail-section-hd{display:none!important}
 .bcard.top1::before{content:'🥇 1위';position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;font-size:11.5px;font-weight:900;border-radius:14px;padding:4px 14px;white-space:nowrap;box-shadow:0 2px 6px rgba(30,58,138,.4);letter-spacing:-.2px}
 .bcard.top2::before{content:'🥈 2위';position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#475569,#94a3b8);color:#fff;font-size:11.5px;font-weight:900;border-radius:14px;padding:4px 14px;white-space:nowrap;box-shadow:0 2px 6px rgba(71,85,105,.3);letter-spacing:-.2px}
 .bcard.top3::before{content:'🥉 3위';position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#b45309,#f59e0b);color:#fff;font-size:11.5px;font-weight:900;border-radius:14px;padding:4px 14px;white-space:nowrap;box-shadow:0 2px 6px rgba(180,83,9,.3);letter-spacing:-.2px}
-.bc-name{font-size:16px;font-weight:900;letter-spacing:-.3px;text-align:center;margin-bottom:4px}
-.bc-fair-badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 9px;border-radius:10px;letter-spacing:-.2px;margin:0 auto 12px;text-align:center}
-.bc-fair-badge.top{background:#fef3c7;color:#854d0e;border:1.5px solid #fbbf24}
-.bc-fair-badge.mid{background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1}
-.bc-fair-badge.low{background:#fef3c7;color:#92400e;border:1.5px solid #fde68a}
-.bc-scores{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px;padding-bottom:11px;border-bottom:1px dashed #e5e7eb}
-.bc-score-block{text-align:center}
-.bc-score-num{font-size:30px;font-weight:900;line-height:1;letter-spacing:-1.5px;margin-bottom:3px}
-.bc-score-lbl{font-size:10.5px;font-weight:800;color:#64748b;letter-spacing:-.2px}
-.bc-score-lbl small{font-weight:700;color:#94a3b8;font-size:9.5px}
-.bc-avg .bc-score-num{font-size:26px}
-.bc-bars{margin-bottom:11px;display:flex;flex-direction:column;gap:5px}
-.bc-bar-row{display:flex;align-items:center;gap:7px}
-.bc-bar-lbl{font-size:9.5px;font-weight:800;color:#94a3b8;width:24px;letter-spacing:-.2px}
-.bc-bar{flex:1;height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden}
-.bc-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.bc-name{font-size:16px;font-weight:900;letter-spacing:-.3px;text-align:center;margin-bottom:8px}
+.bc-grade{display:inline-block;color:#fff;font-size:11px;font-weight:900;padding:3px 11px;border-radius:10px;letter-spacing:-.2px;margin:0 auto 11px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.bc-idx-block{text-align:center;margin-bottom:11px;padding-bottom:11px;border-bottom:1px dashed #e5e7eb}
+.bc-idx-num{font-size:42px;font-weight:900;line-height:1;letter-spacing:-2px;margin-bottom:4px}
+.bc-idx-num small{font-size:14px;font-weight:800;color:#94a3b8;letter-spacing:-.2px}
+.bc-idx-lbl{font-size:11px;font-weight:800;color:#64748b;letter-spacing:-.2px;margin-bottom:7px}
+.bc-idx-lbl small{font-weight:700;color:#94a3b8;font-size:10px}
+.bc-idx-bar{height:7px;background:#f1f5f9;border-radius:4px;overflow:hidden}
+.bc-idx-fill{height:100%;border-radius:4px;transition:width .4s}
+.bc-sum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#f8fafc;border-radius:6px;margin-bottom:10px}
+.bc-sum-lbl{font-size:10.5px;font-weight:800;color:#64748b;letter-spacing:-.2px}
+.bc-sum-val{font-size:14px;font-weight:900;letter-spacing:-.3px}
 .bc-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px}
 .bc-kpi{text-align:center;padding:5px 2px;background:#fafbfc;border-radius:6px;border:1px solid #f1f5f9}
 .bc-kpi b{display:block;font-size:15px;font-weight:900;line-height:1;letter-spacing:-.4px}
@@ -1464,13 +1464,13 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <div id="content-rank" style="display:none">
     <div class="sec-hd" style="padding-bottom:8px">
       <div><div class="sec-title">⚔️ 팀 배틀</div>
-      <div class="sec-sub">전체점수 = 팀 합계 · 평균점수 = 인원수로 나눈 공정 지표 (인원 격차 보정)</div></div>
+      <div class="sec-sub">평균 활동지수 기준 (100점 만점) · 인원 격차 없는 공정 평가</div></div>
       <div id="rank-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="battle-wrap" id="battle-wrap"></div>
     <div class="sec-hd" style="border-top:2px solid #f5f5f5">
       <div><div class="sec-title">🏆 에이전트 랭킹</div>
-      <div class="sec-sub">점수 = 클로징 ×5 + 방문완료/랑숭/비디오콜 ×1 · 클릭 → 회원 목록</div></div>
+      <div class="sec-sub">활동지수 (100점 만점) = 배정→예약(15) + 예약→방문(20) + 방문→클로징(25) + DB→클로징(40)</div></div>
     </div>
     <div class="rank-wrap" id="rank-wrap"></div>
   </div>
@@ -1822,6 +1822,19 @@ const TARGETS = {
   vc: 65,   // 방문→클로징 65% (클로징율)
   dc: 12,   // DB→클로징 12% (DB 대비 클로징율) ⭐ 최종 핵심 목표
 };
+
+// 활동지수 100점 만점 — 4가지 KPI 달성률 가중 평균
+// 가중치: DB→클로징(최종 결과) 40 / 방문→클로징 25 / 예약→방문 20 / 배정→예약 15
+// 각 KPI는 (실제율/목표율)*100 으로 환산하여 100점에서 캡
+function calcActivityIndex(s){
+  if(!s || (s.db||0) === 0) return 0;
+  const cap = v => Math.min(100, Math.max(0, v));
+  const ds = cap((s.r_ds||0) / TARGETS.ds * 100);
+  const sv = cap((s.r_sv||0) / TARGETS.sv * 100);
+  const vc = cap((s.r_vc||0) / TARGETS.vc * 100);
+  const dc = cap((s.r_dc||0) / TARGETS.dc * 100);
+  return Math.round(ds*0.15 + sv*0.20 + vc*0.25 + dc*0.40);
+}
 
 function targetStatus(actual, target){
   const pct = target>0 ? Math.round(actual/target*100) : 0;
@@ -3216,75 +3229,55 @@ function renderStats(){
 
 // ── 랭킹 & 배틀 ─────────────────────────────────────────
 function renderRank(){
-  // 에이전트별 점수 사전 계산 — 팀 MVP / 평균 계산에 사용
+  // 에이전트별 활동지수 사전 계산 (100점 만점)
   const allAgents = Object.keys(D.agent_total);
   const agentStats = {};
   allAgents.forEach(a=>{
     const s = statsRange(curFrom, curTo, null, a);
     const meta = D.agent_meta[a]||{};
-    agentStats[a] = {a, db:s.db||0, score:s.score||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0, dc:s.r_dc||0, team:meta.team, ini:meta.initials};
+    agentStats[a] = {
+      a, db:s.db||0, d:s.d||0, ls:s.ls||0, vc:s.vc||0, cl:s.cl||0,
+      r_ds:s.r_ds||0, r_sv:s.r_sv||0, r_vc:s.r_vc||0, r_dc:s.r_dc||0,
+      actIdx: calcActivityIndex(s),
+      team:meta.team, ini:meta.initials
+    };
   });
 
-  // ── 팀 배틀 ──
+  // ── 팀 배틀: 평균 활동지수 기준 ──
   const teamCards = D.teams.map(t=>{
     const s = statsRange(curFrom, curTo, t, null);
     const members = (D.team_members[t]||[]);
-    const activeMembers = members.filter(a => (agentStats[a]?.db||0) > 0);
-    const headcount = activeMembers.length || members.length;
-    const total = s.score||0;
-    const avg = headcount ? total/headcount : 0;
-    // 팀 MVP (해당 팀 내 점수 1위, 활동 있는 에이전트만)
+    const active = members.map(a=>agentStats[a]).filter(x=>x && x.db>0);
+    const headcount = active.length || members.length;
+    const sumIdx = active.reduce((acc,x)=>acc + x.actIdx, 0);
+    const avgIdx = active.length ? sumIdx/active.length : 0;
+    // 팀 MVP (해당 팀 내 활동지수 1위)
     let mvp = null;
-    members.forEach(a=>{
-      const st = agentStats[a];
-      if(!st || st.db===0) return;
-      if(!mvp || st.score > mvp.score) mvp = st;
-    });
-    return {t, s, headcount, total, avg, mvp};
+    active.forEach(x=>{ if(!mvp || x.actIdx > mvp.actIdx) mvp = x; });
+    return {t, s, headcount, sumIdx, avgIdx, mvp};
   });
-  // 총점 랭킹과 평균 랭킹 모두 계산 (공정성 표시용)
-  const totalRank = [...teamCards].sort((a,b)=>b.total-a.total);
-  const avgRank   = [...teamCards].sort((a,b)=>b.avg-a.avg);
-  const totalRankOf = (t)=> totalRank.findIndex(x=>x.t===t);
-  const avgRankOf   = (t)=> avgRank.findIndex(x=>x.t===t);
-  const sorted = totalRank; // 카드 표시 순서는 총점 기준
-  const maxTotal = Math.max(1, ...teamCards.map(x=>x.total));
-  const maxAvg   = Math.max(1, ...teamCards.map(x=>x.avg));
+  // 팀 랭킹 = 평균 활동지수 기준 (공정한 평가)
+  const sorted = [...teamCards].sort((a,b)=>b.avgIdx-a.avgIdx);
   let bh='';
-  sorted.forEach(({t,s,headcount,total,avg,mvp},i)=>{
-    const totalPct = Math.round(total/maxTotal*100);
-    const avgPct = Math.round(avg/maxAvg*100);
+  sorted.forEach(({t,s,headcount,sumIdx,avgIdx,mvp},i)=>{
     const cls = i===0?'top1':i===1?'top2':'top3';
-    const avgPos = avgRankOf(t);
-    const avgBadge = avgPos===0
-      ? '<span class="bc-fair-badge top">🏅 평균 1위</span>'
-      : (avgPos===1 ? '<span class="bc-fair-badge mid">평균 2위</span>'
-        : '<span class="bc-fair-badge low">평균 3위</span>');
+    const grade = avgIdx>=80?'A':avgIdx>=60?'B':avgIdx>=40?'C':'D';
+    const gradeColor = avgIdx>=80?'#16a34a':avgIdx>=60?'#2563eb':avgIdx>=40?'#d97706':'#dc2626';
+    const idxPct = Math.min(100, Math.round(avgIdx));
     const mvpHtml = mvp
-      ? `<div class="bc-mvp" onclick="openMem('${mvp.a}','d')" title="팀 MVP 회원 목록"><span class="bc-mvp-lbl">🔥 팀 MVP</span><span class="bc-mvp-name">${(D.agent_meta[mvp.a]||{}).short||mvp.a}</span><span class="bc-mvp-score" style="color:${TC[t]}">${mvp.score}점</span></div>`
+      ? `<div class="bc-mvp" onclick="openMem('${mvp.a}','d')" title="팀 MVP 회원 목록"><span class="bc-mvp-lbl">🔥 팀 MVP</span><span class="bc-mvp-name">${(D.agent_meta[mvp.a]||{}).short||mvp.a}</span><span class="bc-mvp-score" style="color:${TC[t]}">${mvp.actIdx}점</span></div>`
       : '';
     bh+=`<div class="bcard ${cls}" style="border-top:4px solid ${TC[t]}">
       <div class="bc-name" style="color:${TC[t]}">${teamShortName(t)}</div>
-      ${avgBadge}
-      <div class="bc-scores">
-        <div class="bc-score-block bc-total">
-          <div class="bc-score-num" style="color:${TC[t]}">${f(total)}</div>
-          <div class="bc-score-lbl">전체점수</div>
-        </div>
-        <div class="bc-score-block bc-avg">
-          <div class="bc-score-num" style="color:${TC[t]}">${avg.toFixed(1)}</div>
-          <div class="bc-score-lbl">평균점수 <small>(${headcount}명)</small></div>
-        </div>
+      <span class="bc-grade" style="background:${gradeColor}">${grade}등급</span>
+      <div class="bc-idx-block">
+        <div class="bc-idx-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}<small>/100</small></div>
+        <div class="bc-idx-lbl">평균 활동지수 <small>(${headcount}명)</small></div>
+        <div class="bc-idx-bar"><div class="bc-idx-fill" style="width:${idxPct}%;background:${TC[t]}"></div></div>
       </div>
-      <div class="bc-bars">
-        <div class="bc-bar-row">
-          <span class="bc-bar-lbl">전체</span>
-          <div class="bc-bar"><div class="bc-bar-fill" style="width:${totalPct}%;background:${TC[t]}"></div></div>
-        </div>
-        <div class="bc-bar-row">
-          <span class="bc-bar-lbl">평균</span>
-          <div class="bc-bar"><div class="bc-bar-fill" style="width:${avgPct}%;background:${TC[t]};opacity:.7"></div></div>
-        </div>
+      <div class="bc-sum-row">
+        <span class="bc-sum-lbl">합계</span>
+        <span class="bc-sum-val" style="color:${TC[t]}">${f(Math.round(sumIdx))}점</span>
       </div>
       <div class="bc-kpis">
         <div class="bc-kpi"><b style="color:#16a34a">${s.d||0}</b><span>방문완료</span></div>
@@ -3297,20 +3290,19 @@ function renderRank(){
   });
   document.getElementById('battle-wrap').innerHTML = bh;
 
-  // ── 에이전트 랭킹 ──
+  // ── 에이전트 랭킹: 활동지수(100점 만점) 기준 정렬 ──
   const agents = curTeam==='ALL' ? allAgents : (D.team_members[curTeam]||[]);
-  const list = agents.map(a=>agentStats[a]).filter(x=>x && x.db>0).sort((a,b)=>b.score-a.score);
-  const maxAS = Math.max(1,...list.map(x=>x.score));
+  const list = agents.map(a=>agentStats[a]).filter(x=>x && x.db>0).sort((a,b)=>b.actIdx-a.actIdx);
   const medals=['🥇','🥈','🥉'];
   const totalAgents = list.length;
   let rh='';
   list.forEach((x,i)=>{
-    const {a,score,d,ls,vc,cl,dc,team,ini} = x;
-    const pct = Math.round(score/maxAS*100);
+    const {a,actIdx,d,ls,vc,cl,r_dc,team,ini} = x;
+    const pct = Math.min(100, Math.round(actIdx));  // 활동지수 자체가 0-100
     const meta = D.agent_meta[a]||{};
     const short = meta.short || a;
     const isTop3 = i<3;
-    const nextGap = i>0 ? (list[i-1].score - score) : 0;
+    const nextGap = i>0 ? (list[i-1].actIdx - actIdx) : 0;
     // 다음 순위까지 동기 멘트
     let motivate = '';
     if(i===0){
@@ -3320,6 +3312,9 @@ function renderRank(){
     } else {
       motivate = `<span class="rk-motivate tied">= ${i}위와 동점</span>`;
     }
+    // 등급
+    const grade = actIdx>=80?'A':actIdx>=60?'B':actIdx>=40?'C':'D';
+    const gradeColor = actIdx>=80?'#16a34a':actIdx>=60?'#2563eb':actIdx>=40?'#d97706':'#dc2626';
     const rankBadge = isTop3
       ? `<div class="rnum rnum-medal rnum-${i+1}">${medals[i]}</div>`
       : `<div class="rnum"><span class="rnum-plain">${i+1}</span></div>`;
@@ -3329,10 +3324,11 @@ function renderRank(){
       <div class="rinfo">
         <div class="rname-row">
           <span class="rname">${short}</span>
+          <span class="rk-grade" style="background:${gradeColor}">${grade}</span>
           ${i===0?'<span class="fire-tag">🔥 TOP</span>':''}
           ${motivate}
         </div>
-        <div class="rteam">${team} · DB→클로징 <b>${dc}%</b></div>
+        <div class="rteam">${team} · DB→클로징 <b>${r_dc}%</b></div>
         <div class="rbar-bg"><div class="rbar" style="width:${pct}%;background:${TC[team]}"></div></div>
       </div>
       <div class="rstats">
@@ -3340,7 +3336,7 @@ function renderRank(){
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','vc')"><div class="rstat-v" style="color:#6d28d9">${vc}</div><div class="rstat-l">비디오</div></div>
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','ls')"><div class="rstat-v" style="color:#1e293b">${ls}</div><div class="rstat-l">랑숭</div></div>
         <div class="rstat" onclick="event.stopPropagation();openMem('${a}','cl')"><div class="rstat-v" style="color:#dc2626">${cl}</div><div class="rstat-l">클로징</div></div>
-        <div class="score-badge">${score}<small>점</small></div>
+        <div class="score-badge act-idx">${actIdx}<small>/100</small></div>
       </div></div>`;
   });
   if(!rh) rh = '<div class="rk-empty">활동한 에이전트가 없습니다</div>';
