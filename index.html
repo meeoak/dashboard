@@ -546,15 +546,15 @@ body.focus-mode #detail-section-hd{display:none!important}
 .kpi.big .kpi-sub{font-size:9.5px;margin-top:2px}
 .kpi-row-wrap:not(.row-all) .kpi{padding:6px 9px}
 
-/* ─ 탭 ─ */
+/* ─ 탭 ─ 남색 바 · 흰색 텍스트 · 활성 탭은 흰 배경+남색 텍스트로 반전 */
 .tabs-bar{max-width:1180px;margin:10px auto 0;padding:0 20px}
-.tabs{display:flex;background:linear-gradient(180deg,#fef9c3,#fffbeb);border-radius:14px 14px 0 0;border:2px solid #fcd34d;border-bottom:none;overflow-x:auto;scrollbar-width:none;box-shadow:0 -2px 8px #1e3a8a14}
+.tabs{display:flex;background:linear-gradient(180deg,#1e3a8a,#1e40af);border-radius:14px 14px 0 0;border:2px solid #1e3a8a;border-bottom:none;overflow-x:auto;scrollbar-width:none;box-shadow:0 -2px 10px rgba(30,58,138,.25)}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:1;min-width:130px;background:transparent;border:none;padding:16px 14px 14px;font-size:15px;font-weight:800;color:#475569;cursor:pointer;transition:all .18s;border-bottom:4px solid transparent;white-space:nowrap;letter-spacing:-.3px;position:relative}
-.tab:not(:last-child){border-right:1px dashed #fde68a}
-.tab:hover:not(.on){background:#fef9c3;color:#1e293b}
-.tab.on{color:#1e3a8a;background:linear-gradient(180deg,#fff,#eff6ff);font-weight:900;font-size:16px;border-bottom-color:#1e3a8a;box-shadow:inset 0 4px 0 #2563eb, 0 -3px 12px #2563eb25;z-index:2}
-.tab.on::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #1e3a8a}
+.tab{flex:1;min-width:130px;background:transparent;border:none;padding:16px 14px 14px;font-size:15.5px;font-weight:800;color:rgba(255,255,255,.78);cursor:pointer;transition:all .18s;border-bottom:4px solid transparent;white-space:nowrap;letter-spacing:-.3px;position:relative}
+.tab:not(:last-child){border-right:1px solid rgba(255,255,255,.12)}
+.tab:hover:not(.on){background:rgba(255,255,255,.08);color:#fff}
+.tab.on{color:#1e3a8a;background:#fff;font-weight:900;font-size:16.5px;border-bottom-color:#fff;box-shadow:inset 0 4px 0 #2563eb,0 -3px 14px rgba(0,0,0,.18);z-index:2}
+.tab.on::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #fff}
 .tab-content{max-width:1180px;margin:0 auto 30px;background:#fff;border:2px solid #fcd34d;border-top:none;border-radius:0 0 14px 14px;overflow:hidden;box-shadow:0 4px 18px #2563eb12}
 
 /* ─ 캘린더 ─ */
@@ -1263,11 +1263,11 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 <!-- 빠른 이동 탭 (필터 바 아래로 이동) — 클릭 시 그 화면만 보임 -->
 <div class="quick-nav-bar"><div class="quick-nav-in">
   <span class="quick-nav-lbl">📂 빠른 이동:</span>
-  <button class="quick-nav-btn" onclick="jumpToTab('cal')" data-qnav="cal">📅 방문 캘린더</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats">👥 에이전트 현황</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank">🏆 랭킹 & 배틀</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('team_insight')" data-qnav="team_insight">🏆 팀 인사이트</button>
-  <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight">👤 에이전트 인사이트</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('cal')" data-qnav="cal">방문 캘린더</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('stats')" data-qnav="stats">에이전트 현황</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank">에이전트 활동지수</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('team_insight')" data-qnav="team_insight">긴급관리</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight">에이전트 인사이트</button>
 </div></div>
 
 <!-- 3개월 트렌드는 KPI 카드 안에 sparkbars로 통합됨 (별도 섹션 제거) -->
@@ -1346,11 +1346,11 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 
 <!-- 탭 -->
 <div class="tabs-bar"><div class="tabs">
-  <button class="tab on"  id="tab-cal"     onclick="switchTab('cal')"     data-t="tab_cal">📅 방문 캘린더</button>
-  <button class="tab"     id="tab-stats"   onclick="switchTab('stats')"   data-t="tab_stats">👥 에이전트 현황</button>
-  <button class="tab"     id="tab-rank"    onclick="switchTab('rank')"    data-t="tab_rank">🏆 랭킹 & 배틀</button>
-  <button class="tab"     id="tab-team_insight"  onclick="switchTab('team_insight')">🏆 팀 인사이트</button>
-  <button class="tab"     id="tab-agent_insight" onclick="switchTab('agent_insight')">👤 에이전트 인사이트</button>
+  <button class="tab on"  id="tab-cal"     onclick="switchTab('cal')"     data-t="tab_cal">방문 캘린더</button>
+  <button class="tab"     id="tab-stats"   onclick="switchTab('stats')"   data-t="tab_stats">에이전트 현황</button>
+  <button class="tab"     id="tab-rank"    onclick="switchTab('rank')"    data-t="tab_rank">에이전트 활동지수</button>
+  <button class="tab"     id="tab-team_insight"  onclick="switchTab('team_insight')">긴급관리</button>
+  <button class="tab"     id="tab-agent_insight" onclick="switchTab('agent_insight')">에이전트 인사이트</button>
 </div></div>
 
 <div class="tab-content">
@@ -1584,8 +1584,8 @@ const LANG = {
     tbl_team_agent:'팀 / 에이전트', tbl_db:'📋 DB배정', tbl_visit_done:'✅ 방문완료',
     tbl_langsung:'⬜ 랑숭비짓', tbl_video:'📹 비디오콜', tbl_book:'📅 방문예약',
     tbl_book_sub:'미래(전체) · ⚠️확인(기간내)', tbl_wait:'⏳ 일정대기', tbl_close:'🏆 클로징',
-    tab_cal:'📅 방문 캘린더', tab_stats:'👥 에이전트 현황', tab_rank:'🏆 랭킹 & 배틀',
-    tab_prov:'📍 지역별', tab_chan:'📡 채널별', tab_insight:'🔥 매니저 인사이트',
+    tab_cal:'방문 캘린더', tab_stats:'에이전트 현황', tab_rank:'에이전트 활동지수',
+    tab_prov:'지역별', tab_chan:'채널별', tab_insight:'긴급관리',
     member_list:'회원 목록', back_dashboard:'← 대시보드로 돌아가기',
     student:'학생', parent:'학부모', region:'지역', channel:'채널',
     visit_date:'방문일', assign_date:'배정일', status:'상태', closing:'클로징',
@@ -1662,8 +1662,8 @@ const LANG = {
     tbl_team_agent:'Tim / Agen', tbl_db:'📋 Alokasi DB', tbl_visit_done:'✅ Visit Selesai',
     tbl_langsung:'⬜ Visit Langsung', tbl_video:'📹 Video Call', tbl_book:'📅 Jadwal Kunjungan',
     tbl_book_sub:'Masa depan(semua) · ⚠️Konfirmasi(periode)', tbl_wait:'⏳ Menunggu', tbl_close:'🏆 Closing',
-    tab_cal:'📅 Kalender Kunjungan', tab_stats:'👥 Status Agen', tab_rank:'🏆 Ranking & Battle',
-    tab_prov:'📍 Per Provinsi', tab_chan:'📡 Per Channel', tab_insight:'🔥 Insight Manajer',
+    tab_cal:'Kalender Kunjungan', tab_stats:'Status Agen', tab_rank:'Indeks Aktivitas Agen',
+    tab_prov:'Per Provinsi', tab_chan:'Per Channel', tab_insight:'Manajemen Mendesak',
     member_list:'Daftar Member', back_dashboard:'← Kembali ke Dashboard',
     student:'Siswa', parent:'Orang Tua', region:'Wilayah', channel:'Channel',
     visit_date:'Tgl Kunjungan', assign_date:'Tgl Alokasi', status:'Status', closing:'Closing',
