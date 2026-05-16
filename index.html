@@ -2269,6 +2269,11 @@ function setCalTeamQuick(team){
   // 기존 selectScope 로직 활용 (OFF/MKT 스코프는 유지)
   curTeam = team;
   curAgent = 'ALL';
+  // 에이전트별 토탈관리 탭에서 특정 팀 선택 시: 그 팀의 첫 에이전트 자동 선택
+  if(curTab === 'agent_insight' && team !== 'ALL'){
+    const teamAgents = (D.team_members && D.team_members[team]) || [];
+    if(teamAgents.length) curAgent = teamAgents[0];
+  }
   document.querySelectorAll('.scope-btn[data-scope]').forEach(b=>{
     if(b.dataset.scope.startsWith('TIM_') || b.dataset.scope==='ALL'){
       const isTeamScope = b.dataset.scope===team || (team==='ALL' && b.dataset.scope==='ALL' && curDbKind==='ALL');
