@@ -14,13 +14,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 .hdr-in{max-width:1180px;margin:0 auto;padding:18px 20px 16px;position:relative}
 .hdr-center{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
 .hdr-title-wrap{text-align:center;flex:1}
-/* 심플·강력 — 흰색 본문 + 골드 underline 강조 */
-.hdr-title{font-size:42px;font-weight:900;letter-spacing:-1.4px;line-height:1.05;color:#fff;display:inline-block;padding-bottom:8px;border-bottom:3px solid #fbbf24;text-shadow:0 0 28px rgba(251,191,36,.35),0 2px 4px rgba(0,0,0,.4)}
-.hdr-live-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
-.hdr-sub{font-size:11.5px;color:#94a3b8;font-weight:700;letter-spacing:.3px}
+/* 심플·강력 — 크고 굵은 흰색 + 골드 underline */
+.hdr-title{font-size:54px;font-weight:900;letter-spacing:-2px;line-height:1.05;color:#fff;display:inline-block;padding-bottom:10px;border-bottom:4px solid #fbbf24;text-shadow:0 0 32px rgba(251,191,36,.4),0 3px 6px rgba(0,0,0,.45)}
 .hdr-lang{position:absolute;top:18px;right:20px;display:flex;gap:0;background:rgba(255,255,255,.08);border-radius:8px;padding:3px;border:1px solid rgba(255,255,255,.18);z-index:2}
 @media(max-width:700px){
-  .hdr-title{font-size:26px;letter-spacing:-.8px;padding-bottom:6px;border-bottom-width:2px}
+  .hdr-title{font-size:32px;letter-spacing:-1px;padding-bottom:7px;border-bottom-width:3px}
   .hdr-lang{position:static;margin:10px auto 0;justify-content:center}
 }
 /* ─────────── 모바일 (≤640px) 종합 대응 ─────────── */
@@ -1738,12 +1736,9 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <div class="hdr-center">
     <div class="hdr-title-wrap">
       <div class="hdr-title" data-t="title">영업팀 통합 대시보드</div>
-      <div class="hdr-live-row">
-        <span class="live-badge">● LIVE</span>
-        <span class="hdr-sub" id="hdr-sub" data-t="subtitle">실시간 방문영업 현황</span>
-      </div>
     </div>
   </div>
+  <span style="display:none" id="hdr-sub"></span>
   <span style="display:none" id="hdr-score"></span>
 </div></div>
 
