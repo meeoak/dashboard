@@ -182,3 +182,258 @@ function writeAgentReport(payload){
   }
   return {sheet: sheetName, appended: rows.length, urgent: items.length};
 }
+
+// ════════════════════════════════════════════════════════════════
+//  📧 매일 오전 7시 (WIB) 에이전트별 일일 보고서 자동 이메일
+// ════════════════════════════════════════════════════════════════
+//
+// 설치 순서 (1회만):
+//  1) 이 코드 전체를 GAS 프로젝트에 붙여넣기 (저장)
+//  2) GAS 콘솔에서 함수 'setupDailyReportTrigger' 선택 → ▶️ 실행
+//     · 첫 실행 시 권한 동의 화면 → 모두 허용 (Gmail/Spreadsheet 권한)
+//  3) 트리거 메뉴에서 'sendDailyReports' 가 매일 7시로 등록됐는지 확인
+//  4) 테스트: 'sendDailyReportsNow' 함수 ▶️ 실행 (오늘 즉시 발송)
+//
+// 변경 가능한 설정:
+//  - REPORT_CFG.TIMEZONE: 'Asia/Jakarta' (WIB) / 'Asia/Seoul' (KST)
+//  - REPORT_CFG.HOUR: 발송 시간 (24시간 표기, e.g. 7 = 오전 7시)
+//  - REPORT_CFG.EMAIL_SHEET_ID / EMAIL_GID: 에이전트 이메일 매핑 시트
+//  - REPORT_CFG.DATA_SHEET_ID: 대시보드 원본 데이터 시트
+// ────────────────────────────────────────────────────────────────
+
+const REPORT_CFG = {
+  EMAIL_SHEET_ID: '1eTjA_f2nf5xmVLT3G_9la_GTQnJkv87Dp1jKeXdWjeg',
+  EMAIL_GID: 823310638,
+  DATA_SHEET_ID: '1TMtrsOIN9UylvYolwkyl5EZzUXd1DcDNg6raPPpBep0',
+  DATA_GID: 0,
+  TIMEZONE: 'Asia/Jakarta',  // WIB · 사용자 기본 인도네시아 에이전트들
+  HOUR: 7,                   // 오전 7시 발송
+  FROM_NAME: '영업팀 대시보드 · Sales Team Dashboard',
+  CC: '',                    // CC 받을 매니저 이메일 (e.g., 'manager@kaia.co.kr'). 비우면 없음.
+};
+
+// 트리거 등록 (1회만 실행)
+function setupDailyReportTrigger() {
+  // 기존 트리거 제거 (중복 방지)
+  ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === 'sendDailyReports')
+    .forEach(t => ScriptApp.deleteTrigger(t));
+  // 새 트리거: 매일 REPORT_CFG.HOUR 시
+  ScriptApp.newTrigger('sendDailyReports')
+    .timeBased()
+    .atHour(REPORT_CFG.HOUR)
+    .everyDays(1)
+    .inTimezone(REPORT_CFG.TIMEZONE)
+    .create();
+  return '✅ Daily report trigger registered: every day at ' + REPORT_CFG.HOUR + ':00 ' + REPORT_CFG.TIMEZONE;
+}
+
+// 트리거 제거 (필요 시)
+function removeDailyReportTrigger() {
+  ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === 'sendDailyReports')
+    .forEach(t => ScriptApp.deleteTrigger(t));
+  return '🗑️ Daily report trigger removed';
+}
+
+// 즉시 테스트 발송 (트리거 기다리지 않고 지금 실행)
+function sendDailyReportsNow() {
+  return sendDailyReports();
+}
+
+// 메인 — 매일 트리거에 의해 실행됨
+function sendDailyReports() {
+  const today = Utilities.formatDate(new Date(), REPORT_CFG.TIMEZONE, 'yyyy-MM-dd');
+  const monthStart = today.slice(0,7) + '-01';
+  Logger.log('📧 Daily report run · today=' + today);
+
+  // 1) 에이전트 이메일 매핑 가져오기
+  const agents = getAgentEmails_();
+  Logger.log('  · 에이전트 목록: ' + agents.length + '명');
+  if(agents.length === 0){
+    Logger.log('  ⚠️ 이메일 매핑 시트가 비어있음 — 시트 헤더에 "이름" + "이메일" 컬럼이 있는지 확인');
+    return {ok: false, error: 'no agent emails found'};
+  }
+
+  // 2) 원본 데이터 시트에서 records 한 번만 로드 (캐시)
+  const records = loadDataRecords_();
+  Logger.log('  · 데이터 레코드: ' + records.length + '건 로드');
+
+  // 3) 각 에이전트에게 이메일 발송
+  let sent = 0, failed = 0;
+  agents.forEach(({name, email}) => {
+    try {
+      const stats = calcAgentStats_(records, name, monthStart, today);
+      if(stats.db === 0 && stats.visit === 0 && stats.cl === 0){
+        Logger.log('  · ' + name + ' 활동 없음 — 메일 발송 skip');
+        return;
+      }
+      const html = buildReportHTML_({name, stats, today, monthStart});
+      const subject = '[일일 보고 · Laporan Harian] ' + name + ' · ' + today;
+      const opts = { htmlBody: html, name: REPORT_CFG.FROM_NAME };
+      if(REPORT_CFG.CC) opts.cc = REPORT_CFG.CC;
+      GmailApp.sendEmail(email, subject, '', opts);
+      sent++;
+      Logger.log('  ✅ ' + name + ' → ' + email);
+    } catch(err){
+      failed++;
+      Logger.log('  ❌ ' + name + ' 실패: ' + err);
+    }
+  });
+  return {ok: true, today, sent, failed, total: agents.length};
+}
+
+// 헬퍼: 이메일 매핑 시트 읽기 (헤더 자동 감지)
+function getAgentEmails_() {
+  const ss = SpreadsheetApp.openById(REPORT_CFG.EMAIL_SHEET_ID);
+  const sheets = ss.getSheets();
+  let sheet = sheets.find(s => s.getSheetId() === REPORT_CFG.EMAIL_GID);
+  if(!sheet) sheet = sheets[0];  // fallback: 첫 번째 탭
+  const data = sheet.getDataRange().getValues();
+  if(data.length < 2) return [];
+
+  // 헤더에서 이름 / 이메일 컬럼 자동 탐지 (한·영·인니 키워드)
+  const headers = data[0].map(h => String(h||'').toLowerCase().trim());
+  const nameIdx  = headers.findIndex(h => /이름|name|nama|agen|에이전트|agent/.test(h));
+  const emailIdx = headers.findIndex(h => /email|이메일|mail|메일/.test(h));
+  if(nameIdx < 0 || emailIdx < 0){
+    Logger.log('⚠️ 헤더에서 이름/이메일 컬럼 찾기 실패: [' + headers.join(' | ') + ']');
+    return [];
+  }
+  return data.slice(1)
+    .map(row => ({
+      name: String(row[nameIdx]||'').trim(),
+      email: String(row[emailIdx]||'').trim()
+    }))
+    .filter(r => r.name && r.email && r.email.indexOf('@') > 0);
+}
+
+// 헬퍼: 데이터 시트 → 정규화된 records 배열
+function loadDataRecords_() {
+  const ss = SpreadsheetApp.openById(REPORT_CFG.DATA_SHEET_ID);
+  const sheets = ss.getSheets();
+  let sheet = sheets.find(s => s.getSheetId() === REPORT_CFG.DATA_GID) || sheets[0];
+  const data = sheet.getDataRange().getValues();
+  if(data.length < 2) return [];
+  // 헤더는 row 0, 데이터는 row 1+
+  // 컬럼 인덱스는 대시보드의 rowToRecord 와 동일하게 가정 (시트 컬럼 순서 안 바뀐다는 전제)
+  return data.slice(1).map(row => ({
+    ad: parseDate_(row[1]),
+    channel: String(row[2]||'').trim(),
+    childName: String(row[3]||'').trim(),
+    parentName: String(row[4]||'').trim(),
+    phone: String(row[5]||'').trim(),
+    province: String(row[10]||'').trim(),
+    agent: String(row[12]||'').trim(),
+    vd: parseDate_(row[14]||''),
+    statusA: String(row[17]||'').trim(),
+    statusB: String(row[18]||'').trim(),
+    clType: String(row[20]||'').trim()
+  })).filter(r => r.ad && r.agent);
+}
+
+function parseDate_(s) {
+  if(!s) return '';
+  if(s instanceof Date){
+    return Utilities.formatDate(s, REPORT_CFG.TIMEZONE, 'yyyy-MM-dd');
+  }
+  s = String(s).trim();
+  let m = s.match(/^(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);
+  if(m) return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
+  m = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if(m) return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
+  return '';
+}
+
+// 헬퍼: 에이전트별 stats 계산 (이번 달 + 어제 / 오늘)
+function calcAgentStats_(records, agentName, monthStart, today) {
+  let db = 0, visit = 0, cl = 0;
+  let dbToday = 0, visitToday = 0, clToday = 0;
+  const yesterday = Utilities.formatDate(
+    new Date(new Date(today).getTime() - 86400000),
+    REPORT_CFG.TIMEZONE, 'yyyy-MM-dd'
+  );
+  records.forEach(r => {
+    if(r.agent !== agentName) return;
+    const inMonth = r.ad >= monthStart && r.ad <= today;
+    if(inMonth) db++;
+    // 어제 배정 (오전 7시 발송 시점에서 가장 임팩트)
+    if(r.ad === yesterday) dbToday++;
+
+    // visit / cl 판단 (status 코드)
+    const sB = r.statusB;
+    const visited = sB.indexOf('Visit Selesai') >= 0 || sB.indexOf('Langsung') >= 0 || sB.indexOf('Video Call') >= 0;
+    const isCl = r.clType && !/^tidak\b/i.test(r.clType);
+
+    if(visited && inMonth){
+      visit++;
+      if(r.vd === yesterday) visitToday++;
+    }
+    if(isCl && inMonth){
+      cl++;
+      if(r.vd === yesterday) clToday++;
+    }
+  });
+  const r_dc = db ? Math.round(cl/db*1000)/10 : 0;
+  return { db, visit, cl, r_dc, dbToday, visitToday, clToday, yesterday };
+}
+
+// 헬퍼: 보고서 HTML 빌더
+function buildReportHTML_({name, stats, today, monthStart}) {
+  const monthLabel = today.slice(0,7);
+  const css = `font-family:'Segoe UI',-apple-system,sans-serif;color:#0f172a`;
+  return ''
+    + '<div style="' + css + ';max-width:600px;margin:0 auto;padding:24px;background:#f8fafc">'
+    + '  <div style="background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;padding:20px 24px;border-radius:14px 14px 0 0">'
+    + '    <div style="font-size:11px;font-weight:700;color:#fbbf24;letter-spacing:3px;margin-bottom:4px">' + today + ' · MORNING REPORT</div>'
+    + '    <div style="font-size:22px;font-weight:900;letter-spacing:-.5px">🌅 ' + name + ' 일일 보고</div>'
+    + '    <div style="font-size:12px;font-weight:600;opacity:.85;margin-top:4px">Selamat pagi · 좋은 아침 — 오늘도 화이팅!</div>'
+    + '  </div>'
+    + '  <div style="background:#fff;padding:22px 24px;border-radius:0 0 14px 14px;border:1px solid #e2e8f0;border-top:none">'
+    + '    <h2 style="font-size:12.5px;color:#64748b;margin:0 0 14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">📊 ' + monthLabel + ' 이번달 성과 · Performa Bulanan</h2>'
+    + '    <table style="width:100%;border-collapse:collapse">'
+    + statRow_('배정 DB · Alokasi DB', stats.db, '#1e3a8a')
+    + statRow_('방문 완료 · Visit Selesai', stats.visit, '#16a34a')
+    + statRow_('클로징 · Closing', stats.cl, '#dc2626')
+    + statRow_('DB → 클로징 · DB→Close', stats.r_dc + '%', '#7c3aed', true)
+    + '    </table>'
+    + '    <h2 style="font-size:12.5px;color:#64748b;margin:20px 0 12px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">📅 어제 (' + stats.yesterday + ') 활동 · Aktivitas Kemarin</h2>'
+    + '    <div style="display:flex;gap:10px;flex-wrap:wrap">'
+    + '      <div style="flex:1;min-width:120px;padding:14px;background:#eff6ff;border-radius:9px;text-align:center">'
+    + '        <div style="font-size:28px;font-weight:900;color:#1e3a8a;letter-spacing:-1px">' + stats.dbToday + '</div>'
+    + '        <div style="font-size:11px;color:#475569;font-weight:700">신규 배정</div>'
+    + '      </div>'
+    + '      <div style="flex:1;min-width:120px;padding:14px;background:#f0fdf4;border-radius:9px;text-align:center">'
+    + '        <div style="font-size:28px;font-weight:900;color:#16a34a;letter-spacing:-1px">' + stats.visitToday + '</div>'
+    + '        <div style="font-size:11px;color:#475569;font-weight:700">방문 완료</div>'
+    + '      </div>'
+    + '      <div style="flex:1;min-width:120px;padding:14px;background:#fef2f2;border-radius:9px;text-align:center">'
+    + '        <div style="font-size:28px;font-weight:900;color:#dc2626;letter-spacing:-1px">' + stats.clToday + '</div>'
+    + '        <div style="font-size:11px;color:#475569;font-weight:700">클로징</div>'
+    + '      </div>'
+    + '    </div>'
+    + '    <div style="margin-top:22px;padding:14px;background:linear-gradient(135deg,#fef3c7,#fefce8);border-radius:9px;border-left:5px solid #f59e0b">'
+    + '      <div style="font-size:12px;font-weight:900;color:#78350f;margin-bottom:4px">💪 오늘의 한 줄</div>'
+    + '      <div style="font-size:13px;color:#92400e;font-weight:600;line-height:1.5">' + dailyMessage_(stats) + '</div>'
+    + '    </div>'
+    + '    <p style="margin:18px 0 0;color:#94a3b8;font-size:10.5px;text-align:center;letter-spacing:.5px">SALES TEAM DASHBOARD · Auto-sent at ' + REPORT_CFG.HOUR + ':00 ' + REPORT_CFG.TIMEZONE + '</p>'
+    + '  </div>'
+    + '</div>';
+}
+
+function statRow_(label, value, color, isLast) {
+  const border = isLast ? '' : 'border-bottom:1px solid #f1f5f9';
+  return ''
+    + '<tr><td style="padding:11px 0;' + border + ';font-size:13.5px;font-weight:700;color:#475569">' + label + '</td>'
+    + '<td style="padding:11px 0;' + border + ';text-align:right;font-size:24px;font-weight:900;color:' + color + ';letter-spacing:-.6px">' + value + '</td></tr>';
+}
+
+function dailyMessage_(stats) {
+  if(stats.clToday >= 2) return '🎉 어제 ' + stats.clToday + '건 클로징 — 멋진 성과입니다! Pertahankan momentum hari ini!';
+  if(stats.clToday === 1) return '🔥 어제 1건 클로징 성공! Tetap fokus — hari ini bisa lebih baik!';
+  if(stats.visitToday >= 3) return '🚀 어제 방문 ' + stats.visitToday + '건 — 다음 클로징이 멀지 않았어요! Closing menanti!';
+  if(stats.dbToday >= 3) return '📋 신규 DB ' + stats.dbToday + '건 배정 — 빠른 첫 컨택이 클로징의 80%! Hubungi segera!';
+  return '☀️ 새로운 하루입니다. 오늘은 1건이라도 더 컨택해보세요! Hari ini, hubungi member lebih banyak!';
+}
