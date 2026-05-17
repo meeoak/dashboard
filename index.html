@@ -4933,28 +4933,6 @@ function renderAnalytics(){
     return h;
   };
 
-  // ─── 추가 분석: 월별 closing 추이 (2024-11 ~ 현재) ────────────
-  const trendByMonth = {};
-  csvClosings.forEach(c=>{
-    const m = c[0].slice(0,7);
-    if(m < '2024-11' || m > todayM) return;
-    trendByMonth[m] = (trendByMonth[m]||0) + 1;
-  });
-  const trendMonths = Object.keys(trendByMonth).sort();
-  const trendMax = Math.max(1, ...Object.values(trendByMonth));
-  const trendAvg = Math.round(Object.values(trendByMonth).reduce((s,v)=>s+v,0) / trendMonths.length);
-
-  // ─── 추가 분석: 결제 종류별 분포 (2026년만) ──────────────────
-  const ptDist = {};
-  csvClosings.forEach(c=>{
-    const m = c[0].slice(0,7);
-    if(m < yearStart || m > todayM) return;
-    const pt = c[5] || '미지정';
-    ptDist[pt] = (ptDist[pt]||0) + 1;
-  });
-  const ptTotal = Object.values(ptDist).reduce((s,v)=>s+v,0);
-  const ptSorted = Object.entries(ptDist).sort((a,b)=>b[1]-a[1]);
-
   // ─── 추가 분석: 평균 lag (배정 → 결제) 매칭된 case 만 ─────────
   const lags = [];
   csvClosings.forEach(c=>{
@@ -5057,40 +5035,6 @@ function renderAnalytics(){
   h += buildCohortTable('OFF',   T('alyt_off_label'),   '#a855f7', '#faf5ff');
   h += buildCohortTable('MKT',   T('alyt_mkt_label'),   '#0891b2', '#ecfeff');
   h += buildCohortTable('TOTAL', T('alyt_total_label'), '#1e3a8a', '#eff6ff');
-
-  // 📈 월별 closing 추이 (2024-11 ~ 현재)
-  h += `<div class="extra-section">
-    <div class="extra-hd">📈 ${T('trend_title')}</div>
-    <div class="extra-sub">${T('trend_sub').replace('{avg}', String(trendAvg))}</div>
-    <div class="trend-wrap">`;
-  trendMonths.forEach(m=>{
-    const v = trendByMonth[m];
-    const pct = Math.round(v/trendMax*100);
-    const isCurYr = m >= yearStart;
-    const barColor = isCurYr ? '#2563eb' : '#94a3b8';
-    h += `<div class="trend-row">
-      <div class="trend-mLbl">${m}</div>
-      <div class="trend-barWrap"><div class="trend-bar" style="width:${pct}%;background:${barColor}"></div></div>
-      <div class="trend-val">${f(v)}</div>
-    </div>`;
-  });
-  h += `</div></div>`;
-
-  // 💳 결제 종류 분포 (2026년)
-  h += `<div class="extra-section">
-    <div class="extra-hd">💳 ${T('pt_title')}</div>
-    <div class="extra-sub">${T('pt_sub').replace('{n}', String(ptTotal))}</div>
-    <div class="pt-grid">`;
-  const ptColors = ['#7c3aed','#0891b2','#16a34a','#d97706','#dc2626','#9333ea','#64748b','#0369a1'];
-  ptSorted.forEach((entry, i)=>{
-    const [pt, cnt] = entry;
-    const pct = Math.round(cnt/ptTotal*1000)/10;
-    h += `<div class="pt-card" style="border-left:5px solid ${ptColors[i%ptColors.length]}">
-      <div class="pt-name">${pt||'미지정'}</div>
-      <div class="pt-val"><b style="color:${ptColors[i%ptColors.length]}">${f(cnt)}</b><span class="pt-pct">${pct}%</span></div>
-    </div>`;
-  });
-  h += `</div></div>`;
 
   // ⏱ 배정 → 결제 lag 분포
   const lagTotal = Object.values(lagBuckets).reduce((s,v)=>s+v,0);
