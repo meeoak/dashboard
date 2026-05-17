@@ -1527,21 +1527,21 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .cohort-sub{font-size:11.5px;color:#64748b;font-weight:600}
 .cohort-wrap{overflow-x:auto}
 .cohort-tbl{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:auto}
-.cohort-tbl th{background:#1e293b;color:#fff;padding:9px 7px;font-weight:800;letter-spacing:-.2px;font-size:12px;text-align:center;border-bottom:none}
+.cohort-tbl th{background:#1e293b;color:#fff;padding:6px 5px;font-weight:800;letter-spacing:-.2px;font-size:11.5px;text-align:center;border-bottom:none;line-height:1.25}
 .cohort-tbl th.L{text-align:left;padding-left:12px}
-.cohort-tbl th.R{text-align:right;padding-right:10px}
-.cohort-tbl th small{font-weight:700;color:#94a3b8;font-size:10.5px}
+.cohort-tbl th.R{text-align:right;padding-right:8px}
+.cohort-tbl th small{font-weight:700;color:#94a3b8;font-size:10px}
 .cohort-tbl th.cum{background:#7c2d12;border-left:3px solid #fb923c}
 .cohort-tbl th.eff{background:#312e81;border-left:3px solid #818cf8}
 /* 좌측 고정 컬럼 (배정월 + DB) — 폭 압축해서 한 묶음처럼 보이게 */
-.cohort-tbl th:first-child, .cohort-tbl td:first-child{width:90px;min-width:90px;padding-left:14px;padding-right:4px;white-space:nowrap}
-.cohort-tbl th:nth-child(2){width:110px;min-width:110px;padding-right:14px;background:#0c4a6e;color:#fef3c7;border-right:3px solid #f59e0b;font-size:13px;letter-spacing:-.3px}
-.cohort-tbl td.db-col{width:110px;min-width:110px;padding-right:16px;border-right:3px solid #f59e0b;background:#fffbeb;color:#7c2d12;font-weight:900;font-size:15.5px;white-space:nowrap;letter-spacing:-.3px}
+.cohort-tbl th:first-child, .cohort-tbl td:first-child{width:78px;min-width:78px;padding-left:12px;padding-right:4px;white-space:nowrap}
+.cohort-tbl th:nth-child(2){width:90px;min-width:90px;padding-right:12px;background:#0c4a6e;color:#fef3c7;border-right:3px solid #f59e0b;font-size:12px;letter-spacing:-.3px}
+.cohort-tbl td.db-col{width:90px;min-width:90px;padding-right:12px;border-right:3px solid #f59e0b;background:#fffbeb;color:#7c2d12;font-weight:900;font-size:14px;white-space:nowrap;letter-spacing:-.3px}
 .cohort-tbl tfoot tr.sum-actual td.db-col, .cohort-tbl tfoot tr.sum-cum td.db-col, .cohort-tbl tfoot tr.sum-diag td.db-col, .cohort-tbl tfoot tr.sum-prev td.db-col{background:inherit}
-.cohort-tbl td{padding:8px 7px;border-bottom:1px solid #f1f5f9;vertical-align:middle;text-align:right;font-weight:800}
-.cohort-tbl td.L{text-align:left;padding-left:12px;color:#0f172a;font-size:13.5px}
-.cohort-tbl td.cum{background:#fef3c7;color:#78350f;font-weight:900;border-left:2px solid #f59e0b;font-size:14px}
-.cohort-tbl td.eff{font-weight:900;font-size:13px;padding:6px 8px;border-left:2px solid #818cf8}
+.cohort-tbl td{padding:5px 6px;border-bottom:1px solid #f1f5f9;vertical-align:middle;text-align:right;font-weight:800;line-height:1.2}
+.cohort-tbl td.L{text-align:left;padding-left:12px;color:#0f172a;font-size:12.5px;line-height:1.25}
+.cohort-tbl td.cum{background:#fef3c7;color:#78350f;font-weight:900;border-left:2px solid #f59e0b;font-size:13.5px}
+.cohort-tbl td.eff{font-weight:900;font-size:12.5px;padding:4px 7px;border-left:2px solid #818cf8}
 .cohort-tbl td.eff.eff-good{background:#dcfce7;color:#15803d}
 .cohort-tbl td.eff.eff-mid{background:#fef9c3;color:#a16207}
 .cohort-tbl td.eff.eff-low{background:#fee2e2;color:#b91c1c}
@@ -1562,8 +1562,10 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .cohort-tbl tfoot tr.sum-prev td small{color:#854d0e;font-weight:700;font-size:10.5px}
 .cohort-tbl tfoot tr td.L{font-weight:900;font-size:13px;line-height:1.3}
 .cohort-tbl tfoot tr td.L small{font-size:10.5px;font-weight:600}
-.cohort-tbl tr.unmatched-row td{background:#fef3c7!important;border-top:2px dashed #f59e0b;border-bottom:2px dashed #f59e0b}
-.cohort-tbl tr.unmatched-row td.L b{color:#92400e;font-weight:900}
+.cohort-tbl tr.unmatched-row td{background:#fed7aa!important;border-top:3px dashed #ea580c;border-bottom:3px dashed #ea580c;padding:8px 7px;font-size:13px;color:#7c2d12;font-weight:900}
+.cohort-tbl tr.unmatched-row td.L{font-size:12.5px;line-height:1.3}
+.cohort-tbl tr.unmatched-row td.L b{color:#7c2d12;font-weight:900;font-size:13px}
+.cohort-tbl tr.unmatched-row td.L small{color:#9a3412;font-size:10.5px;font-weight:700}
 
 /* 📌 자동 인사이트 박스 (재경 보고용) */
 .insight-box{margin:14px 18px 22px;padding:18px 20px;background:linear-gradient(135deg,#fef3c7 0%,#fef9c3 50%,#fffbeb 100%);border:2px solid #f59e0b;border-radius:14px;box-shadow:0 4px 12px rgba(245,158,11,.18)}
@@ -1574,12 +1576,24 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .insight-card.insight-lag{border-left-color:#2563eb}
 .insight-card.insight-eff{border-left-color:#16a34a}
 .insight-card.insight-last{border-left-color:#dc2626}
+.insight-card.insight-unmatch{border-left-color:#ea580c;background:rgba(254,215,170,.7)}
 .insight-label{font-size:11.5px;font-weight:700;color:#64748b;letter-spacing:-.2px;text-transform:uppercase;margin-bottom:4px}
 .insight-value{font-size:28px;font-weight:900;color:#0f172a;letter-spacing:-.8px;line-height:1.1;margin-bottom:4px}
 .insight-card.insight-prev .insight-value{color:#d97706}
 .insight-card.insight-lag .insight-value{color:#1d4ed8}
 .insight-card.insight-eff .insight-value{color:#15803d}
 .insight-card.insight-last .insight-value{color:#b91c1c}
+.insight-card.insight-unmatch .insight-value{color:#c2410c}
+
+/* ⚠️ DB 미매칭 원인 설명 박스 */
+.unmatch-explain{margin:0 18px 18px;padding:14px 18px;background:#fff7ed;border:2px solid #fb923c;border-radius:12px;box-shadow:0 2px 8px rgba(234,88,12,.12)}
+.ue-title{font-size:14.5px;font-weight:900;color:#7c2d12;letter-spacing:-.3px;margin-bottom:10px}
+.ue-causes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-bottom:10px}
+.ue-cause{padding:8px 11px;background:#fff;border-radius:7px;border-left:4px solid #ea580c;font-size:11.5px;color:#475569;line-height:1.4}
+.ue-cause b{font-size:12.5px;color:#9a3412;font-weight:900;display:block;margin-bottom:2px}
+.ue-cause small{font-size:11px;color:#64748b}
+.ue-fix{padding:9px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:7px;font-size:12.5px;color:#78350f;font-weight:600;line-height:1.5}
+.ue-fix b{color:#92400e;font-weight:900}
 .insight-desc{font-size:11.5px;color:#475569;font-weight:600;line-height:1.4}
 /* 📖 매트릭스 범례 박스 */
 .cohort-legend-box{margin:0 18px 18px;padding:14px 18px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px}
@@ -2172,6 +2186,18 @@ const LANG = {
     cohort_section_title:'DB 코호트 매트릭스 — 배정월 × 통장입금 결제월',
     cohort_section_sub:'결제일 = 통장입금일 (Buku Setoran Bank · CSV) · 배정월 = 시트 DB · 매칭 안 된 결제는 \"cohort 미상\" 행에 분리',
     cohort_unmatched:'cohort 미상 (DB 매칭 X)',
+    cohort_unmatched_sub:'전체 결제의 {p}% · {n}건이 시트 DB 와 매칭 X',
+    insight_label_unmatch:'DB 미매칭',
+    insight_desc_unmatch:'{t}건 결제 중 {n}건 시트 DB 매칭 실패',
+    ue_title:'⚠️ DB 매칭 안 된 결제 {n}건 ({p}%) — 비중있게 봐야 할 항목',
+    ue_cause1:'시트에 회원 미등록',
+    ue_cause1_desc:'결제는 됐으나 우리 DB 시트에 해당 회원 row 자체가 없음 (외부 유입·다른 시트)',
+    ue_cause2:'부모 이름 표기 불일치',
+    ue_cause2_desc:'시트: "Hendra Kurniawan" / 입금: "Hendra" — 같은 사람인데 표기 달라 매칭 실패',
+    ue_cause3:'회원 이름 표기 차이',
+    ue_cause3_desc:'대소문자·공백·오타 등으로 자식 이름 불일치',
+    ue_fix_title:'개선 방법',
+    ue_fix_body:'시트의 회원 이름·부모 이름을 통장입금 기록과 동일 형식으로 통일하면 매칭률이 올라갑니다. 또는 누락된 회원을 시트에 추가.',
     cohort_h_assign_sub:'(DB 배정월)',
     cohort_h_db_sub:'(배정된 DB 수)',
     cohort_summary:'배정 DB {db}건 → 누적 클로징 {cl}건 (효율 {eff}%)',
@@ -2447,6 +2473,18 @@ const LANG = {
     cohort_section_title:'Matriks Kohor DB — Bulan Alokasi × Bulan Setoran Bank',
     cohort_section_sub:'Tanggal Closing = Tgl Setoran Bank (Buku Setoran · CSV) · Bulan Alokasi = DB Sheet · Closing tanpa match DB → baris \"Kohor Tidak Match\"',
     cohort_unmatched:'Kohor Tidak Match (DB tidak ditemukan)',
+    cohort_unmatched_sub:'{p}% dari total · {n} closing tidak match DB',
+    insight_label_unmatch:'DB Tidak Match',
+    insight_desc_unmatch:'{n} dari {t} closing tidak match sheet DB',
+    ue_title:'⚠️ {n} Closing ({p}%) Tidak Match DB — Perlu Perhatian',
+    ue_cause1:'Member belum terdaftar di sheet',
+    ue_cause1_desc:'Pembayaran masuk tapi member tidak ada di sheet DB kita (eksternal / sheet lain)',
+    ue_cause2:'Beda penulisan nama orang tua',
+    ue_cause2_desc:'Sheet: "Hendra Kurniawan" / Setoran: "Hendra" — Sama orang tapi penulisan beda',
+    ue_cause3:'Beda penulisan nama anak',
+    ue_cause3_desc:'Kapital/spasi/typo membuat nama anak tidak cocok',
+    ue_fix_title:'Cara Perbaikan',
+    ue_fix_body:'Seragamkan penulisan nama anak·orang tua di sheet dengan catatan setoran bank. Atau tambahkan member yg belum ada di sheet.',
     cohort_h_assign_sub:'(Bln Alokasi DB)',
     cohort_h_db_sub:'(Jml DB dialokasikan)',
     cohort_summary:'Alokasi {db} DB → Total Closing {cl} (Efisiensi {eff}%)',
@@ -4678,18 +4716,16 @@ function renderAnalytics(){
     return;
   }
 
-  // 시작월 동적 결정: D.records 배정월 + CSV 결제월 중 가장 이른 것 (2025-01 이후만)
+  // 시작월 동적 결정: D.records 의 가장 이른 배정월 (2025-01 이후만)
+  //   - production 에 2025 ad 있으면 자동 확장 (사용자 production 케이스)
+  //   - local 처럼 2026 만 있으면 2026-01 부터
+  //   - CSV 결제월의 earliest 는 안 봄 — D.records 가 cover 못하는 cohort 영역까지
+  //     매트릭스에 표시해봤자 다 cohort 미상으로 떨어져서 비현실적 수치 만듦
   const todayM = (D.today || new Date().toISOString().slice(0,10)).slice(0,7);
   let earliest = todayM;
   (D.records||[]).forEach(r=>{
     if(r.ad){
       const m = r.ad.slice(0,7);
-      if(m >= '2025-01' && m < earliest) earliest = m;
-    }
-  });
-  csvClosings.forEach(c=>{
-    if(c[0]){
-      const m = c[0].slice(0,7);
       if(m >= '2025-01' && m < earliest) earliest = m;
     }
   });
@@ -4902,13 +4938,15 @@ function renderAnalytics(){
       let umSum = 0;
       monthsList.forEach(m => { umSum += (unmatched[m]||0); });
       if(umSum > 0){
-        h += `<tr class="unmatched-row"><td class="L" style="color:#92400e"><b>${T('cohort_unmatched')}</b></td><td class="R db-col" style="color:#94a3b8">—</td>`;
+        const allClosings = matchCnt + unmatchCnt;
+        const umPct = allClosings ? Math.round(umSum/allClosings*100) : 0;
+        h += `<tr class="unmatched-row"><td class="L"><b>⚠️ ${T('cohort_unmatched')}</b><br><small>${T('cohort_unmatched_sub').replace('{p}', String(umPct)).replace('{n}', String(umSum))}</small></td><td class="R db-col" style="color:#9a3412">—</td>`;
         monthsList.forEach(m => {
           const v = unmatched[m] || 0;
-          h += `<td class="R" style="background:${v?'rgba(251,191,36,.30)':'transparent'};color:${v?'#92400e':'#cbd5e1'};font-weight:800">${v||'—'}</td>`;
+          h += `<td class="R" style="color:${v?'#7c2d12':'#cbd5e1'};font-weight:900">${v||'—'}</td>`;
         });
-        h += `<td class="R cum">${f(umSum)}</td>`;
-        h += `<td class="R eff" style="color:#94a3b8">—</td></tr>`;
+        h += `<td class="R cum" style="background:#fb923c;color:#7c2d12">${f(umSum)}</td>`;
+        h += `<td class="R eff" style="color:#9a3412">${umPct}%</td></tr>`;
       }
     }
 
@@ -4992,16 +5030,9 @@ function renderAnalytics(){
   });
   const prevContribPct = totalActualSum ? Math.round((totalActualSum - totalDiagSum) / totalActualSum * 100) : 0;
   const overallEff = totalDb ? (totalActualSum / totalDb * 100).toFixed(1) : 0;
-  const matchPct = (matchCnt + unmatchCnt) ? Math.round(matchCnt / (matchCnt + unmatchCnt) * 100) : 0;
-  const lastM = monthsList[monthsList.length-1];
-  const lastMLbl = (D.mlabels && D.mlabels[lastM]) || lastM;
-  const lastColTotal = (function(){
-    let s = unmatched[lastM]||0;
-    monthsList.forEach(cm=>{ s+=(totalCohort[cm] && totalCohort[cm][lastM])||0; });
-    return s;
-  })();
-  const lastDiag = (totalCohort[lastM] && totalCohort[lastM][lastM]) || 0;
-  const lastPrev = lastColTotal - lastDiag;
+  const allClosingsCnt = matchCnt + unmatchCnt;
+  const unmatchPct = allClosingsCnt ? Math.round(unmatchCnt/allClosingsCnt*100) : 0;
+  const matchPct = 100 - unmatchPct;
 
   let h = `
   <!-- 📌 자동 인사이트 박스 (재경 보고용) -->
@@ -5023,12 +5054,23 @@ function renderAnalytics(){
         <div class="insight-value">${overallEff}%</div>
         <div class="insight-desc">${T('insight_desc_eff').replace('{cl}', String(totalActualSum)).replace('{db}', f(totalDb))}</div>
       </div>
-      <div class="insight-card insight-last">
-        <div class="insight-label">${lastMLbl} ${T('insight_label_last')}</div>
-        <div class="insight-value">${lastColTotal}</div>
-        <div class="insight-desc">${T('insight_desc_last').replace('{diag}', String(lastDiag)).replace('{prev}', String(lastPrev))}</div>
+      <div class="insight-card insight-unmatch">
+        <div class="insight-label">⚠️ ${T('insight_label_unmatch')}</div>
+        <div class="insight-value">${unmatchPct}%</div>
+        <div class="insight-desc">${T('insight_desc_unmatch').replace('{n}', f(unmatchCnt)).replace('{t}', f(allClosingsCnt))}</div>
       </div>
     </div>
+  </div>
+
+  <!-- ⚠️ DB 미매칭 원인 안내 -->
+  <div class="unmatch-explain">
+    <div class="ue-title">⚠️ ${T('ue_title').replace('{n}', f(unmatchCnt)).replace('{p}', String(unmatchPct))}</div>
+    <div class="ue-causes">
+      <div class="ue-cause"><b>${T('ue_cause1')}</b><br><small>${T('ue_cause1_desc')}</small></div>
+      <div class="ue-cause"><b>${T('ue_cause2')}</b><br><small>${T('ue_cause2_desc')}</small></div>
+      <div class="ue-cause"><b>${T('ue_cause3')}</b><br><small>${T('ue_cause3_desc')}</small></div>
+    </div>
+    <div class="ue-fix">💡 <b>${T('ue_fix_title')}</b>: ${T('ue_fix_body')}</div>
   </div>
 
   <!-- 📐 매트릭스 읽는 법 -->
