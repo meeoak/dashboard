@@ -208,8 +208,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 .preset-btn{background:#fafafa;border:1px solid #e5e5e5;border-radius:14px;padding:5px 11px;font-size:11px;font-weight:700;color:#666;cursor:pointer;transition:all .12s}
 .preset-btn:hover{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
 .preset-btn.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
-.today-lbl{font-size:11px;color:#aaa;margin-left:auto;display:inline-flex;align-items:center;gap:10px}
-.today-lbl .clock-date{font-weight:700;color:#475569}
+.today-lbl{font-size:11px;color:#aaa;display:inline-flex;align-items:center;gap:10px}
+.today-lbl .clock-date{font-weight:700;color:#475569;font-size:12px}
 .today-lbl .clock-time{
   font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;
   font-size:18px;font-weight:900;
@@ -1555,12 +1555,13 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <span style="display:none" id="hdr-score"></span>
 </div></div>
 
-<!-- 스코프 탭 (1행): 전체 대시보드 + DB 종류 (왼쪽) + 언어·새로고침 (오른쪽) -->
+<!-- 스코프 탭 (1행): 전체 대시보드 + DB 종류 (왼쪽) + 시계·언어·새로고침 (오른쪽) -->
 <div class="scope-bar"><div class="scope-in" id="scope-bar">
   <button class="scope-btn on" data-scope="ALL" onclick="selectScope('ALL')" data-t="all_unified">전체DB(OFF+MKT)</button>
   <button class="scope-btn" data-scope="OFF" onclick="selectScope('OFF')"><span class="scope-dot" style="background:#a855f7"></span>OFF DB</button>
   <button class="scope-btn" data-scope="MKT" onclick="selectScope('MKT')"><span class="scope-dot" style="background:#06b6d4"></span>MKT DB</button>
   <div style="flex:1"></div>
+  <span class="today-lbl" id="today-lbl"></span>
   <div class="lang-toggle scope-lang">
     <button class="lang-btn on" data-lang="ko" onclick="setLang('ko')">🇰🇷 한국어</button>
     <button class="lang-btn" data-lang="id" onclick="setLang('id')">🇮🇩 Bahasa</button>
@@ -1600,7 +1601,6 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <button class="preset-btn" onclick="setPreset('thismonth')" data-t="this_month">이번달</button>
   <button class="preset-btn" onclick="setPreset('lastmonth')" data-t="last_month">지난달</button>
   <button class="preset-btn" onclick="setPreset('all')" data-t="all">전체</button>
-  <span class="today-lbl" id="today-lbl"></span>
 </div></div>
 
 <!-- 빠른 이동 탭 (필터 바 아래로 이동) — 클릭 시 그 화면만 보임 -->
