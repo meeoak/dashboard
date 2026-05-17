@@ -1526,22 +1526,35 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .cohort-title{font-size:15.5px;font-weight:900;letter-spacing:-.3px;margin-bottom:3px}
 .cohort-sub{font-size:11.5px;color:#64748b;font-weight:600}
 .cohort-wrap{overflow-x:auto}
-.cohort-tbl{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;font-size:13px}
+.cohort-tbl{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:auto}
 .cohort-tbl th{background:#1e293b;color:#fff;padding:9px 7px;font-weight:800;letter-spacing:-.2px;font-size:12px;text-align:center;border-bottom:none}
-.cohort-tbl th.L{text-align:left;padding-left:14px}
+.cohort-tbl th.L{text-align:left;padding-left:12px}
 .cohort-tbl th.R{text-align:right;padding-right:10px}
 .cohort-tbl th small{font-weight:700;color:#94a3b8;font-size:10.5px}
 .cohort-tbl th.cum{background:#7c2d12;border-left:3px solid #fb923c}
-.cohort-tbl td{padding:8px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle;text-align:right;font-weight:800}
-.cohort-tbl td.L{text-align:left;padding-left:14px;color:#0f172a;font-size:13.5px}
+.cohort-tbl th.eff{background:#312e81;border-left:3px solid #818cf8}
+/* 좌측 고정 컬럼 (배정월 + DB) — 폭 압축해서 한 묶음처럼 보이게 */
+.cohort-tbl th:first-child, .cohort-tbl td:first-child{width:78px;min-width:78px;padding-left:12px;padding-right:4px;white-space:nowrap}
+.cohort-tbl th:nth-child(2), .cohort-tbl td.db-col{width:80px;min-width:80px;padding-right:14px;border-right:2px solid #cbd5e1;background:#f8fafc;white-space:nowrap}
+.cohort-tbl tfoot tr.sum-actual td.db-col, .cohort-tbl tfoot tr.sum-cum td.db-col, .cohort-tbl tfoot tr.sum-diag td.db-col, .cohort-tbl tfoot tr.sum-prev td.db-col{background:inherit}
+.cohort-tbl td{padding:8px 7px;border-bottom:1px solid #f1f5f9;vertical-align:middle;text-align:right;font-weight:800}
+.cohort-tbl td.L{text-align:left;padding-left:12px;color:#0f172a;font-size:13.5px}
 .cohort-tbl td.cum{background:#fef3c7;color:#78350f;font-weight:900;border-left:2px solid #f59e0b;font-size:14px}
+.cohort-tbl td.eff{font-weight:900;font-size:13px;padding:6px 8px;border-left:2px solid #818cf8}
+.cohort-tbl td.eff.eff-good{background:#dcfce7;color:#15803d}
+.cohort-tbl td.eff.eff-mid{background:#fef9c3;color:#a16207}
+.cohort-tbl td.eff.eff-low{background:#fee2e2;color:#b91c1c}
+.cohort-tbl td.eff.eff-zero{background:#f1f5f9;color:#94a3b8}
+.cohort-tbl td.eff.eff-bold{background:#e0e7ff;color:#3730a3;font-size:14.5px;font-weight:900}
 .cohort-tbl td.impossible{font-size:11px;background:#f8fafc;color:#cbd5e1}
 .cohort-tbl td.coh-diag{position:relative}
-.cohort-tbl tbody tr:hover td:not(.cum):not(.impossible){background-color:rgba(252,211,77,.18)!important}
+.cohort-tbl tbody tr:hover td:not(.cum):not(.impossible):not(.eff){background-color:rgba(252,211,77,.18)!important}
 .cohort-tbl tr.pre-row td.L{color:#92400e}
 .cohort-tbl tfoot tr td{padding:10px 8px}
 .cohort-tbl tfoot tr.sum-actual td{background:#dbeafe;border-top:3px solid #2563eb;color:#1e3a8a;font-weight:900;font-size:14.5px}
 .cohort-tbl tfoot tr.sum-actual td small{color:#3730a3;font-weight:700;font-size:10.5px}
+.cohort-tbl tfoot tr.sum-cum td{background:#e0e7ff;color:#312e81;font-weight:900;font-size:13.5px;border-top:1px solid #a5b4fc}
+.cohort-tbl tfoot tr.sum-cum td small{color:#4338ca;font-weight:700;font-size:10.5px}
 .cohort-tbl tfoot tr.sum-diag td{background:#dcfce7;color:#15803d;font-weight:800}
 .cohort-tbl tfoot tr.sum-diag td small{color:#16a34a;font-weight:700;font-size:10.5px}
 .cohort-tbl tfoot tr.sum-prev td{background:#fef3c7;color:#a16207;font-weight:800;border-bottom:3px solid #ca8a04}
@@ -2107,9 +2120,12 @@ const LANG = {
     cohort_h_db:'배정 DB',
     cohort_h_close:'결제',
     cohort_h_cum:'누적 클로징',
+    cohort_h_eff:'DB 대비 효율',
     cohort_pre:'2024 이전 배정',
     cohort_actual:'당월 실제 클로징',
     cohort_actual_sub:'(= 컬럼 합계 · 재경 보고 숫자)',
+    cohort_cum_ytd:'월별 누적 클로징 (YTD)',
+    cohort_cum_ytd_sub:'(= 당월 실제 클로징 누적 합 · 연간 흐름)',
     cohort_diag:'즉시 전환 (대각선)',
     cohort_diag_sub:'(같은 달 배정 → 같은 달 클로징)',
     cohort_prev:'이전월 기여',
@@ -2348,9 +2364,12 @@ const LANG = {
     cohort_h_db:'Alokasi DB',
     cohort_h_close:'Closing',
     cohort_h_cum:'Total Closing',
+    cohort_h_eff:'Efisiensi vs DB',
     cohort_pre:'Alokasi sblm 2024',
     cohort_actual:'Closing Aktual Bulan Tsb',
     cohort_actual_sub:'(= Jumlah Kolom · Angka Laporan Keuangan)',
+    cohort_cum_ytd:'Closing Kumulatif Bulanan (YTD)',
+    cohort_cum_ytd_sub:'(= Jumlah Kumulatif Aktual · Alur Tahunan)',
     cohort_diag:'Konversi Instan (Diagonal)',
     cohort_diag_sub:'(Alokasi & Closing di Bulan yg Sama)',
     cohort_prev:'Kontribusi Bulan Lalu',
@@ -4539,15 +4558,17 @@ function renderAnalytics(){
     return null;
   };
 
-  // 2025-01 이후 모든 활성 월 (배정 또는 클로징 어느 한쪽이라도 있으면 포함)
+  // 2025-01 ~ 당월 (오늘 기준) 사이의 활성 월만 (미래 데이터 무시)
   const yearStart = '2025-01';
+  const todayM = (D.today || new Date().toISOString().slice(0,10)).slice(0,7);
+  const inRange = (ym)=> ym && ym >= yearStart && ym <= todayM;
   const monthSet = new Set();
   (D.records||[]).forEach(r=>{
     const am = toYM(r.ad);
-    if(am && am >= yearStart) monthSet.add(am);
+    if(inRange(am)) monthSet.add(am);
     if(r.cl===1){
       const vm = toYM(r.vd);
-      if(vm && vm >= yearStart) monthSet.add(vm);
+      if(inRange(vm)) monthSet.add(vm);
     }
   });
   const monthsList = Array.from(monthSet).sort();
@@ -4570,14 +4591,15 @@ function renderAnalytics(){
     const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
     const kinds = k ? [k, 'TOTAL'] : ['TOTAL'];
 
-    if(cohM >= yearStart && dbCount[cohM]){
+    if(inRange(cohM) && dbCount[cohM]){
       kinds.forEach(kk=>{ dbCount[cohM][kk]++; });
     }
     if(r.cl !== 1) return;
     const closeM = toYM(r.vd);
-    if(!closeM || closeM < yearStart) return;
+    if(!closeM || closeM < yearStart || closeM > todayM) return;   // 미래 클로징 무시
 
     if(cohM >= yearStart){
+      if(cohM > todayM) return;                                     // 미래 배정 무시
       kinds.forEach(kk=>{
         if(!cohort[kk][cohM]) cohort[kk][cohM] = {};
         cohort[kk][cohM][closeM] = (cohort[kk][cohM][closeM]||0) + 1;
@@ -4629,22 +4651,30 @@ function renderAnalytics(){
     monthsList.forEach(m => {
       h += `<th class="R">${mLbl(m)}<br><small>${T('cohort_h_close')}</small></th>`;
     });
-    h += `<th class="R cum">${T('cohort_h_cum')}</th></tr></thead><tbody>`;
+    h += `<th class="R cum">${T('cohort_h_cum')}</th>`;
+    h += `<th class="R eff">${T('cohort_h_eff')}</th></tr></thead><tbody>`;
 
     if(pre.count > 0){
-      h += `<tr class="pre-row"><td class="L"><b>${T('cohort_pre')}</b></td><td class="R" style="color:#94a3b8">—</td>`;
+      h += `<tr class="pre-row"><td class="L"><b>${T('cohort_pre')}</b></td><td class="R db-col" style="color:#94a3b8">—</td>`;
       monthsList.forEach(m => {
         const v = pre.byMonth[m] || 0;
         h += `<td class="R" style="background:${v?'rgba(251,191,36,.30)':'transparent'};color:${v?'#92400e':'#cbd5e1'};font-weight:800">${v||'—'}</td>`;
       });
-      h += `<td class="R cum">${f(pre.count)}</td></tr>`;
+      h += `<td class="R cum">${f(pre.count)}</td>`;
+      h += `<td class="R eff" style="color:#94a3b8">—</td></tr>`;
     }
 
+    // 누적 DB·클로징 (효율 푸터용)
+    let grandDb = 0, grandCohClosing = 0;
     monthsList.forEach((cohM, ci)=>{
       const db = dbCount[cohM][kindKey] || 0;
+      grandDb += db;
       let cohSum = 0;
       monthsList.forEach(closeM => { cohSum += (coh[cohM] && coh[cohM][closeM]) || 0; });
-      h += `<tr><td class="L"><b>${mLbl(cohM)}</b></td><td class="R alyt-num">${f(db)}</td>`;
+      grandCohClosing += cohSum;
+      const eff = db ? Math.round(cohSum/db*1000)/10 : 0;
+      const effCls = eff>=10 ? 'eff-good' : eff>=5 ? 'eff-mid' : eff>0 ? 'eff-low' : 'eff-zero';
+      h += `<tr><td class="L"><b>${mLbl(cohM)}</b></td><td class="R db-col">${f(db)}</td>`;
       monthsList.forEach((closeM, mi)=>{
         if(mi < ci){
           h += `<td class="R impossible">·</td>`;
@@ -4656,26 +4686,39 @@ function renderAnalytics(){
           h += `<td class="R coh-cell${isDiag?' coh-diag':''}" style="background:${cellBg(v, isDiag)};${border}color:${txtColor};font-weight:${isDiag?'900':'800'}">${v||'—'}</td>`;
         }
       });
-      h += `<td class="R cum">${f(cohSum)}</td></tr>`;
+      h += `<td class="R cum">${f(cohSum)}</td>`;
+      h += `<td class="R eff ${effCls}">${eff}%</td></tr>`;
     });
 
     h += `</tbody><tfoot>`;
     let grandActual = 0, grandDiag = 0;
     monthsList.forEach(m => { grandActual += colTotals[m]; grandDiag += diagTotals[m]; });
     const grandPrev = grandActual - grandDiag;
+    const colCount = monthsList.length + 3; // 배정월 + DB + N월 + 누적 + 효율
 
+    // 1) 당월 실제 클로징 (컬럼 합계)
     h += `<tr class="sum-actual"><td class="L" colspan="2"><b>${T('cohort_actual')}</b><br><small>${T('cohort_actual_sub')}</small></td>`;
     monthsList.forEach(m => { h += `<td class="R">${f(colTotals[m])}</td>`; });
-    h += `<td class="R cum">${f(grandActual)}</td></tr>`;
+    h += `<td class="R cum">${f(grandActual)}</td>`;
+    const grandEff = grandDb ? Math.round(grandCohClosing/grandDb*1000)/10 : 0;
+    h += `<td class="R eff eff-bold">${grandEff}%</td></tr>`;
 
+    // 2) 누적 클로징 (YTD running sum)
+    let runSum = 0;
+    h += `<tr class="sum-cum"><td class="L" colspan="2"><b>${T('cohort_cum_ytd')}</b><br><small>${T('cohort_cum_ytd_sub')}</small></td>`;
+    monthsList.forEach(m => { runSum += colTotals[m]; h += `<td class="R">${f(runSum)}</td>`; });
+    h += `<td class="R cum">${f(runSum)}</td><td class="R eff">—</td></tr>`;
+
+    // 3) 즉시 전환 (대각선)
     h += `<tr class="sum-diag"><td class="L" colspan="2"><b>${T('cohort_diag')}</b><br><small>${T('cohort_diag_sub')}</small></td>`;
     monthsList.forEach(m => {
       const ratio = colTotals[m] ? Math.round(diagTotals[m]/colTotals[m]*100) : 0;
       h += `<td class="R">${f(diagTotals[m])}<br><small>${ratio}%</small></td>`;
     });
     const diagRatio = grandActual ? Math.round(grandDiag/grandActual*100) : 0;
-    h += `<td class="R cum">${f(grandDiag)}<br><small>${diagRatio}%</small></td></tr>`;
+    h += `<td class="R cum">${f(grandDiag)}<br><small>${diagRatio}%</small></td><td class="R eff">—</td></tr>`;
 
+    // 4) 이전월 기여
     h += `<tr class="sum-prev"><td class="L" colspan="2"><b>${T('cohort_prev')}</b><br><small>${T('cohort_prev_sub')}</small></td>`;
     monthsList.forEach(m => {
       const prevV = colTotals[m] - diagTotals[m];
@@ -4683,7 +4726,7 @@ function renderAnalytics(){
       h += `<td class="R">${f(prevV)}<br><small>${ratio}%</small></td>`;
     });
     const prevRatio = grandActual ? Math.round(grandPrev/grandActual*100) : 0;
-    h += `<td class="R cum">${f(grandPrev)}<br><small>${prevRatio}%</small></td></tr>`;
+    h += `<td class="R cum">${f(grandPrev)}<br><small>${prevRatio}%</small></td><td class="R eff">—</td></tr>`;
 
     h += `</tfoot></table></div></div>`;
     return h;
