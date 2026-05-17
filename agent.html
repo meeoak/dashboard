@@ -274,6 +274,8 @@ button{cursor:pointer}
 // ═════════════════════════════════════════════
 
 const APP_VERSION = '0.1.0-test';
+// 기본 GAS 웹앱 URL — 기존 대시보드 배포본을 그대로 사용 (확장된 WINK 라우터 포함)
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyucQaf2g3vDlXkRlGTSg8wZ0SiVdUmWJXA_UQH-wR6rcZJfxsXWpzrn1xHlkaUQeyXYg/exec';
 const LS = {
   url: 'wink_url',
   session: 'wink_session',
@@ -309,7 +311,7 @@ function show(id){
 
 // ───── 서버 통신 ─────
 function getUrl(){
-  return localStorage.getItem(LS.url) || '';
+  return (localStorage.getItem(LS.url) || '').trim() || DEFAULT_GAS_URL;
 }
 async function api(action, payload){
   const url = getUrl();
