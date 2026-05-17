@@ -805,8 +805,12 @@ body.focus-mode #detail-section-hd{display:none!important}
 .rstats{display:flex;gap:5px;flex-shrink:0;align-items:center}
 .rstat{text-align:center;min-width:36px;padding:3px 5px;border-radius:6px;transition:background .12s}
 .rstat:hover{background:#f1f5f9}
-.rstat-v{font-size:14px;font-weight:900;letter-spacing:-.3px}
-.rstat-l{font-size:9.5px;color:#94a3b8;font-weight:800;letter-spacing:-.2px}
+.rstat-v{font-size:14px;font-weight:900;letter-spacing:-.3px;line-height:1.1}
+.rstat-v-prev{font-size:11px;color:#94a3b8;font-weight:800;letter-spacing:-.3px;line-height:1.1;margin-top:2px;border-top:1px dashed #e2e8f0;padding-top:2px;cursor:pointer}
+.rstat-v-prev:hover{color:#475569}
+.rstat-rate .rstat-v-prev{color:#a16207;border-top-color:#fde68a}
+.rstat-rate .rstat-v-prev:hover{color:#854d0e}
+.rstat-l{font-size:9.5px;color:#94a3b8;font-weight:800;letter-spacing:-.2px;margin-top:2px}
 .score-badge{background:linear-gradient(135deg,#fef3c7,#fefce8);color:#1e3a8a;font-size:18px;font-weight:900;border-radius:9px;padding:6px 12px;min-width:64px;text-align:center;border:1.5px solid #fbbf24;letter-spacing:-.4px;line-height:1}
 .score-badge small{font-size:10px;font-weight:800;color:#92400e;letter-spacing:-.2px;margin-left:1px}
 .score-badge.act-idx{background:linear-gradient(135deg,#dbeafe,#eff6ff);color:#1e3a8a;border-color:#3b82f6}
@@ -1709,8 +1713,8 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <!-- 통계 -->
   <div id="content-stats" style="display:none">
     <div class="sec-hd">
-      <div><div class="sec-title">📊 에이전트별 월별 현황</div>
-      <div class="sec-sub">숫자 클릭 → 회원 목록 · 배정일 기준</div></div>
+      <div><div class="sec-title" data-t="sec_stats_month">📊 에이전트별 월별 현황</div>
+      <div class="sec-sub" data-t="sec_stats_month_sub">숫자 클릭 → 회원 목록 · 배정일 기준</div></div>
       <div id="stats-filter-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div style="overflow-x:auto"><table class="month-tbl" id="month-tbl"></table></div>
@@ -1718,14 +1722,14 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <!-- 랭킹 -->
   <div id="content-rank" style="display:none">
     <div class="sec-hd" style="padding-bottom:8px">
-      <div><div class="sec-title">⚔️ 팀 배틀</div>
-      <div class="sec-sub">평균 활동지수 기준 · 한달 KPI 목표 100점</div></div>
+      <div><div class="sec-title" data-t="sec_battle">⚔️ 팀 배틀</div>
+      <div class="sec-sub" data-t="sec_battle_sub">평균 활동지수 기준 · 한달 KPI 목표 100점</div></div>
       <div id="rank-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="battle-wrap" id="battle-wrap"></div>
     <div class="sec-hd" style="border-top:2px solid #f5f5f5">
-      <div><div class="sec-title">🏆 에이전트 랭킹</div>
-      <div class="sec-sub">활동지수 = 클로징×5 + 방문완료/랑숭/비디오콜 각 1점 · 한달 KPI 100점 · 📍 오늘 기준 페이스</div></div>
+      <div><div class="sec-title" data-t="sec_rank">🏆 에이전트 랭킹</div>
+      <div class="sec-sub" data-t="sec_rank_sub">활동지수 = 클로징×5 + 방문완료/랑숭/비디오콜 각 1점 · 한달 KPI 100점 · 📍 오늘 기준 페이스</div></div>
     </div>
     <div class="rank-wrap" id="rank-wrap"></div>
   </div>
@@ -1735,14 +1739,14 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     <div id="urgent-banner"></div>
     <!-- 🔥 에이전트별 긴급 현황 (랭킹) -->
     <div class="sec-hd">
-      <div><div class="sec-title">🔥 에이전트별 긴급 현황</div>
-      <div class="sec-sub">긴급 건수 많은 순 · 1+2+3 합산 · 즉시 액션 필요</div></div>
+      <div><div class="sec-title" data-t="sec_team_urg">🔥 에이전트별 긴급 현황</div>
+      <div class="sec-sub" data-t="sec_team_urg_sub">긴급 건수 많은 순 · 1+2+3 합산 · 즉시 액션 필요</div></div>
       <div id="r3d-range-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="r3d-grid" id="ins-recent-3d-grid"></div>
     <div class="sec-hd">
-      <div><div class="sec-title">🏆 팀별 성과 인사이트</div>
-      <div class="sec-sub">팀리더용 · 선택한 기간 동안의 팀별 성과 분석 · 강점/약점/권고</div></div>
+      <div><div class="sec-title" data-t="sec_team_perf">🏆 팀별 성과 인사이트</div>
+      <div class="sec-sub" data-t="sec_team_perf_sub">팀리더용 · 선택한 기간 동안의 팀별 성과 분석 · 강점/약점/권고</div></div>
       <div id="insight-team-lbl" style="font-size:11px;color:#bbb"></div>
     </div>
     <div class="ins-team-grid" id="ins-team-grid"></div>
@@ -2002,6 +2006,99 @@ const LANG = {
     prev_month:'이전 월', next_month:'다음 월',
     nav_home:'🏠 전체 대시보드', nav_giar:'GIAR 대시보드', nav_tina:'TINA 대시보드', nav_lidia:'LIDIA 대시보드',
     nav_home_title:'전체 대시보드로 돌아가기',
+    // 랭킹/배틀 섹션 헤더
+    sec_stats_month:'📊 에이전트별 월별 현황',
+    sec_stats_month_sub:'숫자 클릭 → 회원 목록 · 배정일 기준',
+    sec_battle:'⚔️ 팀 배틀',
+    sec_battle_sub:'평균 활동지수 기준 · 한달 KPI 목표 100점',
+    sec_rank:'🏆 에이전트 랭킹',
+    sec_rank_sub:'활동지수 = 클로징×5 + 방문완료/랑숭/비디오콜 각 1점 · 한달 KPI 100점 · 📍 오늘 기준 페이스',
+    sec_team_urg:'🔥 에이전트별 긴급 현황',
+    sec_team_urg_sub:'긴급 건수 많은 순 · 1+2+3 합산 · 즉시 액션 필요',
+    sec_team_perf:'🏆 팀별 성과 인사이트',
+    sec_team_perf_sub:'팀리더용 · 선택한 기간 동안의 팀별 성과 분석 · 강점/약점/권고',
+    // 배틀 카드
+    bc_cur:'📊 당월', bc_prev:'📅 전월',
+    bc_avg_act_idx:'평균 활동지수', bc_persons:'명', bc_monthly_kpi:'한달 KPI',
+    bc_points:'점', bc_team_total:'팀 합계',
+    bc_done:'방문완료', bc_lsvc:'랑숭+비디오', bc_close:'🏆 클로징', bc_db_close:'DB→클로징',
+    bc_team_mvp:'🔥 팀 MVP',
+    bc_no_activity:'활동 없음',
+    bc_prev_avg_title:'전월 평균 활동지수',
+    // 랭킹 row
+    r_cur:'당월', r_prev:'전월',
+    r_top:'🔥 TOP',
+    r_keep_1st:'👑 1위 — 자리 지키기!',
+    r_climb_to:'⬆️ {n}위까지',
+    r_pts:'점',
+    r_tied_with:'= {n}위와 동점',
+    r_prev_beat:'전월 {p} ✅ +{d}',
+    r_prev_below:'전월 {p} ⬇ {d}',
+    r_team_meta:'{team} · DB→클로징 {dc}% · KPI 달성 {kpi}%',
+    r_no_agents:'활동한 에이전트가 없습니다',
+    r_today_pace:'📍 오늘 {md} · 페이스 {p}%',
+    r_today_pace_title:'기간 {from}~{to} 중 {today}까지 경과',
+    r_total_active:'총 {n}명 활동',
+    r_pace_title:'오늘 {today} · 페이스 {p}%',
+    // rstats 라벨/타이틀
+    rs_db:'DB', rs_sched:'예약', rs_done:'완료', rs_video:'비디오', rs_lang:'랑숭', rs_close:'클로', rs_dbcl:'DB→cl',
+    rs_db_t:'DB 배정', rs_sched_t:'상담예약 (sched)', rs_done_t:'방문완료', rs_video_t:'비디오콜',
+    rs_lang_t:'랑숭비짓', rs_close_t:'클로징', rs_dbcl_t:'DB 대비 클로징율',
+    rs_prev_pfx:'전월',
+    // 긴급 배너
+    urg_b_no_target:'긴급 관리 대상 없음',
+    urg_b_no_target_sub:'배정 후 2주 이내 회원 중 즉시 액션 필요한 건 없습니다',
+    urg_b_title:'긴급 관리 필요 {n}건', urg_b_scope_all:'전체',
+    urg_b_subtitle:'배정 후 2주 이내 · 이관 임박 · 매일 자동 업데이트 (오늘 {today})',
+    urg_b_no_memo:'📝 상담기록없음', urg_b_overdue:'⚠️ 방문일 지남', urg_b_no_resp:'🚨 응답없음',
+    urg_b_wait:'⏳ 일정대기 누적', urg_b_soon:'📅 방문 임박',
+    urg_b_no_memo_t:'상담기록도 없고 옵션도 선택 안된 회원 목록',
+    urg_b_overdue_t:'방문일 지남 회원 목록',
+    urg_b_no_resp_t:'메모 있음 + 옵션 있음 — 회원 무응답',
+    urg_b_wait_t:'일정대기 누적 회원 목록',
+    urg_b_soon_t:'방문 임박 회원 목록',
+    urg_b_top_agents:'긴급 건수 TOP 에이전트:',
+    // 에이전트별 긴급 현황
+    r3d_emp_no_urg:'긴급 관리 대상이 있는 에이전트가 없습니다 👍',
+    r3d_no_urg_target:'긴급 관리 대상 없음',
+    r3d_rank_1:'🚨 긴급 1위', r3d_rank_2:'🔥 긴급 2위', r3d_rank_3:'⚠️ 긴급 3위',
+    r3d_action_immediate:'🔥 즉시 조치', r3d_action_priority:'⚠️ 우선 관리',
+    r3d_urg_count:'🚨 긴급 {n}건',
+    r3d_no_memo:'상담기록없음', r3d_overdue:'방문일 지남', r3d_no_resp:'응답없음',
+    r3d_wait:'일정대기', r3d_soon:'방문 임박',
+    r3d_expand:'▼ 펼치기', r3d_collapse:'▲ 접기',
+    r3d_no_memo_chip_t:'상담기록없음 — 클릭 → 회원 목록',
+    r3d_overdue_chip_t:'방문일 지남 — 클릭 → 회원 목록',
+    r3d_no_resp_chip_t:'응답없음 — 클릭 → 회원 목록',
+    r3d_wait_chip_t:'일정대기 — 클릭 → 회원 목록',
+    r3d_soon_chip_t:'방문 임박 — 클릭 → 회원 목록',
+    // 팀 인사이트
+    ti_no_activity:'활동 없음', ti_no_db:'기간 내 DB 배정 없음',
+    ti_strengths:'✅ 강점', ti_weaknesses:'⚠️ 약점', ti_coaching:'💡 코칭 권고',
+    ti_all_unified:'전체 통합',
+    ti_lbl_db:'DB', ti_lbl_visit:'방문', ti_lbl_close:'클로징', ti_lbl_db_close:'DB→클로',
+    ti_video_active:'📹 비디오콜 {n}건 활발 ({p}%)',
+    ti_video_low:'📹 비디오콜 {n}건 ({p}% · 비율 낮음)',
+    ti_db_cl_ok:'💰 DB→클로 {n}% 달성',
+    ti_db_cl_kpi:'💰 DB→클로 {n}% ⭐ KPI 달성',
+    ti_db_cl_miss:'💰 DB→클로 {n}% (목표 {t}% 미달)',
+    ti_book_ok:'📅 예약율 {n}% 달성',
+    ti_book_miss:'📅 예약율 {n}% (-{d}%p)',
+    ti_visit_ok:'✅ 방문율 {n}% 달성',
+    ti_visit_miss:'✅ 방문율 {n}% (-{d}%p)',
+    ti_close_ok:'🏆 클로율 {n}% 달성',
+    ti_close_miss:'🏆 클로율 {n}% (-{d}%p)',
+    ti_adv_call:'전화·영상 후속 강화',
+    ti_adv_early:'초기 콜·메시지 후속 강화',
+    ti_adv_reminder:'예약 노쇼 방지 사전 리마인드',
+    ti_adv_close_train:'방문 시 클로징 트레이닝',
+    ti_adv_wait_decision:'⏳ 일정대기 {n}건 누적 - 결단 필요',
+    // 통계 테이블 헤더
+    st_h_agent:'에이전트', st_h_team:'팀', st_h_sched:'예정', st_h_wait:'대기', st_h_total:'합계',
+    st_h_book_rate:'예약율', st_h_visit_rate:'방문율', st_h_close_rate:'클로율', st_h_db_close:'DB→클로',
+    st_h_book_rate_t:'배정→예약 목표 25%', st_h_visit_rate_t:'예약→방문 목표 75%',
+    st_h_close_rate_t:'방문→클로징 목표 65%', st_h_db_close_t:'DB→클로징 목표 12% (최종 KPI)',
+    st_basis_alloc:'배정일 기준',
   },
   id: {
     title:'Dashboard Penjualan Terpadu', subtitle:'Status Penjualan Kunjungan Real-time',
@@ -2099,11 +2196,110 @@ const LANG = {
     prev_month:'Bulan Sebelumnya', next_month:'Bulan Berikutnya',
     nav_home:'🏠 Dashboard Utama', nav_giar:'Dashboard GIAR', nav_tina:'Dashboard TINA', nav_lidia:'Dashboard LIDIA',
     nav_home_title:'Kembali ke Dashboard Utama',
+    // Header section Ranking/Battle
+    sec_stats_month:'📊 Status Bulanan per Agen',
+    sec_stats_month_sub:'Klik angka → Daftar Member · Berdasarkan Tgl Alokasi',
+    sec_battle:'⚔️ Battle Tim',
+    sec_battle_sub:'Berdasarkan rata-rata indeks aktivitas · Target KPI bulanan 100 poin',
+    sec_rank:'🏆 Ranking Agen',
+    sec_rank_sub:'Indeks Aktivitas = Closing×5 + Visit/Langsung/Video Call masing-masing 1 poin · KPI bulanan 100 poin · 📍 Pace per hari ini',
+    sec_team_urg:'🔥 Status Mendesak per Agen',
+    sec_team_urg_sub:'Urutan jumlah mendesak terbanyak · Total 1+2+3 · Perlu aksi segera',
+    sec_team_perf:'🏆 Insight Performa per Tim',
+    sec_team_perf_sub:'Untuk Team Leader · Analisis performa tim dalam periode terpilih · Kekuatan/Kelemahan/Rekomendasi',
+    // Kartu Battle
+    bc_cur:'📊 Bulan Ini', bc_prev:'📅 Bulan Lalu',
+    bc_avg_act_idx:'Rata-rata Indeks Aktivitas', bc_persons:'org', bc_monthly_kpi:'KPI Bulanan',
+    bc_points:'pt', bc_team_total:'Total Tim',
+    bc_done:'Visit Selesai', bc_lsvc:'Langsung+Video', bc_close:'🏆 Closing', bc_db_close:'DB→Closing',
+    bc_team_mvp:'🔥 MVP Tim',
+    bc_no_activity:'Tidak ada aktivitas',
+    bc_prev_avg_title:'Rata-rata Indeks Aktivitas Bulan Lalu',
+    // Baris Ranking
+    r_cur:'Bln ini', r_prev:'Bln lalu',
+    r_top:'🔥 TOP',
+    r_keep_1st:'👑 Peringkat 1 — Pertahankan!',
+    r_climb_to:'⬆️ Ke #{n}',
+    r_pts:'pt',
+    r_tied_with:'= Seri dgn #{n}',
+    r_prev_beat:'Bln Lalu {p} ✅ +{d}',
+    r_prev_below:'Bln Lalu {p} ⬇ {d}',
+    r_team_meta:'{team} · DB→Closing {dc}% · KPI {kpi}%',
+    r_no_agents:'Tidak ada agen yang aktif',
+    r_today_pace:'📍 Hari ini {md} · Pace {p}%',
+    r_today_pace_title:'Sudah lewat {today} dari periode {from}~{to}',
+    r_total_active:'Total {n} agen aktif',
+    r_pace_title:'Hari ini {today} · Pace {p}%',
+    // Label/Title rstats
+    rs_db:'DB', rs_sched:'Jadwal', rs_done:'Visit', rs_video:'Video', rs_lang:'Langsung', rs_close:'Close', rs_dbcl:'DB→cl',
+    rs_db_t:'Alokasi DB', rs_sched_t:'Jadwal Konsultasi (sched)', rs_done_t:'Visit Selesai', rs_video_t:'Video Call',
+    rs_lang_t:'Visit Langsung', rs_close_t:'Closing', rs_dbcl_t:'DB-Closing Rate',
+    rs_prev_pfx:'Bln Lalu',
+    // Banner Mendesak
+    urg_b_no_target:'Tidak ada manajemen mendesak',
+    urg_b_no_target_sub:'Tidak ada member yang perlu aksi segera dalam 2 minggu setelah alokasi',
+    urg_b_title:'{n} Item Perlu Manajemen Mendesak', urg_b_scope_all:'Semua',
+    urg_b_subtitle:'Dalam 2 minggu setelah alokasi · Akan dipindahkan · Update otomatis harian (Hari ini {today})',
+    urg_b_no_memo:'📝 Tanpa Catatan', urg_b_overdue:'⚠️ Lewat Tgl Visit', urg_b_no_resp:'🚨 Tidak Respons',
+    urg_b_wait:'⏳ Tunggu Jadwal', urg_b_soon:'📅 Visit Mendatang',
+    urg_b_no_memo_t:'Daftar member tanpa catatan dan tanpa opsi terpilih',
+    urg_b_overdue_t:'Daftar member yang lewat tanggal visit',
+    urg_b_no_resp_t:'Ada catatan + ada opsi — member tidak respons',
+    urg_b_wait_t:'Daftar member yang menumpuk menunggu jadwal',
+    urg_b_soon_t:'Daftar member dengan visit mendatang',
+    urg_b_top_agents:'TOP Agen dengan kasus mendesak:',
+    // Status Mendesak per Agen
+    r3d_emp_no_urg:'Tidak ada agen dengan kasus mendesak 👍',
+    r3d_no_urg_target:'Tidak ada kasus mendesak',
+    r3d_rank_1:'🚨 Mendesak #1', r3d_rank_2:'🔥 Mendesak #2', r3d_rank_3:'⚠️ Mendesak #3',
+    r3d_action_immediate:'🔥 Aksi Segera', r3d_action_priority:'⚠️ Prioritas',
+    r3d_urg_count:'🚨 {n} Kasus Mendesak',
+    r3d_no_memo:'Tanpa Catatan', r3d_overdue:'Lewat Tgl Visit', r3d_no_resp:'Tidak Respons',
+    r3d_wait:'Tunggu Jadwal', r3d_soon:'Visit Mendatang',
+    r3d_expand:'▼ Buka', r3d_collapse:'▲ Tutup',
+    r3d_no_memo_chip_t:'Tanpa Catatan — Klik → Daftar Member',
+    r3d_overdue_chip_t:'Lewat Tgl Visit — Klik → Daftar Member',
+    r3d_no_resp_chip_t:'Tidak Respons — Klik → Daftar Member',
+    r3d_wait_chip_t:'Tunggu Jadwal — Klik → Daftar Member',
+    r3d_soon_chip_t:'Visit Mendatang — Klik → Daftar Member',
+    // Insight Tim
+    ti_no_activity:'Tanpa Aktivitas', ti_no_db:'Tidak ada alokasi DB dalam periode',
+    ti_strengths:'✅ Kekuatan', ti_weaknesses:'⚠️ Kelemahan', ti_coaching:'💡 Rekomendasi Coaching',
+    ti_all_unified:'Semua Terpadu',
+    ti_lbl_db:'DB', ti_lbl_visit:'Visit', ti_lbl_close:'Closing', ti_lbl_db_close:'DB→Close',
+    ti_video_active:'📹 Video Call {n} aktif ({p}%)',
+    ti_video_low:'📹 Video Call {n} ({p}% · rasio rendah)',
+    ti_db_cl_ok:'💰 DB→Close {n}% tercapai',
+    ti_db_cl_kpi:'💰 DB→Close {n}% ⭐ KPI tercapai',
+    ti_db_cl_miss:'💰 DB→Close {n}% (target {t}% belum tercapai)',
+    ti_book_ok:'📅 Tingkat Jadwal {n}% tercapai',
+    ti_book_miss:'📅 Tingkat Jadwal {n}% (-{d}%p)',
+    ti_visit_ok:'✅ Tingkat Visit {n}% tercapai',
+    ti_visit_miss:'✅ Tingkat Visit {n}% (-{d}%p)',
+    ti_close_ok:'🏆 Tingkat Closing {n}% tercapai',
+    ti_close_miss:'🏆 Tingkat Closing {n}% (-{d}%p)',
+    ti_adv_call:'Perkuat follow-up telepon·video',
+    ti_adv_early:'Perkuat follow-up call/pesan awal',
+    ti_adv_reminder:'Reminder dini cegah no-show',
+    ti_adv_close_train:'Training closing saat visit',
+    ti_adv_wait_decision:'⏳ {n} Tunggu Jadwal menumpuk - perlu keputusan',
+    // Header tabel statistik
+    st_h_agent:'Agen', st_h_team:'Tim', st_h_sched:'Jadwal', st_h_wait:'Menunggu', st_h_total:'Total',
+    st_h_book_rate:'Tk. Jadwal', st_h_visit_rate:'Tk. Visit', st_h_close_rate:'Tk. Close', st_h_db_close:'DB→Close',
+    st_h_book_rate_t:'Alokasi→Jadwal target 25%', st_h_visit_rate_t:'Jadwal→Visit target 75%',
+    st_h_close_rate_t:'Visit→Close target 65%', st_h_db_close_t:'DB→Close target 12% (KPI Akhir)',
+    st_basis_alloc:'Berdasarkan Tgl Alokasi',
   }
 };
 
 let curLang = localStorage.getItem('dash_lang') || 'ko';
 function T(key){ return LANG[curLang]?.[key] || LANG.ko[key] || key; }
+// 플레이스홀더 치환: T_('r_climb_to', {n:2}) → "⬆️ 2위까지"
+function T_(key, vars){
+  let s = T(key);
+  if(vars){ for(const k in vars) s = s.replace(new RegExp('\\{'+k+'\\}','g'), vars[k]); }
+  return s;
+}
 function setLang(lang){
   curLang = lang;
   try{ localStorage.setItem('dash_lang', lang); }catch(e){}
@@ -3608,19 +3804,19 @@ function renderStats(){
   }
   // 헤더: 에이전트/팀 + DB + 활동 6개 + 전환율 4개
   let h = `<thead><tr>
-    <th class="L">에이전트</th>
-    <th>팀</th>
-    <th style="font-size:12.5px;color:#333">📋 DB</th>
-    <th style="font-size:12.5px;color:#16a34a">✅ 완료</th>
-    <th style="font-size:12.5px;color:#1e293b">⬜ 랑숭</th>
-    <th style="font-size:12.5px;color:#6d28d9">📹 비디오</th>
-    <th style="font-size:12.5px;color:#1d4ed8">📅 예정</th>
-    <th style="font-size:12.5px;color:#92400e">⏳ 대기</th>
-    <th style="font-size:12.5px;color:#1e3a8a">🏆 클로징</th>
-    <th style="border-left:2px solid #ddd;font-size:12px;color:#1d4ed8" title="배정→예약 목표 25%">예약율<br><small style="font-weight:600;font-size:10px">목표${TARGETS.ds}%</small></th>
-    <th style="font-size:12px;color:#16a34a" title="예약→방문 목표 75%">방문율<br><small style="font-weight:600;font-size:10px">목표${TARGETS.sv}%</small></th>
-    <th style="font-size:12px;color:#dc2626" title="방문→클로징 목표 65%">클로율<br><small style="font-weight:600;font-size:10px">목표${TARGETS.vc}%</small></th>
-    <th style="font-size:12px;color:#1e3a8a;background:#fefce8" title="DB→클로징 목표 12% (최종 KPI)">⭐DB→클로<br><small style="font-weight:600;font-size:10px">목표${TARGETS.dc}%</small></th>
+    <th class="L">${T('st_h_agent')}</th>
+    <th>${T('st_h_team')}</th>
+    <th style="font-size:12.5px;color:#333">📋 ${T('rs_db')}</th>
+    <th style="font-size:12.5px;color:#16a34a">✅ ${T('rs_done')}</th>
+    <th style="font-size:12.5px;color:#1e293b">⬜ ${T('rs_lang')}</th>
+    <th style="font-size:12.5px;color:#6d28d9">📹 ${T('rs_video')}</th>
+    <th style="font-size:12.5px;color:#1d4ed8">📅 ${T('st_h_sched')}</th>
+    <th style="font-size:12.5px;color:#92400e">⏳ ${T('st_h_wait')}</th>
+    <th style="font-size:12.5px;color:#1e3a8a">🏆 ${T('rs_close')}</th>
+    <th style="border-left:2px solid #ddd;font-size:12px;color:#1d4ed8" title="${T('st_h_book_rate_t')}">${T('st_h_book_rate')}<br><small style="font-weight:600;font-size:10px">${T('target_short')}${TARGETS.ds}%</small></th>
+    <th style="font-size:12px;color:#16a34a" title="${T('st_h_visit_rate_t')}">${T('st_h_visit_rate')}<br><small style="font-weight:600;font-size:10px">${T('target_short')}${TARGETS.sv}%</small></th>
+    <th style="font-size:12px;color:#dc2626" title="${T('st_h_close_rate_t')}">${T('st_h_close_rate')}<br><small style="font-weight:600;font-size:10px">${T('target_short')}${TARGETS.vc}%</small></th>
+    <th style="font-size:12px;color:#1e3a8a;background:#fefce8" title="${T('st_h_db_close_t')}">⭐${T('st_h_db_close')}<br><small style="font-weight:600;font-size:10px">${T('target_short')}${TARGETS.dc}%</small></th>
   </tr></thead><tbody>`;
   filtered.forEach(a=>{
     const meta = D.agent_meta[a];
@@ -3655,7 +3851,7 @@ function renderStats(){
   const fn2=(v,st)=>v>0?`<span class="clicknum cn-${st}" onclick="openMem(null,'${st}')">${v}</span>`:'0';
   const dbAllClick = t2.db>0 ? `<span class="clicknum" style="color:#555;font-weight:900" onclick="openMem(null,'db')">${f(t2.db)}</span>` : '0';
   h+=`<tfoot><tr>
-    <td class="L">합계</td>
+    <td class="L">${T('st_h_total')}</td>
     <td></td>
     <td>${dbAllClick}</td>
     <td>${fn2(t2.d||0,'d')}</td>
@@ -3670,7 +3866,7 @@ function renderStats(){
     <td style="background:#ffedd5;border-left:1px solid #fde68a;font-weight:900">${rateCell(t2.r_dc||0, TARGETS.dc)}</td>
   </tr></tfoot></tbody>`;
   document.getElementById('month-tbl').innerHTML = h;
-  document.getElementById('stats-filter-lbl').textContent = rangeLbl() + ' · 배정일 기준';
+  document.getElementById('stats-filter-lbl').textContent = rangeLbl() + ' · ' + T('st_basis_alloc');
 }
 
 // ── 랭킹 & 배틀 ─────────────────────────────────────────
@@ -3688,11 +3884,14 @@ function renderRank(){
   const allAgents = Object.keys(D.agent_total);
   // 전월 활동지수 사전 계산 — 팀별·에이전트별
   const prevRange = previousMonthRange();
+  const prevMonthStr = prevRange ? prevRange.from.slice(0,7) : null;
   const prevAgentIdx = {};   // agent → activity index
+  const prevAgentStats = {}; // agent → full stats (db, sched, d, ls, vc, cl, r_dc, ...)
   const prevTeamAvg = {};    // team → avg activity index
   if(prevRange){
     allAgents.forEach(a=>{
       const ps = statsRange(prevRange.from, prevRange.to, null, a);
+      prevAgentStats[a] = ps;
       prevAgentIdx[a] = (ps && (ps.db||0) > 0) ? calcActivityIndex(ps) : 0;
     });
     D.teams.forEach(t=>{
@@ -3741,28 +3940,28 @@ function renderRank(){
     const prevPct = Math.min(100, Math.round(prevAvg/kpiTarget*100));
     const beatPrev = avgIdx > prevAvg;
     const mvpHtml = mvp
-      ? `<div class="bc-mvp" onclick="openMem('${mvp.a}','d')" title="팀 MVP 회원 목록"><span class="bc-mvp-lbl">🔥 팀 MVP</span><span class="bc-mvp-name">${(D.agent_meta[mvp.a]||{}).short||mvp.a}</span><span class="bc-mvp-score" style="color:${TC[t]}">${mvp.actIdx}점</span></div>`
+      ? `<div class="bc-mvp" onclick="openMem('${mvp.a}','d')" title="${T('bc_team_mvp')}"><span class="bc-mvp-lbl">${T('bc_team_mvp')}</span><span class="bc-mvp-name">${(D.agent_meta[mvp.a]||{}).short||mvp.a}</span><span class="bc-mvp-score" style="color:${TC[t]}">${mvp.actIdx}${T('bc_points')}</span></div>`
       : '';
     let prevMarkHtml = '';
     if(prevAvg > 0){
-      prevMarkHtml = '<div class="bc-prev-mark '+(beatPrev?'beat':'below')+'" style="left:'+prevPct+'%" title="전월 평균 활동지수 '+prevAvg.toFixed(1)+'점"></div>';
+      prevMarkHtml = '<div class="bc-prev-mark '+(beatPrev?'beat':'below')+'" style="left:'+prevPct+'%" title="'+T('bc_prev_avg_title')+' '+prevAvg.toFixed(1)+T('bc_points')+'"></div>';
     }
     bh+=`<div class="bcard ${cls}" style="border-top:4px solid ${TC[t]}">
       <div class="bc-name" style="color:${TC[t]}">${teamShortName(t)}</div>
       <div class="bc-idx-block">
         <div class="bc-idx-num" style="color:${TC[t]}">${avgIdx.toFixed(1)}<small>/${kpiTarget}</small></div>
-        <div class="bc-idx-lbl-row">평균 활동지수 <small>(${headcount}명 · 한달 KPI ${kpiTarget}점)</small></div>
+        <div class="bc-idx-lbl-row">${T('bc_avg_act_idx')} <small>(${headcount}${T('bc_persons')} · ${T('bc_monthly_kpi')} ${kpiTarget}${T('bc_points')})</small></div>
         <div class="bc-dual-bar">
           <div class="bc-dual-row">
-            <span class="bc-dual-lbl">📊 당월</span>
+            <span class="bc-dual-lbl">${T('bc_cur')}</span>
             <div class="bc-idx-bar">
               <div class="bc-idx-fill" style="width:${barPct}%;background:${TC[t]}"></div>
-              ${pacePct!==null?`<div class="bc-pace-mark" style="left:${pacePct}%" title="오늘 ${D.today} · 페이스 ${pacePct}%"></div>`:''}
+              ${pacePct!==null?`<div class="bc-pace-mark" style="left:${pacePct}%" title="${T_('r_pace_title',{today:D.today,p:pacePct})}"></div>`:''}
             </div>
             <span class="bc-dual-val" style="color:${TC[t]}">${avgIdx.toFixed(1)}</span>
           </div>
           <div class="bc-dual-row bc-dual-prev">
-            <span class="bc-dual-lbl">📅 전월</span>
+            <span class="bc-dual-lbl">${T('bc_prev')}</span>
             <div class="bc-idx-bar">
               <div class="bc-idx-fill" style="width:${prevPct}%;background:${TC[t]};opacity:.4"></div>
             </div>
@@ -3771,14 +3970,14 @@ function renderRank(){
         </div>
       </div>
       <div class="bc-sum-row">
-        <span class="bc-sum-lbl">팀 합계</span>
-        <span class="bc-sum-val" style="color:${TC[t]}">${f(Math.round(sumIdx))}점</span>
+        <span class="bc-sum-lbl">${T('bc_team_total')}</span>
+        <span class="bc-sum-val" style="color:${TC[t]}">${f(Math.round(sumIdx))}${T('bc_points')}</span>
       </div>
       <div class="bc-kpis">
-        <div class="bc-kpi"><b style="color:#16a34a">${s.d||0}</b><span>방문완료</span></div>
-        <div class="bc-kpi"><b style="color:#6d28d9">${(s.ls||0)+(s.vc||0)}</b><span>랑숭+비디오</span></div>
-        <div class="bc-kpi"><b style="color:#dc2626">${s.cl||0}</b><span>🏆 클로징</span></div>
-        <div class="bc-kpi"><b style="color:#1e3a8a">${s.r_dc||0}%</b><span>DB→클로징</span></div>
+        <div class="bc-kpi"><b style="color:#16a34a">${s.d||0}</b><span>${T('bc_done')}</span></div>
+        <div class="bc-kpi"><b style="color:#6d28d9">${(s.ls||0)+(s.vc||0)}</b><span>${T('bc_lsvc')}</span></div>
+        <div class="bc-kpi"><b style="color:#dc2626">${s.cl||0}</b><span>${T('bc_close')}</span></div>
+        <div class="bc-kpi"><b style="color:#1e3a8a">${s.r_dc||0}%</b><span>${T('bc_db_close')}</span></div>
       </div>
       ${mvpHtml}
     </div>`;
@@ -3803,6 +4002,15 @@ function renderRank(){
     const prevIdx = prevAgentIdx[a] || 0;
     const prevPct = Math.min(100, Math.round(prevIdx/kpiTarget*100));
     const beatPrev = actIdx > prevIdx;
+    // 전월 상세 통계 (없으면 0)
+    const ps = prevAgentStats[a] || {};
+    const p_db    = ps.db||0;
+    const p_sched = ps.sched||0;
+    const p_d     = ps.d||0;
+    const p_ls    = ps.ls||0;
+    const p_vc    = ps.vc||0;
+    const p_cl    = ps.cl||0;
+    const p_r_dc  = ps.r_dc||0;
     const meta = D.agent_meta[a]||{};
     const short = meta.short || a;
     const isTop3 = i<3;
@@ -3810,42 +4018,55 @@ function renderRank(){
     // 다음 순위까지 동기 멘트
     let motivate = '';
     if(i===0){
-      motivate = `<span class="rk-motivate top">👑 1위 — 자리 지키기!</span>`;
+      motivate = `<span class="rk-motivate top">${T('r_keep_1st')}</span>`;
     } else if(nextGap > 0){
-      motivate = `<span class="rk-motivate climb">⬆️ ${i}위까지 <b>${nextGap}점</b></span>`;
+      motivate = `<span class="rk-motivate climb">${T_('r_climb_to',{n:i})} <b>${nextGap}${T('r_pts')}</b></span>`;
     } else {
-      motivate = `<span class="rk-motivate tied">= ${i}위와 동점</span>`;
+      motivate = `<span class="rk-motivate tied">${T_('r_tied_with',{n:i})}</span>`;
     }
     // 전월 대비 표시
     const prevDiff = prevIdx > 0 ? actIdx - prevIdx : 0;
     const prevDiffLbl = prevIdx > 0
-      ? (prevDiff>=0 ? `<span class="rk-prev beat">전월 ${prevIdx} ✅ +${prevDiff}</span>` : `<span class="rk-prev below">전월 ${prevIdx} ⬇ ${prevDiff}</span>`)
+      ? (prevDiff>=0 ? `<span class="rk-prev beat">${T_('r_prev_beat',{p:prevIdx,d:prevDiff})}</span>` : `<span class="rk-prev below">${T_('r_prev_below',{p:prevIdx,d:prevDiff})}</span>`)
       : '';
     const rankBadge = isTop3
       ? `<div class="rnum rnum-medal rnum-${i+1}">${medals[i]}</div>`
       : `<div class="rnum"><span class="rnum-plain">${i+1}</span></div>`;
+    // 전월 셀 클릭 시 전월 회원 목록 열기 헬퍼 (prevMonthStr 가 있을 때만)
+    const prevClick = (stype) => prevMonthStr
+      ? `onclick="event.stopPropagation();openMem('${a}','${stype}','${prevMonthStr}')"`
+      : '';
+    const prevTitle = T('rs_prev_pfx');
+    // 전월 값이 모두 0이면 prev 행 표시 안 함 (배정 자체가 없었던 경우)
+    const hasPrev = p_db > 0 || prevIdx > 0;
+    const pv = (val, stype, color) => hasPrev
+      ? `<div class="rstat-v-prev" ${prevClick(stype)} title="${prevTitle} ${val}" style="${color?`color:${color}`:''}">${val}</div>`
+      : `<div class="rstat-v-prev" style="color:#cbd5e1;cursor:default" title="${prevTitle} -">-</div>`;
+    const pvRate = (val) => hasPrev
+      ? `<div class="rstat-v-prev" title="${prevTitle} ${val}%">${val}%</div>`
+      : `<div class="rstat-v-prev" style="color:#cbd5e1;cursor:default" title="${prevTitle} -">-</div>`;
     rh+=`<div class="rank-row ${isTop3?'top3-row':''}" onclick="openMem('${a}','d')">
       ${rankBadge}
       <div class="rav rav${TK[team]}">${ini}</div>
       <div class="rinfo">
         <div class="rname-row">
-          <span class="rname rname-clickable" onclick="event.stopPropagation();openMem('${a}','db')" title="${short} — 기간 내 배정 회원 전체">${short}</span>
-          ${i===0?'<span class="fire-tag">🔥 TOP</span>':''}
+          <span class="rname rname-clickable" onclick="event.stopPropagation();openMem('${a}','db')" title="${short}">${short}</span>
+          ${i===0?`<span class="fire-tag">${T('r_top')}</span>`:''}
           ${motivate}
           ${prevDiffLbl}
         </div>
-        <div class="rteam">${team} · DB→클로징 <b>${r_dc}%</b> · KPI 달성 <b>${Math.round(achPct)}%</b></div>
+        <div class="rteam">${T_('r_team_meta',{team:team,dc:r_dc,kpi:Math.round(achPct)})}</div>
         <div class="r-dual-bar">
           <div class="r-dual-row">
-            <span class="r-dual-lbl">당월</span>
+            <span class="r-dual-lbl">${T('r_cur')}</span>
             <div class="rbar-bg">
               <div class="rbar" style="width:${barPct}%;background:${TC[team]}"></div>
-              ${pacePct!==null?`<div class="rbar-pace-mark" style="left:${pacePct}%" title="오늘 ${D.today} · 페이스 ${pacePct}%"></div>`:''}
+              ${pacePct!==null?`<div class="rbar-pace-mark" style="left:${pacePct}%" title="${T_('r_pace_title',{today:D.today,p:pacePct})}"></div>`:''}
             </div>
             <span class="r-dual-val" style="color:${TC[team]}">${actIdx}</span>
           </div>
           <div class="r-dual-row r-dual-prev">
-            <span class="r-dual-lbl">전월</span>
+            <span class="r-dual-lbl">${T('r_prev')}</span>
             <div class="rbar-bg">
               <div class="rbar" style="width:${prevPct}%;background:${TC[team]};opacity:.4"></div>
             </div>
@@ -3854,30 +4075,30 @@ function renderRank(){
         </div>
       </div>
       <div class="rstats">
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','db')" title="DB 배정"><div class="rstat-v" style="color:#1e3a8a">${db}</div><div class="rstat-l">DB</div></div>
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','s,d,vc,ls,cl')" title="상담예약 (sched)"><div class="rstat-v" style="color:#0891b2">${sched}</div><div class="rstat-l">예약</div></div>
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','d')" title="방문완료"><div class="rstat-v" style="color:#16a34a">${d}</div><div class="rstat-l">완료</div></div>
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','vc')" title="비디오콜"><div class="rstat-v" style="color:#6d28d9">${vc}</div><div class="rstat-l">비디오</div></div>
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','ls')" title="랑숭비짓"><div class="rstat-v" style="color:#1e293b">${ls}</div><div class="rstat-l">랑숭</div></div>
-        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','cl')" title="클로징"><div class="rstat-v" style="color:#dc2626">${cl}</div><div class="rstat-l">클로</div></div>
-        <div class="rstat rstat-rate" title="DB 대비 클로징율"><div class="rstat-v" style="color:#1e3a8a">${r_dc}%</div><div class="rstat-l">DB→cl</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','db')" title="${T('rs_db_t')}"><div class="rstat-v" style="color:#1e3a8a">${db}</div>${pv(p_db,'db','#1e3a8a')}<div class="rstat-l">${T('rs_db')}</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','s,d,vc,ls,cl')" title="${T('rs_sched_t')}"><div class="rstat-v" style="color:#0891b2">${sched}</div>${pv(p_sched,'s,d,vc,ls,cl','#0891b2')}<div class="rstat-l">${T('rs_sched')}</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','d')" title="${T('rs_done_t')}"><div class="rstat-v" style="color:#16a34a">${d}</div>${pv(p_d,'d','#16a34a')}<div class="rstat-l">${T('rs_done')}</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','vc')" title="${T('rs_video_t')}"><div class="rstat-v" style="color:#6d28d9">${vc}</div>${pv(p_vc,'vc','#6d28d9')}<div class="rstat-l">${T('rs_video')}</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','ls')" title="${T('rs_lang_t')}"><div class="rstat-v" style="color:#1e293b">${ls}</div>${pv(p_ls,'ls','#1e293b')}<div class="rstat-l">${T('rs_lang')}</div></div>
+        <div class="rstat" onclick="event.stopPropagation();openMem('${a}','cl')" title="${T('rs_close_t')}"><div class="rstat-v" style="color:#dc2626">${cl}</div>${pv(p_cl,'cl','#dc2626')}<div class="rstat-l">${T('rs_close')}</div></div>
+        <div class="rstat rstat-rate" title="${T('rs_dbcl_t')}"><div class="rstat-v" style="color:#1e3a8a">${r_dc}%</div>${pvRate(p_r_dc)}<div class="rstat-l">${T('rs_dbcl')}</div></div>
         <div class="score-badge act-idx">${actIdx}<small>/${kpiTarget}</small></div>
       </div></div>`;
   });
-  if(!rh) rh = '<div class="rk-empty">활동한 에이전트가 없습니다</div>';
+  if(!rh) rh = `<div class="rk-empty">${T('r_no_agents')}</div>`;
   document.getElementById('rank-wrap').innerHTML = rh;
   const rankLblEl = document.getElementById('rank-lbl');
   // 페이스 배지: 오늘 날짜 + 페이스 %를 큰 배지로 한 번만 표시
   const todayParts = (D.today||'').split('-');
   const todayMD = todayParts.length===3 ? `${parseInt(todayParts[1])}/${parseInt(todayParts[2])}` : '';
   const paceHtml = pacePct!==null
-    ? `<span class="rank-pace-badge" title="기간 ${curFrom}~${curTo} 중 ${D.today}까지 경과">📍 오늘 ${todayMD} · 페이스 ${pacePct}%</span>`
+    ? `<span class="rank-pace-badge" title="${T_('r_today_pace_title',{from:curFrom,to:curTo,today:D.today})}">${T_('r_today_pace',{md:todayMD,p:pacePct})}</span>`
     : '';
-  rankLblEl.innerHTML = `${paceHtml}<span class="rank-range-lbl">${rangeLbl()} · 총 ${totalAgents}명 활동</span>`;
+  rankLblEl.innerHTML = `${paceHtml}<span class="rank-range-lbl">${rangeLbl()} · ${T_('r_total_active',{n:totalAgents})}</span>`;
 }
 
 function rangeLbl(){
-  if(curFrom===D.date_min && curTo===D.date_max) return '전체기간';
+  if(curFrom===D.date_min && curTo===D.date_max) return T('all_period');
   if(curFrom===curTo) return curFrom;
   return curFrom + ' ~ ' + curTo;
 }
@@ -4199,7 +4420,7 @@ function renderUrgentBanner(){
   if(anyItems===0){
     banner.innerHTML = `<div class="urgent-banner-ok">
       <div class="ub-icon">✅</div>
-      <div class="ub-content"><div class="ub-title">긴급 관리 대상 없음</div><div class="ub-sub">배정 후 2주 이내 회원 중 즉시 액션 필요한 건 없습니다</div></div>
+      <div class="ub-content"><div class="ub-title">${T('urg_b_no_target')}</div><div class="ub-sub">${T('urg_b_no_target_sub')}</div></div>
     </div>`;
     return;
   }
@@ -4209,24 +4430,24 @@ function renderUrgentBanner(){
 
   const scopeLbl = curAgent !== 'ALL'
     ? ((D.agent_meta[curAgent]||{}).short || curAgent)
-    : (curTeam !== 'ALL' ? teamShortName(curTeam) : '전체');
+    : (curTeam !== 'ALL' ? teamShortName(curTeam) : T('urg_b_scope_all'));
   banner.innerHTML = `<div class="urgent-banner-alert">
     <div class="ub-hd">
       <span class="ub-flame">🚨</span>
       <div class="ub-hd-text">
-        <div class="ub-title">긴급 관리 필요 ${totals.total}건 <span style="font-size:12px;font-weight:700;background:rgba(127,29,29,.12);color:#7f1d1d;padding:2px 9px;border-radius:6px;margin-left:6px">${scopeLbl}</span></div>
-        <div class="ub-sub">배정 후 2주 이내 · 이관 임박 · 매일 자동 업데이트 (오늘 ${todayStr})</div>
+        <div class="ub-title">${T_('urg_b_title',{n:totals.total})} <span style="font-size:12px;font-weight:700;background:rgba(127,29,29,.12);color:#7f1d1d;padding:2px 9px;border-radius:6px;margin-left:6px">${scopeLbl}</span></div>
+        <div class="ub-sub">${T_('urg_b_subtitle',{today:todayStr})}</div>
       </div>
     </div>
     <div class="ub-stats">
-      <div class="ub-stat ub-stat-red ${totals.noMemo===0?'ub-stat-zero':''}" onclick="openUrgentByType('noMemo')" title="상담기록도 없고 옵션도 선택 안된 회원 목록"><b>${totals.noMemo}</b><span>📝 상담기록없음</span></div>
-      <div class="ub-stat ub-stat-red ${totals.overdue===0?'ub-stat-zero':''}" onclick="openUrgentByType('overdue')" title="방문일 지남 회원 목록"><b>${totals.overdue}</b><span>⚠️ 방문일 지남</span></div>
-      <div class="ub-stat ub-stat-coral ${totals.idle===0?'ub-stat-zero':''}" onclick="openUrgentByType('idle')" title="메모 있음 + 옵션 있음 — 회원 무응답"><b>${totals.idle}</b><span>🚨 응답없음</span></div>
-      <div class="ub-stat ub-stat-orange ${totals.wait===0?'ub-stat-zero':''}" onclick="openUrgentByType('wait')" title="일정대기 누적 회원 목록"><b>${totals.wait}</b><span>⏳ 일정대기 누적</span></div>
-      <div class="ub-stat ub-stat-blue ${totals.soon===0?'ub-stat-zero':''}" onclick="openUrgentByType('soon')" title="방문 임박 회원 목록"><b>${totals.soon}</b><span>📅 방문 임박</span></div>
+      <div class="ub-stat ub-stat-red ${totals.noMemo===0?'ub-stat-zero':''}" onclick="openUrgentByType('noMemo')" title="${T('urg_b_no_memo_t')}"><b>${totals.noMemo}</b><span>${T('urg_b_no_memo')}</span></div>
+      <div class="ub-stat ub-stat-red ${totals.overdue===0?'ub-stat-zero':''}" onclick="openUrgentByType('overdue')" title="${T('urg_b_overdue_t')}"><b>${totals.overdue}</b><span>${T('urg_b_overdue')}</span></div>
+      <div class="ub-stat ub-stat-coral ${totals.idle===0?'ub-stat-zero':''}" onclick="openUrgentByType('idle')" title="${T('urg_b_no_resp_t')}"><b>${totals.idle}</b><span>${T('urg_b_no_resp')}</span></div>
+      <div class="ub-stat ub-stat-orange ${totals.wait===0?'ub-stat-zero':''}" onclick="openUrgentByType('wait')" title="${T('urg_b_wait_t')}"><b>${totals.wait}</b><span>${T('urg_b_wait')}</span></div>
+      <div class="ub-stat ub-stat-blue ${totals.soon===0?'ub-stat-zero':''}" onclick="openUrgentByType('soon')" title="${T('urg_b_soon_t')}"><b>${totals.soon}</b><span>${T('urg_b_soon')}</span></div>
     </div>
     ${curAgent==='ALL' && topAgents.length ? `<div class="ub-agents">
-      <div class="ub-agents-lbl">긴급 건수 TOP 에이전트:</div>
+      <div class="ub-agents-lbl">${T('urg_b_top_agents')}</div>
       ${topAgents.map(([a,n])=>{
         const meta = D.agent_meta[a]||{};
         const tcol = TC[meta.team]||'#888';
@@ -5443,16 +5664,16 @@ function renderRecent7DaysByTeam(){
 
   // 긴급 회원 리스트 렌더링 헬퍼 (에이전트별)
   const kindBandMap = {
-    'kind-noMemo':  {icon:'📝', lbl:'상담기록없음'},
-    'kind-overdue': {icon:'⚠️', lbl:'방문일 지남'},
-    'kind-idle':    {icon:'🚨', lbl:'응답없음'},
-    'kind-wait':    {icon:'⏳', lbl:'일정대기'},
-    'kind-soon':    {icon:'📅', lbl:'방문 임박'},
+    'kind-noMemo':  {icon:'📝', lbl:T('r3d_no_memo')},
+    'kind-overdue': {icon:'⚠️', lbl:T('r3d_overdue')},
+    'kind-idle':    {icon:'🚨', lbl:T('r3d_no_resp')},
+    'kind-wait':    {icon:'⏳', lbl:T('r3d_wait')},
+    'kind-soon':    {icon:'📅', lbl:T('r3d_soon')},
   };
   // 카테고리 우선순위: 상담기록없음 → 방문일 지남 → 응답없음 → 일정대기 → 방문 임박
   const kindOrder = {noMemo:0, overdue:1, idle:2, wait:3, soon:4};
   const renderUrgRows = (urgent, agentName)=>{
-    if(!urgent.length) return `<div class="r3d-urg-empty">긴급 관리 대상 없음</div>`;
+    if(!urgent.length) return `<div class="r3d-urg-empty">${T('r3d_no_urg_target')}</div>`;
     const sorted = [...urgent].sort((a,b)=>{
       const ka = kindOrder[classifyUrgent(a)] ?? 99;
       const kb = kindOrder[classifyUrgent(b)] ?? 99;
@@ -5514,16 +5735,16 @@ function renderRecent7DaysByTeam(){
 
   // 위험 순위 배지 (영업팀 관리: TOP=최악, 메달 아님)
   const rankBadge = (i)=>{
-    if(i===0) return '<span class="r3d-rank danger-1">🚨 긴급 1위</span>';
-    if(i===1) return '<span class="r3d-rank danger-2">🔥 긴급 2위</span>';
-    if(i===2) return '<span class="r3d-rank danger-3">⚠️ 긴급 3위</span>';
+    if(i===0) return `<span class="r3d-rank danger-1">${T('r3d_rank_1')}</span>`;
+    if(i===1) return `<span class="r3d-rank danger-2">${T('r3d_rank_2')}</span>`;
+    if(i===2) return `<span class="r3d-rank danger-3">${T('r3d_rank_3')}</span>`;
     return `<span class="r3d-rank">#${i+1}</span>`;
   };
   // 심각도 클래스 (긴급 합산 기준)
   const sevClass = (n)=> n>=15 ? 'sev-red' : (n>=5 ? 'sev-amber' : '');
   const actionHint = (n)=>{
-    if(n>=15) return '<span class="r3d-action-hint danger">🔥 즉시 조치</span>';
-    if(n>=5)  return '<span class="r3d-action-hint warn">⚠️ 우선 관리</span>';
+    if(n>=15) return `<span class="r3d-action-hint danger">${T('r3d_action_immediate')}</span>`;
+    if(n>=5)  return `<span class="r3d-action-hint warn">${T('r3d_action_priority')}</span>`;
     return '';
   };
 
@@ -5536,16 +5757,16 @@ function renderRecent7DaysByTeam(){
     const teamLbl = teamShortName(tm);
     const sev = sevClass(d.urgentTotal);
     const sevCardCls = (idx===0 && d.urgentTotal>=15) ? 'rank-top' : (sev==='sev-red' ? 'sev-red-card' : '');
-    const chip = (cls, icon, lbl, n, kind)=>{
+    const chip = (cls, icon, lbl, n, kind, titleKey)=>{
       const zeroCls = n===0 ? 'r3d-urg-chip-zero' : '';
-      return `<span class="r3d-urg-chip ${cls} ${zeroCls}" title="${lbl} — 클릭 → 회원 목록" onclick="event.stopPropagation();openUrgentByType('${kind}','${a}')"><b>${n}</b><span>${icon} ${lbl}</span></span>`;
+      return `<span class="r3d-urg-chip ${cls} ${zeroCls}" title="${T(titleKey)}" onclick="event.stopPropagation();openUrgentByType('${kind}','${a}')"><b>${n}</b><span>${icon} ${lbl}</span></span>`;
     };
     const chips = [
-      chip('c-noMemo','📝','상담기록없음',d.cNoMemo,'noMemo'),
-      chip('c-overdue','⚠️','방문일 지남',d.cOverdue,'overdue'),
-      chip('c-idle','🚨','응답없음',d.cIdle,'idle'),
-      chip('c-wait','⏳','일정대기',d.cWait,'wait'),
-      chip('c-soon','📅','방문 임박',d.cSoon,'soon'),
+      chip('c-noMemo','📝',T('r3d_no_memo'),d.cNoMemo,'noMemo','r3d_no_memo_chip_t'),
+      chip('c-overdue','⚠️',T('r3d_overdue'),d.cOverdue,'overdue','r3d_overdue_chip_t'),
+      chip('c-idle','🚨',T('r3d_no_resp'),d.cIdle,'idle','r3d_no_resp_chip_t'),
+      chip('c-wait','⏳',T('r3d_wait'),d.cWait,'wait','r3d_wait_chip_t'),
+      chip('c-soon','📅',T('r3d_soon'),d.cSoon,'soon','r3d_soon_chip_t'),
     ].join('');
     html += `
     <div class="r3d-agent-card ${sevCardCls}" style="border-left-color:${color}">
@@ -5556,12 +5777,12 @@ function renderRecent7DaysByTeam(){
           ${actionHint(d.urgentTotal)}
         </span>
         <div class="r3d-agent-stats">
-          <span class="r3d-agent-stat urg urg-big ${sev}">🚨 긴급 ${d.urgentTotal}건</span>
+          <span class="r3d-agent-stat urg urg-big ${sev}">${T_('r3d_urg_count',{n:d.urgentTotal})}</span>
         </div>
       </div>
       <div class="r3d-urg-summary">
         ${chips}
-        <button class="r3d-urg-toggle" onclick="toggleAgentUrgent(this)">▼ 펼치기</button>
+        <button class="r3d-urg-toggle" onclick="toggleAgentUrgent(this)">${T('r3d_expand')}</button>
       </div>
       <div class="r3d-urg-list-wrap">
         ${renderUrgRows(d.urgent, a)}
@@ -5569,7 +5790,7 @@ function renderRecent7DaysByTeam(){
     </div>`;
   });
 
-  if(!html) html = '<div class="r3d-empty">긴급 관리 대상이 있는 에이전트가 없습니다 👍</div>';
+  if(!html) html = `<div class="r3d-empty">${T('r3d_emp_no_urg')}</div>`;
   wrap.innerHTML = html;
 }
 
@@ -5580,7 +5801,7 @@ function toggleAgentUrgent(btn){
   const wrap = card.querySelector('.r3d-urg-list-wrap');
   if(!wrap) return;
   const expanded = wrap.classList.toggle('expanded');
-  btn.innerHTML = expanded ? '▲ 접기' : '▼ 펼치기';
+  btn.innerHTML = expanded ? T('r3d_collapse') : T('r3d_expand');
 }
 
 // 에이전트별 7일 업데이트 — 더 보기 (전체 모달)
@@ -5769,7 +5990,7 @@ function renderAgentInsightOnly(){
     const urgentGrid = document.getElementById('ai-urgent-grid');
     if(urgentGrid){
       urgentGrid.querySelectorAll('.r3d-urg-list-wrap').forEach(el=>el.classList.add('expanded'));
-      urgentGrid.querySelectorAll('.r3d-urg-toggle').forEach(btn=>{ btn.innerHTML = '▲ 접기'; });
+      urgentGrid.querySelectorAll('.r3d-urg-toggle').forEach(btn=>{ btn.innerHTML = T('r3d_collapse'); });
     }
   }
   if(singleAgent){
@@ -5835,7 +6056,7 @@ function renderTeamCardsOnly(){
   // 팀별 카드
   const teamGrid = document.getElementById('ins-team-grid');
   const teamLbl = document.getElementById('insight-team-lbl');
-  if(teamLbl) teamLbl.textContent = rangeLbl() + ' · ' + (curTeam==='ALL'?'전체 통합':teamShortName(curTeam));
+  if(teamLbl) teamLbl.textContent = rangeLbl() + ' · ' + (curTeam==='ALL'?T('ti_all_unified'):teamShortName(curTeam));
 
   const teamsToShow = curTeam==='ALL' ? D.teams : [curTeam];
   let teamHtml = '';
@@ -5844,8 +6065,8 @@ function renderTeamCardsOnly(){
     if(!st.db){
       teamHtml += `<div class="ins-team-card" style="border-left-color:${TC[t]};opacity:.5">
         <div class="ins-tc-head"><span class="ins-tc-name" style="color:${TC[t]}">${teamShortName(t)}</span>
-        <span class="ins-tc-badge" style="background:#94a3b8">활동 없음</span></div>
-        <div style="color:#999;padding:14px;text-align:center;font-size:13px">기간 내 DB 배정 없음</div>
+        <span class="ins-tc-badge" style="background:#94a3b8">${T('ti_no_activity')}</span></div>
+        <div style="color:#999;padding:14px;text-align:center;font-size:13px">${T('ti_no_db')}</div>
       </div>`;
       return;
     }
@@ -5854,24 +6075,25 @@ function renderTeamCardsOnly(){
     const strengths=[], weaknesses=[], advices=[];
 
     if(isLidia){
-      if(st.vc>=st.db*0.3) strengths.push(`📹 비디오콜 ${st.vc}건 활발 (${Math.round(st.vc/st.db*100)}%)`);
-      else weaknesses.push(`📹 비디오콜 ${st.vc}건 (${Math.round(st.vc/st.db*100)}% · 비율 낮음)`);
-      if(r_dc>=TARGETS.dc) strengths.push(`💰 DB→클로 ${r_dc}% 달성`);
-      else weaknesses.push(`💰 DB→클로 ${r_dc}% (목표 ${TARGETS.dc}% 미달)`);
-      if(st.cl<5) advices.push('전화·영상 후속 강화');
+      const vcPct = Math.round(st.vc/st.db*100);
+      if(st.vc>=st.db*0.3) strengths.push(T_('ti_video_active',{n:st.vc,p:vcPct}));
+      else weaknesses.push(T_('ti_video_low',{n:st.vc,p:vcPct}));
+      if(r_dc>=TARGETS.dc) strengths.push(T_('ti_db_cl_ok',{n:r_dc}));
+      else weaknesses.push(T_('ti_db_cl_miss',{n:r_dc,t:TARGETS.dc}));
+      if(st.cl<5) advices.push(T('ti_adv_call'));
     } else {
-      if(r_ds>=TARGETS.ds) strengths.push(`📅 예약율 ${r_ds}% 달성`);
-      else weaknesses.push(`📅 예약율 ${r_ds}% (-${(TARGETS.ds-r_ds).toFixed(1)}%p)`);
-      if(r_sv>=TARGETS.sv) strengths.push(`✅ 방문율 ${r_sv}% 달성`);
-      else weaknesses.push(`✅ 방문율 ${r_sv}% (-${(TARGETS.sv-r_sv).toFixed(1)}%p)`);
-      if(r_vc>=TARGETS.vc) strengths.push(`🏆 클로율 ${r_vc}% 달성`);
-      else if(st.visit>0) weaknesses.push(`🏆 클로율 ${r_vc}% (-${(TARGETS.vc-r_vc).toFixed(1)}%p)`);
-      if(r_dc>=TARGETS.dc) strengths.push(`💰 DB→클로 ${r_dc}% ⭐ KPI 달성`);
-      else weaknesses.push(`💰 DB→클로 ${r_dc}% (목표 ${TARGETS.dc}% 미달)`);
-      if(r_ds<TARGETS.ds*0.7) advices.push('초기 콜·메시지 후속 강화');
-      if(r_sv<TARGETS.sv*0.7) advices.push('예약 노쇼 방지 사전 리마인드');
-      if(r_vc<TARGETS.vc*0.7) advices.push('방문 시 클로징 트레이닝');
-      if(st.w>st.db*0.2) advices.push(`⏳ 일정대기 ${st.w}건 누적 - 결단 필요`);
+      if(r_ds>=TARGETS.ds) strengths.push(T_('ti_book_ok',{n:r_ds}));
+      else weaknesses.push(T_('ti_book_miss',{n:r_ds,d:(TARGETS.ds-r_ds).toFixed(1)}));
+      if(r_sv>=TARGETS.sv) strengths.push(T_('ti_visit_ok',{n:r_sv}));
+      else weaknesses.push(T_('ti_visit_miss',{n:r_sv,d:(TARGETS.sv-r_sv).toFixed(1)}));
+      if(r_vc>=TARGETS.vc) strengths.push(T_('ti_close_ok',{n:r_vc}));
+      else if(st.visit>0) weaknesses.push(T_('ti_close_miss',{n:r_vc,d:(TARGETS.vc-r_vc).toFixed(1)}));
+      if(r_dc>=TARGETS.dc) strengths.push(T_('ti_db_cl_kpi',{n:r_dc}));
+      else weaknesses.push(T_('ti_db_cl_miss',{n:r_dc,t:TARGETS.dc}));
+      if(r_ds<TARGETS.ds*0.7) advices.push(T('ti_adv_early'));
+      if(r_sv<TARGETS.sv*0.7) advices.push(T('ti_adv_reminder'));
+      if(r_vc<TARGETS.vc*0.7) advices.push(T('ti_adv_close_train'));
+      if(st.w>st.db*0.2) advices.push(T_('ti_adv_wait_decision',{n:st.w}));
     }
     const score = st.score||0;
     const grade = score>=60?'A':score>=40?'B':score>=20?'C':'D';
@@ -5880,17 +6102,17 @@ function renderTeamCardsOnly(){
     teamHtml += `<div class="ins-team-card" style="border-left-color:${TC[t]}">
       <div class="ins-tc-head">
         <span class="ins-tc-name" style="color:${TC[t]}">${TEAM_EMO[t]||''} ${teamShortName(t)}</span>
-        <span class="ins-tc-badge" style="background:${gradeColor}">${grade} · ${score}점</span>
+        <span class="ins-tc-badge" style="background:${gradeColor}">${grade} · ${score}${T('bc_points')}</span>
       </div>
       <div class="ins-tc-stats">
-        <div class="ins-tc-stat"><span class="ins-tc-lbl">DB</span><span class="ins-tc-val">${st.db}</span></div>
-        <div class="ins-tc-stat"><span class="ins-tc-lbl">방문</span><span class="ins-tc-val" style="color:#16a34a">${st.visit||0}</span></div>
-        <div class="ins-tc-stat"><span class="ins-tc-lbl">클로징</span><span class="ins-tc-val" style="color:#dc2626">${st.cl||0}</span></div>
-        <div class="ins-tc-stat"><span class="ins-tc-lbl">DB→클로</span><span class="ins-tc-val" style="color:#1e3a8a">${r_dc}%</span></div>
+        <div class="ins-tc-stat"><span class="ins-tc-lbl">${T('ti_lbl_db')}</span><span class="ins-tc-val">${st.db}</span></div>
+        <div class="ins-tc-stat"><span class="ins-tc-lbl">${T('ti_lbl_visit')}</span><span class="ins-tc-val" style="color:#16a34a">${st.visit||0}</span></div>
+        <div class="ins-tc-stat"><span class="ins-tc-lbl">${T('ti_lbl_close')}</span><span class="ins-tc-val" style="color:#dc2626">${st.cl||0}</span></div>
+        <div class="ins-tc-stat"><span class="ins-tc-lbl">${T('ti_lbl_db_close')}</span><span class="ins-tc-val" style="color:#1e3a8a">${r_dc}%</span></div>
       </div>
-      ${strengths.length?`<div class="ins-tc-sec ins-tc-good"><b>✅ 강점</b>${strengths.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
-      ${weaknesses.length?`<div class="ins-tc-sec ins-tc-bad"><b>⚠️ 약점</b>${weaknesses.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
-      ${advices.length?`<div class="ins-tc-sec ins-tc-tip"><b>💡 코칭 권고</b>${advices.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
+      ${strengths.length?`<div class="ins-tc-sec ins-tc-good"><b>${T('ti_strengths')}</b>${strengths.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
+      ${weaknesses.length?`<div class="ins-tc-sec ins-tc-bad"><b>${T('ti_weaknesses')}</b>${weaknesses.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
+      ${advices.length?`<div class="ins-tc-sec ins-tc-tip"><b>${T('ti_coaching')}</b>${advices.map(s=>`<div class="ins-tc-item">${s}</div>`).join('')}</div>`:''}
     </div>`;
   });
   teamGrid.innerHTML = teamHtml;
