@@ -291,7 +291,9 @@ function sendDailyReports() {
         Logger.log('  · ' + name + ' 활동 없음 — 메일 발송 skip');
         return;
       }
-      const html = buildReportHTML_({name, stats, today, monthStart});
+      const urgent = getUrgentMembers_(records, name, today);
+      const cal    = getCalendarSummary_(records, name, monthStart, today);
+      const html = buildReportHTML_({name, stats, urgent, cal, today, monthStart});
       const subject = '[일일 보고 · Laporan Harian] ' + name + ' · ' + today;
       const opts = { htmlBody: html, name: REPORT_CFG.FROM_NAME };
       if(REPORT_CFG.CC) opts.cc = REPORT_CFG.CC;
@@ -404,20 +406,89 @@ function calcAgentStats_(records, agentName, monthStart, today) {
     }
   });
   const r_dc = db ? Math.round(cl/db*1000)/10 : 0;
+  const r_dv = db ? Math.round(visit/db*1000)/10 : 0;
+  const r_vc = visit ? Math.round(cl/visit*1000)/10 : 0;
   // 활동지수: 클로징×5 + 방문완료/랑숭/비디오콜 각 1점 (visit 에 모두 포함)
   const score = cl * 5 + visit;
   // 오늘 기준 페이스 (월 일수 대비)
   const td = new Date(today);
   const lastDay = new Date(td.getFullYear(), td.getMonth()+1, 0).getDate();
   const pacePct = Math.round(td.getDate() / lastDay * 100);
-  const scorePct = Math.min(100, score);  // KPI 100점 기준
+  const scorePct = Math.min(100, score);
   const paceDiff = scorePct - pacePct;
-  return { db, visit, cl, r_dc, dbToday, visitToday, clToday, yesterday, score, scorePct, pacePct, paceDiff, lastDay };
+
+  // DB 활동 분포 (DB 배정 분석용)
+  const myInMonth = records.filter(r => r.agent === agentName && r.ad >= monthStart && r.ad <= today);
+  let progressing = 0, waiting = 0, idle = 0, etc = 0;
+  myInMonth.forEach(r => {
+    const sB = (r.statusB||'').toLowerCase();
+    const sA = (r.statusA||'').toLowerCase();
+    if(sB.indexOf('visit selesai') >= 0 || sB.indexOf('langsung') >= 0 || sB.indexOf('video call') >= 0 || sB.indexOf('booking') >= 0 || sA.indexOf('daftar') >= 0) progressing++;
+    else if(sB.indexOf('wait') >= 0 || sB.indexOf('pending') >= 0 || sB.indexOf('tunggu') >= 0) waiting++;
+    else if(!sB || sB === 'none' || sB.indexOf('belum') >= 0 || sB.indexOf('tidak') >= 0) idle++;
+    else etc++;
+  });
+  const actRate = db ? Math.round(progressing / db * 1000)/10 : 0;
+
+  return {
+    db, visit, cl, r_dc, r_dv, r_vc,
+    dbToday, visitToday, clToday, yesterday,
+    score, scorePct, pacePct, paceDiff, lastDay,
+    progressing, waiting, idle, etc, actRate
+  };
+}
+
+// 긴급 회원 분류 (4 카테고리)
+function getUrgentMembers_(records, agentName, today) {
+  const td = new Date(today);
+  const my = records.filter(r => r.agent === agentName);
+  const simulasi = [], belum = [], dorman = [], menunggu = [];
+
+  my.forEach(r => {
+    const sB = (r.statusB||'').toLowerCase();
+    const sA = (r.statusA||'').toLowerCase();
+    const visited = sB.indexOf('visit selesai') >= 0 || sB.indexOf('langsung') >= 0 || sB.indexOf('video call') >= 0;
+    const isCl    = r.clType && !/^tidak\b/i.test(r.clType);
+    const isDaftar = sA.indexOf('daftar') >= 0;
+    const daysAd = r.ad ? Math.floor((td - new Date(r.ad))/86400000) : 0;
+    const daysVd = r.vd ? Math.floor((td - new Date(r.vd))/86400000) : 0;
+    const memberName = r.childName || r.parentName || '(no name)';
+
+    if(isCl && !isDaftar && daysVd >= 3 && daysVd <= 30){
+      menunggu.push({name: memberName, days: daysVd, reason: 'Closing setuju &middot; menunggu pendaftaran'});
+    } else if(visited && !isCl && daysVd >= 7){
+      simulasi.push({name: memberName, days: daysVd, reason: 'Visit selesai &middot; perlu follow-up closing'});
+    } else if(!visited && daysAd >= 30){
+      dorman.push({name: memberName, days: daysAd, reason: 'Tidak ada aktivitas 30+ hari'});
+    } else if(!visited && daysAd >= 3 && daysAd <= 14){
+      belum.push({name: memberName, days: daysAd, reason: 'DB baru &middot; kontak pertama menanti'});
+    }
+  });
+
+  // 각 카테고리 D-day 큰 순으로 정렬
+  [simulasi, belum, dorman, menunggu].forEach(arr => arr.sort((a,b)=>b.days-a.days));
+  return { simulasi, belum, dorman, menunggu };
+}
+
+// 방문 캘린더 카운트 (월간)
+function getCalendarSummary_(records, agentName, monthStart, today) {
+  const my = records.filter(r => r.agent === agentName && r.vd && r.vd >= monthStart.slice(0,7)+'-01' && r.vd <= monthStart.slice(0,7)+'-31');
+  let visit = 0, meeting = 0, visual = 0, jadwal = 0;
+  my.forEach(r => {
+    const sB = (r.statusB||'').toLowerCase();
+    if(sB.indexOf('visit selesai') >= 0) visit++;
+    if(sB.indexOf('video call') >= 0 || sB.indexOf('meeting') >= 0) meeting++;
+    if(sB.indexOf('langsung') >= 0 || sB.indexOf('visual') >= 0) visual++;
+    if(r.vd) jadwal++;
+  });
+  return { visit, meeting, visual, jadwal };
 }
 
 // 헬퍼: 보고서 HTML 빌더 (풀버전 · 인니어 · 모닝 보고)
 // 이모지는 HTML entity 로 처리하여 4byte surrogate-pair 손상 방지
-function buildReportHTML_({name, stats, today, monthStart}) {
+function buildReportHTML_({name, stats, urgent, cal, today, monthStart}) {
+  urgent = urgent || {simulasi:[], belum:[], dorman:[], menunggu:[]};
+  cal    = cal    || {visit:0, meeting:0, visual:0, jadwal:0};
   const monthLabel = today.slice(0,7);
   const ff = `font-family:Segoe UI,-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;color:#0f172a`;
   const initial = String(name||'?').charAt(0).toUpperCase();
@@ -450,16 +521,101 @@ function buildReportHTML_({name, stats, today, monthStart}) {
     + '  <div style="font-size:11.5px;font-weight:600;opacity:.85;margin-top:6px">&#x1F4C5; ' + monthStart + ' ~ ' + monthLabel + '-' + stats.lastDay + ' &middot; Performa Bulanan</div>'
     + '</td></tr></table>'
 
+    // ─── DB 배정 분석 (3 카드) ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:14px">'
+    + '<tr><td style="padding:18px">'
+    + '  <div style="font-size:12.5px;color:#64748b;margin:0 0 14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">&#x1F4CA; Analisis Alokasi DB &middot; DB 배정 분석</div>'
+    + '  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:8px 0"><tr>'
+    + '    <td width="35%" style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;padding:16px;border-radius:11px;text-align:center;vertical-align:middle">'
+    + '      <div style="font-size:10px;color:#fbbf24;font-weight:800;letter-spacing:1.5px">TOTAL ALOKASI DB</div>'
+    + '      <div style="font-size:44px;font-weight:900;letter-spacing:-2px;margin:4px 0">' + stats.db + '</div>'
+    + '      <div style="font-size:10px;color:#cbd5e1;font-weight:600">' + monthStart + ' ~ ' + monthLabel + '-' + stats.lastDay + '</div>'
+    + '    </td>'
+    + '    <td width="65%" style="background:#f8fafc;padding:14px;border-radius:11px;vertical-align:top">'
+    + '      <table width="100%" cellpadding="0" cellspacing="0"><tr>'
+    + '        <td style="font-size:10.5px;color:#64748b;font-weight:800;letter-spacing:1px">TINGKAT AKTIVITAS</td>'
+    + '        <td style="text-align:right"><span style="font-size:22px;font-weight:900;color:#1e3a8a">' + stats.actRate + '%</span> <span style="font-size:10.5px;color:#64748b;font-weight:700">' + stats.progressing + ' / ' + stats.db + '</span></td>'
+    + '      </tr></table>'
+    + '      <div style="height:9px;background:#e2e8f0;border-radius:5px;margin:8px 0 10px">'
+    + '        <div style="width:' + stats.actRate + '%;height:100%;background:linear-gradient(90deg,#3b82f6,#1e40af);border-radius:5px"></div>'
+    + '      </div>'
+    + '      <table width="100%" cellpadding="0" cellspacing="0" style="font-size:11.5px">'
+    + '        <tr><td style="padding:4px 0;color:#475569;font-weight:700">&#x1F7E2; Sedang Diproses &middot; 진행중</td><td style="padding:4px 0;text-align:right;color:#16a34a;font-weight:900">' + stats.progressing + '</td></tr>'
+    + '        <tr><td style="padding:4px 0;color:#475569;font-weight:700">&#x1F7E1; Tertunda &middot; 보류대기</td><td style="padding:4px 0;text-align:right;color:#f59e0b;font-weight:900">' + stats.waiting + '</td></tr>'
+    + '        <tr><td style="padding:4px 0;color:#475569;font-weight:700">&#x1F534; Belum Diproses &middot; 미진행</td><td style="padding:4px 0;text-align:right;color:#dc2626;font-weight:900">' + stats.idle + '</td></tr>'
+    + '        <tr><td style="padding:4px 0;color:#475569;font-weight:700">&#x26AA; Lainnya &middot; 기타</td><td style="padding:4px 0;text-align:right;color:#64748b;font-weight:900">' + stats.etc + '</td></tr>'
+    + '      </table>'
+    + '    </td>'
+    + '  </tr></table>'
+    + '</td></tr></table>'
+
     // ─── 이번달 성과 ───
     + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:14px">'
     + '<tr><td style="padding:18px">'
-    + '  <div style="font-size:12.5px;color:#64748b;margin:0 0 14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">&#x1F4CA; ' + monthLabel + ' Performa Bulanan &middot; 이번달 성과</div>'
+    + '  <div style="font-size:12.5px;color:#64748b;margin:0 0 14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">&#x1F4C8; ' + monthLabel + ' Performa Bulanan &middot; 이번달 성과</div>'
     + '  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">'
     + statRow_('Alokasi DB &middot; 배정 DB', stats.db, '#1e3a8a')
     + statRow_('Visit Selesai &middot; 방문 완료', stats.visit + ' <span style="font-size:13px;color:#64748b;font-weight:700">(' + visitRate + '%)</span>', '#16a34a')
     + statRow_('Closing &middot; 클로징', stats.cl + ' <span style="font-size:13px;color:#64748b;font-weight:700">(' + clRate + '%)</span>', '#dc2626')
     + statRow_('DB &rarr; Closing &middot; DB&rarr;클로', stats.r_dc + '%', '#7c3aed', true)
     + '  </table>'
+    + '</td></tr></table>'
+
+    // ─── 에이전트 현황 (1행 표) ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:14px">'
+    + '<tr><td style="padding:18px">'
+    + '  <div style="font-size:12.5px;color:#64748b;margin:0 0 12px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">&#x1F4C8; Statistik Agen &middot; 에이전트 현황</div>'
+    + '  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11.5px">'
+    + '    <thead><tr style="background:#f1f5f9;color:#475569">'
+    + '      <th style="padding:8px 6px;text-align:left;font-weight:800;letter-spacing:.3px">Agen</th>'
+    + '      <th style="padding:8px 6px;font-weight:800">DB</th>'
+    + '      <th style="padding:8px 6px;font-weight:800">Visit</th>'
+    + '      <th style="padding:8px 6px;font-weight:800">Closing</th>'
+    + '      <th style="padding:8px 6px;font-weight:800">T.Visit</th>'
+    + '      <th style="padding:8px 6px;font-weight:800">T.Closing</th>'
+    + '      <th style="padding:8px 6px;font-weight:800">DB&rarr;CL</th>'
+    + '    </tr></thead>'
+    + '    <tbody><tr style="background:#eff6ff">'
+    + '      <td style="padding:10px 6px;text-align:left;font-weight:900;color:#1e3a8a">' + name + '</td>'
+    + '      <td style="padding:10px 6px;text-align:center;font-weight:900">' + stats.db + '</td>'
+    + '      <td style="padding:10px 6px;text-align:center;font-weight:900;color:#16a34a">' + stats.visit + '</td>'
+    + '      <td style="padding:10px 6px;text-align:center;font-weight:900;color:#dc2626">' + stats.cl + '</td>'
+    + '      <td style="padding:10px 6px;text-align:center">' + stats.r_dv + '%</td>'
+    + '      <td style="padding:10px 6px;text-align:center;color:#dc2626;font-weight:900">' + stats.r_vc + '%</td>'
+    + '      <td style="padding:10px 6px;text-align:center;color:#7c3aed;font-weight:900">' + stats.r_dc + '%</td>'
+    + '    </tr></tbody>'
+    + '  </table>'
+    + '</td></tr></table>'
+
+    // ─── 긴급 회원 관리 ───
+    + buildUrgentSection_(urgent)
+
+    // ─── 방문 캘린더 (4 카드) ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:14px">'
+    + '<tr><td style="padding:18px">'
+    + '  <div style="font-size:12.5px;color:#64748b;margin:0 0 14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">&#x1F4C5; Kalender Visit &middot; 방문 캘린더 (' + monthLabel + ')</div>'
+    + '  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:8px 0"><tr>'
+    + '    <td width="25%" style="background:#eff6ff;border:2px solid #dbeafe;border-radius:10px;padding:14px;text-align:center">'
+    + '      <div style="font-size:10px;color:#1e3a8a;font-weight:800;letter-spacing:1px">VISIT</div>'
+    + '      <div style="font-size:32px;font-weight:900;color:#1e3a8a;letter-spacing:-1.5px;line-height:1">' + cal.visit + '</div>'
+    + '      <div style="font-size:10px;color:#64748b;font-weight:700;margin-top:4px">방문</div>'
+    + '    </td>'
+    + '    <td width="25%" style="background:#fffbeb;border:2px solid #fef3c7;border-radius:10px;padding:14px;text-align:center">'
+    + '      <div style="font-size:10px;color:#b45309;font-weight:800;letter-spacing:1px">MEETING</div>'
+    + '      <div style="font-size:32px;font-weight:900;color:#b45309;letter-spacing:-1.5px;line-height:1">' + cal.meeting + '</div>'
+    + '      <div style="font-size:10px;color:#64748b;font-weight:700;margin-top:4px">미팅</div>'
+    + '    </td>'
+    + '    <td width="25%" style="background:#f0fdf4;border:2px solid #dcfce7;border-radius:10px;padding:14px;text-align:center">'
+    + '      <div style="font-size:10px;color:#166534;font-weight:800;letter-spacing:1px">VISUAL</div>'
+    + '      <div style="font-size:32px;font-weight:900;color:#16a34a;letter-spacing:-1.5px;line-height:1">' + cal.visual + '</div>'
+    + '      <div style="font-size:10px;color:#64748b;font-weight:700;margin-top:4px">비주얼</div>'
+    + '    </td>'
+    + '    <td width="25%" style="background:#fef2f2;border:2px solid #fee2e2;border-radius:10px;padding:14px;text-align:center">'
+    + '      <div style="font-size:10px;color:#991b1b;font-weight:800;letter-spacing:1px">JADWAL</div>'
+    + '      <div style="font-size:32px;font-weight:900;color:#dc2626;letter-spacing:-1.5px;line-height:1">' + cal.jadwal + '</div>'
+    + '      <div style="font-size:10px;color:#64748b;font-weight:700;margin-top:4px">일정</div>'
+    + '    </td>'
+    + '  </tr></table>'
     + '</td></tr></table>'
 
     // ─── 활동지수 (원본 디자인) ───
@@ -543,6 +699,49 @@ function buildReportHTML_({name, stats, today, monthStart}) {
     + '</div>';
 }
 
+function buildUrgentSection_(urgent) {
+  const cats = [
+    {key:'simulasi', list:urgent.simulasi, label:'Simulasi Pendapatan &middot; 수익 시뮬', icon:'&#x1F4B0;', bg:'#fef2f2', border:'#fee2e2', color:'#991b1b', pillBg:'#fee2e2'},
+    {key:'belum',    list:urgent.belum,    label:'Belum Dihubungi &middot; 영업 미진행', icon:'&#x1F4DE;', bg:'#fffbeb', border:'#fef3c7', color:'#b45309', pillBg:'#fef3c7'},
+    {key:'dorman',   list:urgent.dorman,   label:'Pemulihan Dorman &middot; 휴면 회복', icon:'&#x1F634;', bg:'#eef2ff', border:'#e0e7ff', color:'#4338ca', pillBg:'#e0e7ff'},
+    {key:'menunggu', list:urgent.menunggu, label:'Menunggu Daftar &middot; 등록 대기',  icon:'&#x1F4DD;', bg:'#f0fdf4', border:'#dcfce7', color:'#15803d', pillBg:'#dcfce7'}
+  ];
+  let total = 0; cats.forEach(c => total += c.list.length);
+
+  let html = '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:14px">'
+    + '<tr><td style="padding:18px">'
+    + '  <div style="font-size:12.5px;color:#64748b;margin:0 0 12px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">&#x1F6A8; Member Prioritas Tinggi &middot; 긴급 회원 관리 (' + total + ')</div>'
+    + '  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:5px 0;margin-bottom:10px"><tr>';
+  cats.forEach(c => {
+    html += '<td width="25%" style="background:' + c.pillBg + ';color:' + c.color + ';padding:8px;border-radius:8px;text-align:center;font-size:10.5px;font-weight:900">' + c.icon + ' ' + c.list.length + '</td>';
+  });
+  html += '</tr></table>';
+
+  if(total === 0){
+    html += '  <div style="padding:14px;background:#f0fdf4;border:1px dashed #86efac;border-radius:8px;color:#15803d;font-size:12.5px;font-weight:700;text-align:center">&#x2705; Tidak ada member mendesak hari ini. Pertahankan!</div>';
+  } else {
+    cats.forEach(c => {
+      if(c.list.length === 0) return;
+      const showList = c.list.slice(0, 5);
+      const more = c.list.length - showList.length;
+      html += '  <div style="border:1px solid ' + c.border + ';border-radius:9px;margin-bottom:8px;overflow:hidden">';
+      html += '    <div style="background:' + c.bg + ';padding:7px 12px;font-size:11px;font-weight:900;color:' + c.color + ';letter-spacing:.2px">' + c.icon + ' ' + c.label + ' (' + c.list.length + ')</div>';
+      showList.forEach(m => {
+        html += '<table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ' + c.border + '"><tr>'
+          + '<td style="padding:8px 12px;font-size:12px"><b style="color:#0f172a">' + m.name + '</b><br><span style="font-size:10.5px;color:#64748b">' + m.reason + '</span></td>'
+          + '<td style="padding:8px 12px;text-align:right;font-size:11px;color:' + c.color + ';font-weight:900;width:60px;white-space:nowrap">D+' + m.days + '</td>'
+          + '</tr></table>';
+      });
+      if(more > 0){
+        html += '<div style="padding:6px 12px;font-size:10.5px;color:#64748b;background:#fafafa;text-align:center;font-weight:700">&hellip; dan ' + more + ' member lainnya</div>';
+      }
+      html += '  </div>';
+    });
+  }
+  html += '</td></tr></table>';
+  return html;
+}
+
 function statRow_(label, value, color, isLast) {
   const border = isLast ? '' : 'border-bottom:1px solid #f1f5f9';
   return ''
@@ -594,8 +793,11 @@ function sendTestReport_(agentNameQuery, toEmail) {
   }
 
   const stats = calcAgentStats_(records, agentName, monthStart, today);
+  const urgent = getUrgentMembers_(records, agentName, today);
+  const cal = getCalendarSummary_(records, agentName, monthStart, today);
   Logger.log('  · stats: ' + JSON.stringify(stats));
-  const html = buildReportHTML_({name: agentName, stats, today, monthStart});
+  Logger.log('  · urgent: simulasi=' + urgent.simulasi.length + ' belum=' + urgent.belum.length + ' dorman=' + urgent.dorman.length + ' menunggu=' + urgent.menunggu.length);
+  const html = buildReportHTML_({name: agentName, stats, urgent, cal, today, monthStart});
   const subject = '[TEST · 일일 보고 · Laporan Harian] ' + agentName + ' · ' + today;
   GmailApp.sendEmail(toEmail, subject, '', {
     htmlBody: html,
