@@ -1565,6 +1565,18 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .cohort-tbl tfoot tr.sum-diag td small{color:#16a34a;font-weight:700;font-size:10.5px}
 .cohort-tbl tfoot tr.sum-prev td{background:#fef3c7;color:#a16207;font-weight:800;border-bottom:3px solid #ca8a04}
 .cohort-tbl tfoot tr.sum-prev td small{color:#854d0e;font-weight:700;font-size:10.5px}
+/* 당월 클로징 sub-rows (OFF/MKT 당월·이전 + 매칭 못한) */
+.cohort-tbl tfoot tr.sum-sub td{background:#f8fafc;font-weight:700;font-size:12px;color:#475569}
+.cohort-tbl tfoot tr.sum-sub td.L{padding-left:24px;color:#334155}
+.cohort-tbl tfoot tr.sum-sub td.L b{font-size:12px;font-weight:800}
+.cohort-tbl tfoot tr.sum-sub td.cum{background:#fef9c3;color:#854d0e;font-weight:900}
+.cohort-tbl tfoot tr.sum-sub .sub-bullet{display:inline-block;margin-right:6px;color:#94a3b8;font-weight:700}
+.cohort-tbl tfoot tr.sub-off-diag td.L b{color:#15803d}
+.cohort-tbl tfoot tr.sub-off-prev td.L b{color:#a16207}
+.cohort-tbl tfoot tr.sub-mkt-diag td.L b{color:#0e7490}
+.cohort-tbl tfoot tr.sub-mkt-prev td.L b{color:#9333ea}
+.cohort-tbl tfoot tr.sub-unmatch td{background:#fff7ed!important}
+.cohort-tbl tfoot tr.sub-unmatch td.L b{color:#c2410c}
 .cohort-tbl tfoot tr td.L{font-weight:900;font-size:13px;line-height:1.3}
 .cohort-tbl tfoot tr td.L small{font-size:10.5px;font-weight:600}
 .cohort-tbl tr.unmatched-row td{background:#fed7aa!important;border-top:3px dashed #ea580c;border-bottom:3px dashed #ea580c;padding:8px 7px;font-size:13px;color:#7c2d12;font-weight:900}
@@ -2183,7 +2195,12 @@ const LANG = {
     cohort_section_title:'DB 코호트 매트릭스 — 배정월 × 통장입금 결제월',
     cohort_section_sub:'결제일 = 통장입금일 (Buku Setoran Bank · CSV) · 배정월 = 시트 DB · 매칭 안 된 결제는 \"cohort 미상\" 행에 분리',
     cohort_unmatched:'cohort 미상 (DB 매칭 X)',
-    cohort_unmatched_sub:'전체 결제의 {p}% · {n}건이 시트 DB 와 매칭 X',
+    cohort_unmatched_sub:'2026 결제의 {p}% · {n}건이 시트 DB 와 매칭 X',
+    cohort_sub_off_diag:'OFF DB 당월 결제',
+    cohort_sub_off_prev:'OFF DB 이전 결제 수',
+    cohort_sub_mkt_diag:'MKT DB 당월 결제',
+    cohort_sub_mkt_prev:'MKT DB 이전 결제 수',
+    cohort_sub_unmatch:'매칭 못한 DB 결제 수',
     insight_label_unmatch:'DB 미매칭',
     insight_desc_unmatch:'{t}건 결제 중 {n}건 시트 DB 매칭 실패',
     ue_title:'⚠️ DB 매칭 안 된 결제 {n}건 ({p}%) — 비중있게 봐야 할 항목',
@@ -2470,7 +2487,12 @@ const LANG = {
     cohort_section_title:'Matriks Kohor DB — Bulan Alokasi × Bulan Setoran Bank',
     cohort_section_sub:'Tanggal Closing = Tgl Setoran Bank (Buku Setoran · CSV) · Bulan Alokasi = DB Sheet · Closing tanpa match DB → baris \"Kohor Tidak Match\"',
     cohort_unmatched:'Kohor Tidak Match (DB tidak ditemukan)',
-    cohort_unmatched_sub:'{p}% dari total · {n} closing tidak match DB',
+    cohort_unmatched_sub:'{p}% closing 2026 · {n} tidak match DB',
+    cohort_sub_off_diag:'OFF DB Closing Bulan Ini',
+    cohort_sub_off_prev:'OFF DB Closing Bulan Lalu',
+    cohort_sub_mkt_diag:'MKT DB Closing Bulan Ini',
+    cohort_sub_mkt_prev:'MKT DB Closing Bulan Lalu',
+    cohort_sub_unmatch:'Closing DB Tidak Match',
     insight_label_unmatch:'DB Tidak Match',
     insight_desc_unmatch:'{n} dari {t} closing tidak match sheet DB',
     ue_title:'⚠️ {n} Closing ({p}%) Tidak Match DB — Perlu Perhatian',
@@ -4930,17 +4952,48 @@ function renderAnalytics(){
       h += `<td class="R eff ${effCls}">${eff}%</td></tr>`;
     });
 
+    // OFF / MKT 별 column total / diagonal 별도 계산 (footer 세부 행 용)
+    const offColTot = {}, offDiag = {}, mktColTot = {}, mktDiag = {};
+    monthsList.forEach(m => { offColTot[m]=0; offDiag[m]=0; mktColTot[m]=0; mktDiag[m]=0; });
+    monthsList.forEach(cohM => {
+      monthsList.forEach(closeM => {
+        const offV = (cohort.OFF[cohM] && cohort.OFF[cohM][closeM]) || 0;
+        const mktV = (cohort.MKT[cohM] && cohort.MKT[cohM][closeM]) || 0;
+        offColTot[closeM] += offV;
+        mktColTot[closeM] += mktV;
+        if(cohM === closeM){ offDiag[closeM] = offV; mktDiag[closeM] = mktV; }
+      });
+    });
+
+    // 표시 헬퍼: 2026-01 이전 컬럼은 '—' (사용자 요청 — 보고는 2026 부터)
+    const REPORT_START = '2026-01';
+    const cellOr = (m, html)=>{
+      if(m < REPORT_START) return `<td class="R" style="color:#cbd5e1">—</td>`;
+      return html;
+    };
+
     // TOTAL 표만: 'cohort 미상' 행 (D.records 에 매칭 안 된 CSV closing)
     if(isTotal){
       let umSum = 0;
-      monthsList.forEach(m => { umSum += (unmatched[m]||0); });
+      monthsList.forEach(m => { if(m >= REPORT_START) umSum += (unmatched[m]||0); });
       if(umSum > 0){
-        const allClosings = matchCnt + unmatchCnt;
-        const umPct = allClosings ? Math.round(umSum/allClosings*100) : 0;
+        // 2026 기준으로 매칭률 다시 계산
+        let total2026 = 0, unmatch2026 = 0;
+        monthsList.forEach(m => {
+          if(m < REPORT_START) return;
+          unmatch2026 += (unmatched[m]||0);
+          monthsList.forEach(cm => { total2026 += (cohort.TOTAL[cm] && cohort.TOTAL[cm][m]) || 0; });
+        });
+        total2026 += unmatch2026;
+        const umPct = total2026 ? Math.round(unmatch2026/total2026*100) : 0;
         h += `<tr class="unmatched-row"><td class="L"><b>⚠️ ${T('cohort_unmatched')}</b><br><small>${T('cohort_unmatched_sub').replace('{p}', String(umPct)).replace('{n}', String(umSum))}</small></td><td class="R db-col" style="color:#9a3412">—</td>`;
         monthsList.forEach(m => {
-          const v = unmatched[m] || 0;
-          h += `<td class="R" style="color:${v?'#7c2d12':'#cbd5e1'};font-weight:900">${v||'—'}</td>`;
+          if(m < REPORT_START){
+            h += `<td class="R" style="color:#cbd5e1">—</td>`;
+          } else {
+            const v = unmatched[m] || 0;
+            h += `<td class="R" style="color:${v?'#7c2d12':'#cbd5e1'};font-weight:900">${v||'—'}</td>`;
+          }
         });
         h += `<td class="R cum" style="background:#fb923c;color:#7c2d12">${f(umSum)}</td>`;
         h += `<td class="R eff" style="color:#9a3412">${umPct}%</td></tr>`;
@@ -4948,42 +5001,70 @@ function renderAnalytics(){
     }
 
     h += `</tbody><tfoot>`;
-    let grandActual = 0, grandDiag = 0;
-    monthsList.forEach(m => { grandActual += colTotals[m]; grandDiag += diagTotals[m]; });
-    const grandPrev = grandActual - grandDiag;
-    const colCount = monthsList.length + 3; // 배정월 + DB + N월 + 누적 + 효율
+    // 2026 부터의 합계 계산
+    let actual2026 = 0, offDiag2026 = 0, offPrev2026 = 0, mktDiag2026 = 0, mktPrev2026 = 0, unmatch2026 = 0;
+    monthsList.forEach(m => {
+      if(m < REPORT_START) return;
+      actual2026 += colTotals[m];
+      offDiag2026 += offDiag[m];
+      offPrev2026 += (offColTot[m] - offDiag[m]);
+      mktDiag2026 += mktDiag[m];
+      mktPrev2026 += (mktColTot[m] - mktDiag[m]);
+      unmatch2026 += (unmatched[m] || 0);
+    });
 
-    // 1) 당월 실제 클로징 (컬럼 합계)
+    // 1) 당월 실제 클로징 (컬럼 합계) — 2026부터
     h += `<tr class="sum-actual"><td class="L" colspan="2"><b>${T('cohort_actual')}</b><br><small>${T('cohort_actual_sub')}</small></td>`;
-    monthsList.forEach(m => { h += `<td class="R">${f(colTotals[m])}</td>`; });
-    h += `<td class="R cum">${f(grandActual)}</td>`;
+    monthsList.forEach(m => {
+      h += cellOr(m, `<td class="R">${f(colTotals[m])}</td>`);
+    });
+    h += `<td class="R cum">${f(actual2026)}</td>`;
     const grandEff = grandDb ? Math.round(grandCohClosing/grandDb*1000)/10 : 0;
     h += `<td class="R eff eff-bold">${grandEff}%</td></tr>`;
 
-    // 2) 누적 클로징 (YTD running sum)
+    // 2-1) ㄴ OFF DB 당월 결제 (= OFF diagonal)
+    h += `<tr class="sum-sub sub-off-diag"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_off_diag')}</b></td>`;
+    monthsList.forEach(m => { h += cellOr(m, `<td class="R">${f(offDiag[m])}</td>`); });
+    h += `<td class="R cum">${f(offDiag2026)}</td><td class="R eff">—</td></tr>`;
+
+    // 2-2) ㄴ OFF DB 이전 결제 (= OFF column total - diagonal)
+    h += `<tr class="sum-sub sub-off-prev"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_off_prev')}</b></td>`;
+    monthsList.forEach(m => {
+      const v = offColTot[m] - offDiag[m];
+      h += cellOr(m, `<td class="R">${f(v)}</td>`);
+    });
+    h += `<td class="R cum">${f(offPrev2026)}</td><td class="R eff">—</td></tr>`;
+
+    // 2-3) ㄴ MKT DB 당월 결제 (= MKT diagonal)
+    h += `<tr class="sum-sub sub-mkt-diag"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_mkt_diag')}</b></td>`;
+    monthsList.forEach(m => { h += cellOr(m, `<td class="R">${f(mktDiag[m])}</td>`); });
+    h += `<td class="R cum">${f(mktDiag2026)}</td><td class="R eff">—</td></tr>`;
+
+    // 2-4) ㄴ MKT DB 이전 결제
+    h += `<tr class="sum-sub sub-mkt-prev"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_mkt_prev')}</b></td>`;
+    monthsList.forEach(m => {
+      const v = mktColTot[m] - mktDiag[m];
+      h += cellOr(m, `<td class="R">${f(v)}</td>`);
+    });
+    h += `<td class="R cum">${f(mktPrev2026)}</td><td class="R eff">—</td></tr>`;
+
+    // 2-5) ㄴ 매칭 못한 DB 결제 수 (= unmatched)
+    h += `<tr class="sum-sub sub-unmatch"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_unmatch')}</b></td>`;
+    monthsList.forEach(m => { h += cellOr(m, `<td class="R">${f(unmatched[m]||0)}</td>`); });
+    h += `<td class="R cum">${f(unmatch2026)}</td><td class="R eff">—</td></tr>`;
+
+    // 3) 월별 누적 클로징 (YTD) — 2026부터 누적
     let runSum = 0;
     h += `<tr class="sum-cum"><td class="L" colspan="2"><b>${T('cohort_cum_ytd')}</b><br><small>${T('cohort_cum_ytd_sub')}</small></td>`;
-    monthsList.forEach(m => { runSum += colTotals[m]; h += `<td class="R">${f(runSum)}</td>`; });
+    monthsList.forEach(m => {
+      if(m < REPORT_START){
+        h += `<td class="R" style="color:#cbd5e1">—</td>`;
+      } else {
+        runSum += colTotals[m];
+        h += `<td class="R">${f(runSum)}</td>`;
+      }
+    });
     h += `<td class="R cum">${f(runSum)}</td><td class="R eff">—</td></tr>`;
-
-    // 3) 즉시 전환 (대각선)
-    h += `<tr class="sum-diag"><td class="L" colspan="2"><b>${T('cohort_diag')}</b><br><small>${T('cohort_diag_sub')}</small></td>`;
-    monthsList.forEach(m => {
-      const ratio = colTotals[m] ? Math.round(diagTotals[m]/colTotals[m]*100) : 0;
-      h += `<td class="R">${f(diagTotals[m])}<br><small>${ratio}%</small></td>`;
-    });
-    const diagRatio = grandActual ? Math.round(grandDiag/grandActual*100) : 0;
-    h += `<td class="R cum">${f(grandDiag)}<br><small>${diagRatio}%</small></td><td class="R eff">—</td></tr>`;
-
-    // 4) 이전월 기여
-    h += `<tr class="sum-prev"><td class="L" colspan="2"><b>${T('cohort_prev')}</b><br><small>${T('cohort_prev_sub')}</small></td>`;
-    monthsList.forEach(m => {
-      const prevV = colTotals[m] - diagTotals[m];
-      const ratio = colTotals[m] ? Math.round(prevV/colTotals[m]*100) : 0;
-      h += `<td class="R">${f(prevV)}<br><small>${ratio}%</small></td>`;
-    });
-    const prevRatio = grandActual ? Math.round(grandPrev/grandActual*100) : 0;
-    h += `<td class="R cum">${f(grandPrev)}<br><small>${prevRatio}%</small></td><td class="R eff">—</td></tr>`;
 
     h += `</tfoot></table></div></div>`;
     return h;
