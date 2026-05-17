@@ -1884,11 +1884,11 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     </div>
     <div class="cal-wrap" id="ai-cal-wrap"></div>
   </div>
-  <!-- 📊 통계 (월별 보고용 표 — OFF / 마케팅 / 토탈) -->
+  <!-- 📐 통계 — DB 코호트 매트릭스 (배정월 × 클로징 발생월) -->
   <div id="content-analytics" style="display:none">
     <div class="sec-hd">
-      <div><div class="sec-title" data-t="sec_analytics">📊 월별 통계 (업무 보고용)</div>
-      <div class="sec-sub" data-t="sec_analytics_sub">OFF · 마케팅 · 토탈 — 월별 배정 / 예약 / 방문 / 결제 추이</div></div>
+      <div><div class="sec-title" data-t="sec_analytics">📐 DB 코호트 분석 (재경 보고용 · 2025~현재)</div>
+      <div class="sec-sub" data-t="sec_analytics_sub">배정월 × 클로징 발생월 매트릭스 — 과거 DB 가 매월 매출에 기여하는 비율 시각화</div></div>
     </div>
     <div id="analytics-wrap" style="padding:14px 18px;overflow-x:auto"></div>
   </div>
@@ -2078,8 +2078,9 @@ const LANG = {
     // 추가 — Bahasa 전환 시 누락 항목
     tab_agent_insight:'에이전트별 토탈관리',
     tab_analytics:'📊 통계',
-    sec_analytics:'📊 월별 통계 (업무 보고용 · 2026)',
-    sec_analytics_sub:'OFF · 마케팅 · 토탈 — 월별 배정 / 예약 / 방문 / 결제 추이 · 발생주의 (배정일 기준)',
+    sec_analytics:'📐 DB 코호트 분석 (재경 보고용 · 2025~현재)',
+    sec_analytics_sub:'배정월 × 클로징 발생월 매트릭스 — "이전 달 DB 가 매월 매출의 몇 %를 만드는지" 시각화',
+    cohort_no_data:'2025년 이후 데이터 없음',
     alyt_off_label:'OFF DB (콜렉터+Sales)',
     alyt_mkt_label:'마케팅 DB',
     alyt_total_label:'토탈',
@@ -2100,13 +2101,13 @@ const LANG = {
     cohort_section_sub:'재경 보고용 — "이전 달 배정 DB 가 현재 매출의 몇 %를 만드는지" 직접 증명 · 우리 비즈니스 특성(긴 lag)을 시각화',
     cohort_lg_diag:'■ 대각선 (즉시 전환)',
     cohort_lg_off:'■ 비대각선 (이전 달 DB · 늦게 클로징)',
-    cohort_lg_pre:'■ 2025 이전 cohort',
+    cohort_lg_pre:'■ 2024 이전 배정 cohort',
     cohort_sub:'행=DB 배정월 / 열=클로징 발생월 · 대각선=즉시 / 비대각선=이전 달 DB의 지연 클로징',
     cohort_h_assign:'배정월',
     cohort_h_db:'배정 DB',
     cohort_h_close:'결제',
     cohort_h_cum:'누적 클로징',
-    cohort_pre:'2025 이전',
+    cohort_pre:'2024 이전 배정',
     cohort_actual:'당월 실제 클로징',
     cohort_actual_sub:'(= 컬럼 합계 · 재경 보고 숫자)',
     cohort_diag:'즉시 전환 (대각선)',
@@ -2318,8 +2319,9 @@ const LANG = {
     // Tambahan — item yang tertinggal saat ganti bahasa
     tab_agent_insight:'Manajemen Total per Agen',
     tab_analytics:'📊 Statistik',
-    sec_analytics:'📊 Statistik Bulanan (Laporan · 2026)',
-    sec_analytics_sub:'OFF · Marketing · Total — Alokasi / Jadwal / Visit / Closing per bulan · Basis Akrual (Tgl Alokasi)',
+    sec_analytics:'📐 Analisis Kohor DB (Laporan Keuangan · 2025~Sekarang)',
+    sec_analytics_sub:'Matriks Bulan Alokasi × Bulan Closing — Visualisasi "berapa % omzet bulan ini berasal dari DB bulan-bulan lalu"',
+    cohort_no_data:'Tidak ada data sejak 2025',
     alyt_off_label:'OFF DB (Collector+Sales)',
     alyt_mkt_label:'Marketing DB',
     alyt_total_label:'Total',
@@ -2340,13 +2342,13 @@ const LANG = {
     cohort_section_sub:'Untuk Laporan Keuangan — Bukti langsung "berapa % omzet bulan ini berasal dari DB bulan lalu" · Visualisasi karakter bisnis kita (lag panjang)',
     cohort_lg_diag:'■ Diagonal (Konversi Instan)',
     cohort_lg_off:'■ Non-Diagonal (DB Bulan Lalu · Closing Terlambat)',
-    cohort_lg_pre:'■ Kohor sebelum 2025',
+    cohort_lg_pre:'■ Kohor alokasi sebelum 2024',
     cohort_sub:'Baris=Bulan Alokasi DB / Kolom=Bulan Closing · Diagonal=Instan / Non-Diagonal=Closing Tertunda dari DB Lama',
     cohort_h_assign:'Bln Alokasi',
     cohort_h_db:'Alokasi DB',
     cohort_h_close:'Closing',
     cohort_h_cum:'Total Closing',
-    cohort_pre:'Sebelum 2025',
+    cohort_pre:'Alokasi sblm 2024',
     cohort_actual:'Closing Aktual Bulan Tsb',
     cohort_actual_sub:'(= Jumlah Kolom · Angka Laporan Keuangan)',
     cohort_diag:'Konversi Instan (Diagonal)',
@@ -4520,153 +4522,68 @@ function renderTab(){
   else if(curTab==='insight') renderTeamInsightOnly(); // legacy fallback
 }
 
-// ── 📊 월별 통계 (업무 보고용 · 발생주의 / 배정일 기준) ──────
-// 구분(OFF / MKT / 토탈) × 월별로 배정→예약→방문→결제 funnel 집계
-// 모든 지표는 배정일(ad) 의 월을 기준으로 묶음 (예: 3월 배정된 DB 가
-// 4월에 결제되었어도 3월 행의 '결제' 칸에 잡힘)
+// ── 📐 통계 탭 — DB 코호트 매트릭스 (재경 보고용) ──────────
+// 배정월(ad) × 클로징 발생월(vd) 매트릭스로 "이전 달 DB 가 계속 익어가는"
+// 우리 비즈니스의 본질을 시각화. 2025-01 이후 모든 월을 가로/세로로 깔아둠.
 function renderAnalytics(){
   const wrap = document.getElementById('analytics-wrap');
   if(!wrap) return;
-  // 보고용: 올해(D.today 기준 연도) 데이터만 — 현재는 2026
-  const today = D.today || '';
-  const curYear = today.slice(0,4) || '2026';
-  const monthsList = (D.months || []).filter(m => m.startsWith(curYear)).sort();
-  //  - cl       : 발생주의 (배정월 기준) — 배정월에 들어온 DB 중 결국 클로징된 건수
-  //  - clByVd   : 현금주의 (방문/클로징일 기준) — 그 달에 실제로 발생한 클로징 건수
-  const init = ()=>({db:0, sched:0, d:0, vc:0, ls:0, cl:0, clByVd:0});
-  const data = {};
-  monthsList.forEach(m=>{ data[m] = {OFF:init(), MKT:init(), TOTAL:init()}; });
 
-  (D.records||[]).forEach(r=>{
-    const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
-    // 발생주의 — 배정일(ad) 기준
-    if(r.ad){
-      const m = r.ad.slice(0,7);
-      if(data[m]){
-        const targets = k ? [data[m][k], data[m].TOTAL] : [data[m].TOTAL];
-        targets.forEach(t => t.db++);
-        if(r.st==='s' || r.st==='d' || r.st==='vc' || r.st==='ls' || r.cl===1){
-          targets.forEach(t => t.sched++);
-        }
-        if(r.st==='d')  targets.forEach(t => t.d++);
-        if(r.st==='vc') targets.forEach(t => t.vc++);
-        if(r.st==='ls') targets.forEach(t => t.ls++);
-        if(r.cl===1)    targets.forEach(t => t.cl++);
-      }
+  // 날짜 → YYYY-MM 정규화 (vd 는 일부 DD-MM-YYYY 형식이 섞여있음)
+  const toYM = (s)=>{
+    if(!s || typeof s !== 'string') return null;
+    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,7);             // YYYY-MM-DD
+    if(/^\d{2}-\d{2}-\d{4}$/.test(s)){                                // DD-MM-YYYY
+      const [d, mo, y] = s.split('-'); return `${y}-${mo}`;
     }
-    // 현금주의 — 클로징이 실제 발생한 월(방문일 vd 기준)
-    if(r.cl===1 && r.vd){
-      const vm = r.vd.slice(0,7);
-      if(data[vm]){
-        const targets = k ? [data[vm][k], data[vm].TOTAL] : [data[vm].TOTAL];
-        targets.forEach(t => t.clByVd++);
-      }
+    return null;
+  };
+
+  // 2025-01 이후 모든 활성 월 (배정 또는 클로징 어느 한쪽이라도 있으면 포함)
+  const yearStart = '2025-01';
+  const monthSet = new Set();
+  (D.records||[]).forEach(r=>{
+    const am = toYM(r.ad);
+    if(am && am >= yearStart) monthSet.add(am);
+    if(r.cl===1){
+      const vm = toYM(r.vd);
+      if(vm && vm >= yearStart) monthSet.add(vm);
     }
   });
+  const monthsList = Array.from(monthSet).sort();
+  if(monthsList.length === 0){
+    wrap.innerHTML = `<div style="padding:40px;text-align:center;color:#94a3b8;font-weight:700">${T('cohort_no_data')}</div>`;
+    return;
+  }
 
-  // 월별 실제 집계 기간 (1일 ~ 말일, 단 진행 중인 월은 오늘까지)
-  const fmtMD = (s)=>{ const p=s.split('-'); return p.length===3 ? `${parseInt(p[1])}/${parseInt(p[2])}` : s; };
-  const monthRangeLbl = (m)=>{
-    const [y, mo] = m.split('-').map(Number);
-    const first = `${m}-01`;
-    const lastDay = new Date(y, mo, 0).getDate();
-    const natural = `${m}-${String(lastDay).padStart(2,'0')}`;
-    const last = (today && today.startsWith(m) && today < natural) ? today : natural;
-    return `${fmtMD(first)}~${fmtMD(last)}`;
-  };
+  // 배정월별 DB 카운트 (cohort 행의 'DB' 컬럼용)
+  const dbCount = {};
+  monthsList.forEach(m=>{ dbCount[m] = {OFF:0, MKT:0, TOTAL:0}; });
 
-  const pct = (num, den, digits)=>{
-    if(!den) return 0;
-    const p = num/den*100;
-    return digits>0 ? Math.round(p*Math.pow(10,digits))/Math.pow(10,digits) : Math.round(p);
-  };
-  const pctCell = (val, strong)=>{
-    const cls = val>=20 ? 'apc-good' : val>=10 ? 'apc-mid' : val>0 ? 'apc-low' : 'apc-zero';
-    return `<span class="apct ${strong?'apct-strong':''} ${cls}">${val}%</span>`;
-  };
-
-  const kinds = [
-    {key:'OFF',   label:T('alyt_off_label'),   color:'#a855f7', bgRow:'#faf5ff'},
-    {key:'MKT',   label:T('alyt_mkt_label'),   color:'#0891b2', bgRow:'#ecfeff'},
-    {key:'TOTAL', label:T('alyt_total_label'), color:'#1e3a8a', bgRow:'#eff6ff'},
-  ];
-
-  let h = `<table class="month-tbl alyt-tbl">
-    <thead><tr>
-      <th class="L">${T('alyt_h_kind')}</th>
-      <th class="L">${T('alyt_h_period')}</th>
-      <th class="R">${T('alyt_h_db')}</th>
-      <th class="R">${T('alyt_h_booking')}</th>
-      <th class="R">${T('alyt_h_db_to_book')}</th>
-      <th class="R">${T('alyt_h_book_visit')}</th>
-      <th class="R">${T('alyt_h_book_to_visit')}</th>
-      <th class="R">${T('alyt_h_langsung')}<br><small style="font-weight:700;color:#94a3b8">${T('alyt_h_langsung_sub')}</small></th>
-      <th class="R">${T('alyt_h_closing')}<br><small style="font-weight:700;color:#94a3b8">${T('alyt_h_closing_sub')}</small></th>
-      <th class="R" style="background:#7f1d1d">${T('alyt_h_cl_actual')}<br><small style="font-weight:700;color:#fecaca">${T('alyt_h_cl_actual_sub')}</small></th>
-      <th class="R">${T('alyt_h_visit_to_close')}</th>
-      <th class="R">${T('alyt_h_db_to_close')}</th>
-    </tr></thead><tbody>`;
-
-  kinds.forEach(kind=>{
-    monthsList.forEach((m, i)=>{
-      const d = data[m][kind.key];
-      const bookVisit = d.d + d.vc;
-      const r_db_book  = pct(d.sched, d.db, 1);
-      const r_book_v   = pct(bookVisit, d.sched, 0);
-      const r_v_close  = pct(d.cl, bookVisit, 1);
-      const r_db_close = pct(d.cl, d.db, 1);
-      const mLbl = (D.mlabels && D.mlabels[m]) || m;
-      const periodLbl = monthRangeLbl(m);
-      const isFirst = i===0;
-      const isLast  = i===monthsList.length-1;
-      h += `<tr class="alyt-row ${kind.key.toLowerCase()}" style="background:${kind.bgRow};${isLast?'border-bottom:3px solid '+kind.color+';':''}">`;
-      if(isFirst){
-        h += `<td rowspan="${monthsList.length}" class="L alyt-kind" style="color:#fff;background:${kind.color};font-weight:900;font-size:13.5px;text-align:center;letter-spacing:-.3px">${kind.label}</td>`;
-      }
-      h += `<td class="L alyt-month"><b>${mLbl}</b><br><span class="alyt-period">${periodLbl}</span></td>`;
-      h += `<td class="R alyt-num" style="color:#0f172a">${f(d.db)}</td>`;
-      h += `<td class="R alyt-num" style="color:#1d4ed8">${f(d.sched)}</td>`;
-      h += `<td class="R">${pctCell(r_db_book, false)}</td>`;
-      h += `<td class="R alyt-num" style="color:#16a34a">${f(bookVisit)}</td>`;
-      h += `<td class="R">${pctCell(r_book_v, false)}</td>`;
-      h += `<td class="R alyt-num" style="color:#1e293b">${f(d.ls)}</td>`;
-      h += `<td class="R alyt-num" style="color:#dc2626;font-weight:900">${f(d.cl)}</td>`;
-      h += `<td class="R alyt-num alyt-cl-actual" style="color:#7f1d1d;font-weight:900;background:#fee2e2">${f(d.clByVd)}</td>`;
-      h += `<td class="R">${pctCell(r_v_close, true)}</td>`;
-      h += `<td class="R">${pctCell(r_db_close, true)}</td>`;
-      h += `</tr>`;
-    });
-  });
-
-  h += `</tbody></table>
-    <div class="alyt-note">
-      <b>${T('alyt_note_title')}</b>
-      <span>${T('alyt_note_basis')}</span>
-      <span>${T('alyt_note_booking')}</span>
-      <span>${T('alyt_note_cl_actual')}</span>
-      <span>${T('alyt_note_close_rate')}</span>
-    </div>`;
-
-  // ─── 📐 코호트 매트릭스 (배정월 × 클로징 발생월) ───────────────
-  //   재경 보고용 — "이전 달 DB 가 계속 익어가는 증거"
-  //   클로징은 r.cl===1 AND r.vd (방문일=클로징일) 기준으로 집계
-  const cohort     = { OFF:{}, MKT:{}, TOTAL:{} };
-  const cohortPre  = { OFF:{count:0,byMonth:{}}, MKT:{count:0,byMonth:{}}, TOTAL:{count:0,byMonth:{}} };
+  // 코호트 매트릭스 데이터
+  const cohort    = { OFF:{}, MKT:{}, TOTAL:{} };
+  const cohortPre = { OFF:{count:0,byMonth:{}}, MKT:{count:0,byMonth:{}}, TOTAL:{count:0,byMonth:{}} };
 
   (D.records||[]).forEach(r=>{
-    if(r.cl!==1 || !r.vd || !r.ad) return;
-    const closeM = r.vd.slice(0,7);
-    if(!closeM.startsWith(curYear)) return;     // 클로징이 올해 발생한 것만
-    const cohM = r.ad.slice(0,7);
+    const cohM = toYM(r.ad);
+    if(!cohM) return;
     const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
-    const kindsArr = k ? [k, 'TOTAL'] : ['TOTAL'];
-    if(cohM.startsWith(curYear)){
-      kindsArr.forEach(kk=>{
+    const kinds = k ? [k, 'TOTAL'] : ['TOTAL'];
+
+    if(cohM >= yearStart && dbCount[cohM]){
+      kinds.forEach(kk=>{ dbCount[cohM][kk]++; });
+    }
+    if(r.cl !== 1) return;
+    const closeM = toYM(r.vd);
+    if(!closeM || closeM < yearStart) return;
+
+    if(cohM >= yearStart){
+      kinds.forEach(kk=>{
         if(!cohort[kk][cohM]) cohort[kk][cohM] = {};
         cohort[kk][cohM][closeM] = (cohort[kk][cohM][closeM]||0) + 1;
       });
     } else {
-      kindsArr.forEach(kk=>{
+      kinds.forEach(kk=>{
         cohortPre[kk].count++;
         cohortPre[kk].byMonth[closeM] = (cohortPre[kk].byMonth[closeM]||0) + 1;
       });
@@ -4677,7 +4594,6 @@ function renderAnalytics(){
     const coh = cohort[kindKey];
     const pre = cohortPre[kindKey];
 
-    // 히트맵 강도 — 매트릭스 안에서의 max 기준
     let maxVal = 0;
     Object.values(coh).forEach(row => Object.values(row).forEach(v => { if(v>maxVal) maxVal = v; }));
     Object.values(pre.byMonth).forEach(v => { if(v>maxVal) maxVal = v; });
@@ -4686,13 +4602,12 @@ function renderAnalytics(){
       if(val === 0) return 'transparent';
       const intensity = Math.min(1, val/maxVal);
       return isDiag
-        ? `rgba(34,197,94,${0.20 + intensity*0.45})`     // 대각선 = 초록 (즉시 전환)
-        : `rgba(168,85,247,${0.15 + intensity*0.40})`;   // 비대각선 = 보라 (지연 클로징)
+        ? `rgba(34,197,94,${0.20 + intensity*0.45})`
+        : `rgba(168,85,247,${0.15 + intensity*0.40})`;
     };
     const mLbl = (m)=> (D.mlabels && D.mlabels[m]) || m;
 
-    // 컬럼 합계 (당월 실제 클로징 — 재경 보고 숫자) + 대각선 (즉시 전환)
-    const colTotals = {}; const diagTotals = {};
+    const colTotals = {}, diagTotals = {};
     monthsList.forEach(m => {
       colTotals[m]  = (pre.byMonth[m] || 0);
       diagTotals[m] = (coh[m] && coh[m][m]) || 0;
@@ -4716,7 +4631,6 @@ function renderAnalytics(){
     });
     h += `<th class="R cum">${T('cohort_h_cum')}</th></tr></thead><tbody>`;
 
-    // 2025 이전 cohort 한 줄 (있을 때만)
     if(pre.count > 0){
       h += `<tr class="pre-row"><td class="L"><b>${T('cohort_pre')}</b></td><td class="R" style="color:#94a3b8">—</td>`;
       monthsList.forEach(m => {
@@ -4726,15 +4640,14 @@ function renderAnalytics(){
       h += `<td class="R cum">${f(pre.count)}</td></tr>`;
     }
 
-    // 올해 cohort 행들
     monthsList.forEach((cohM, ci)=>{
-      const dbCount = (data[cohM] && data[cohM][kindKey] && data[cohM][kindKey].db) || 0;
+      const db = dbCount[cohM][kindKey] || 0;
       let cohSum = 0;
       monthsList.forEach(closeM => { cohSum += (coh[cohM] && coh[cohM][closeM]) || 0; });
-      h += `<tr><td class="L"><b>${mLbl(cohM)}</b></td><td class="R alyt-num">${f(dbCount)}</td>`;
+      h += `<tr><td class="L"><b>${mLbl(cohM)}</b></td><td class="R alyt-num">${f(db)}</td>`;
       monthsList.forEach((closeM, mi)=>{
         if(mi < ci){
-          h += `<td class="R impossible">·</td>`;        // 클로징이 배정 이전일 수 없음
+          h += `<td class="R impossible">·</td>`;
         } else {
           const v = (coh[cohM] && coh[cohM][closeM]) || 0;
           const isDiag = (mi === ci);
@@ -4746,7 +4659,6 @@ function renderAnalytics(){
       h += `<td class="R cum">${f(cohSum)}</td></tr>`;
     });
 
-    // 푸터: 당월 실제 클로징 / 즉시 전환 / 이전월 기여
     h += `</tbody><tfoot>`;
     let grandActual = 0, grandDiag = 0;
     monthsList.forEach(m => { grandActual += colTotals[m]; grandDiag += diagTotals[m]; });
@@ -4777,7 +4689,7 @@ function renderAnalytics(){
     return h;
   };
 
-  h += `<div class="cohort-section-hd">
+  let h = `<div class="cohort-section-hd">
     <div class="cohort-section-title">📐 ${T('cohort_section_title')}</div>
     <div class="cohort-section-sub">${T('cohort_section_sub')}</div>
     <div class="cohort-legend">
