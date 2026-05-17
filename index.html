@@ -4678,9 +4678,22 @@ function renderAnalytics(){
     return;
   }
 
-  // 2026-01 ~ 당월 까지 (CSV ↔ D.records 매칭이 안정적인 범위)
-  const yearStart = '2026-01';
+  // 시작월 동적 결정: D.records 배정월 + CSV 결제월 중 가장 이른 것 (2025-01 이후만)
   const todayM = (D.today || new Date().toISOString().slice(0,10)).slice(0,7);
+  let earliest = todayM;
+  (D.records||[]).forEach(r=>{
+    if(r.ad){
+      const m = r.ad.slice(0,7);
+      if(m >= '2025-01' && m < earliest) earliest = m;
+    }
+  });
+  csvClosings.forEach(c=>{
+    if(c[0]){
+      const m = c[0].slice(0,7);
+      if(m >= '2025-01' && m < earliest) earliest = m;
+    }
+  });
+  const yearStart = earliest;
   const monthsList = [];
   let cur = yearStart;
   while(cur <= todayM){
@@ -4813,7 +4826,14 @@ function renderAnalytics(){
         ? `rgba(34,197,94,${0.20 + intensity*0.45})`
         : `rgba(168,85,247,${0.15 + intensity*0.40})`;
     };
-    const mLbl = (m)=> (D.mlabels && D.mlabels[m]) || m;
+    // 매트릭스 안에서만 연도 prefix 붙은 짧은 라벨 (2025·2026 구분)
+    const _MO_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const mLbl = (m)=>{
+      const p = m.split('-');
+      if(p.length < 2) return m;
+      const moStr = _MO_EN[parseInt(p[1])-1] || p[1];
+      return `${moStr}<br><small style="font-weight:700;color:#94a3b8;font-size:10px">'${p[0].slice(2)}</small>`;
+    };
 
     // 컬럼 합계 & 대각선 — TOTAL 표만 unmatched 포함
     const colTotals = {}, diagTotals = {};
@@ -4850,7 +4870,7 @@ function renderAnalytics(){
     h += `<th class="R cum">${T('cohort_h_cum')}</th>`;
     h += `<th class="R eff">${T('cohort_h_eff')}</th></tr></thead><tbody>`;
 
-    // cohort 행들 (배정월)
+    // cohort 행들 (배정월) — DB 도 클로징도 0 인 월은 숨김 (table 깔끔하게)
     let grandDb = 0, grandCohClosing = 0;
     monthsList.forEach((cohM, ci)=>{
       const db = dbCount[cohM][kindKey] || 0;
@@ -4858,6 +4878,7 @@ function renderAnalytics(){
       let cohSum = 0;
       monthsList.forEach(closeM => { cohSum += (coh[cohM] && coh[cohM][closeM]) || 0; });
       grandCohClosing += cohSum;
+      if(db === 0 && cohSum === 0) return;  // 활동 없는 cohort 행 skip
       const eff = db ? Math.round(cohSum/db*1000)/10 : 0;
       const effCls = eff>=10 ? 'eff-good' : eff>=5 ? 'eff-mid' : eff>0 ? 'eff-low' : 'eff-zero';
       h += `<tr><td class="L"><b>${mLbl(cohM)}</b></td><td class="R db-col">${f(db)}</td>`;
