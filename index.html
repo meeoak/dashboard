@@ -13,17 +13,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
 @keyframes bgPulse{0%,100%{opacity:.5}50%{opacity:1}}
 .hdr-in{max-width:1180px;margin:0 auto;padding:18px 20px 16px;position:relative}
 .hdr-center{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
-.hdr-flame{font-size:38px;filter:drop-shadow(0 0 12px #fbbf24);animation:flameDance 1.5s ease-in-out infinite alternate}
+.hdr-flame{font-size:36px;filter:drop-shadow(0 0 12px #fbbf24);animation:flameDance 1.5s ease-in-out infinite alternate}
 @keyframes flameDance{0%{transform:rotate(-5deg) scale(1)}100%{transform:rotate(5deg) scale(1.1)}}
-.hdr-title-wrap{text-align:center}
-.hdr-title{font-size:42px;font-weight:900;letter-spacing:-1.2px;line-height:1;background:linear-gradient(135deg,#fff 0%,#fde68a 30%,#2563eb 60%,#fff 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;filter:drop-shadow(0 0 16px #1e3a8a66);animation:gradFlow 3s ease-in-out infinite}
+/* 🏆 트로피 — 좌우 양쪽 */
+.hdr-trophy{font-size:40px;filter:drop-shadow(0 0 14px #fbbf24cc) drop-shadow(0 0 28px #dc262644);display:inline-block;animation:trophyShine 2s ease-in-out infinite alternate}
+.hdr-trophy-l{animation-delay:0s}
+.hdr-trophy-r{animation-delay:.5s;transform:scaleX(-1)}
+@keyframes trophyShine{
+  0%{transform:rotate(-4deg) scale(1) translateY(0)}
+  100%{transform:rotate(4deg) scale(1.08) translateY(-3px)}
+}
+.hdr-trophy-r{animation-name:trophyShineR}
+@keyframes trophyShineR{
+  0%{transform:scaleX(-1) rotate(-4deg) scale(1) translateY(0)}
+  100%{transform:scaleX(-1) rotate(4deg) scale(1.08) translateY(-3px)}
+}
+.hdr-title-wrap{text-align:center;flex:1}
+/* 챔피언 그라데이션 — 골드 → 흰색 → 빨강 → 흰색 → 골드 (3 색 흐름) */
+.hdr-title{font-size:46px;font-weight:900;letter-spacing:-1.4px;line-height:1.05;background:linear-gradient(135deg,#fbbf24 0%,#fff 22%,#fbbf24 38%,#dc2626 55%,#fbbf24 72%,#fff 88%,#fbbf24 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;filter:drop-shadow(0 0 20px #fbbf2480) drop-shadow(0 0 40px #dc262640);animation:gradFlow 4s ease-in-out infinite;text-shadow:0 4px 0 rgba(0,0,0,.5)}
 @keyframes gradFlow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-.hdr-sub-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
-.hdr-sub{font-size:12px;color:#aaa;font-weight:600}
+/* ⚡ 챔피언 부제 — 작지만 임팩트 */
+.hdr-sub-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
+.hdr-bolt{font-size:16px;color:#fde047;animation:bolt 1.2s ease-in-out infinite;display:inline-block}
+@keyframes bolt{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.25)}}
+.hdr-champ-sub{font-size:13px;font-weight:900;color:#fde047;letter-spacing:4px;text-transform:uppercase;text-shadow:0 0 12px #fbbf24a0,0 2px 4px rgba(0,0,0,.5)}
+.hdr-live-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
+.hdr-sub{font-size:11.5px;color:#bbb;font-weight:600;letter-spacing:.2px}
 .hdr-lang{position:absolute;top:18px;right:20px;display:flex;gap:0;background:rgba(255,255,255,.08);border-radius:8px;padding:3px;border:1px solid rgba(255,255,255,.18);z-index:2}
 @media(max-width:700px){
-  .hdr-title{font-size:28px}
-  .hdr-flame{font-size:28px}
+  .hdr-title{font-size:28px;letter-spacing:-.8px}
+  .hdr-flame{font-size:24px}
+  .hdr-trophy{font-size:26px}
+  .hdr-champ-sub{font-size:10.5px;letter-spacing:2px}
+  .hdr-bolt{font-size:13px}
   .hdr-lang{position:static;margin:10px auto 0;justify-content:center}
 }
 /* ─────────── 모바일 (≤640px) 종합 대응 ─────────── */
@@ -1447,8 +1469,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 .scope-home-btn:hover{background:#2563eb;border-color:#2563eb}
 .team-bar-agent{margin-left:8px;border:1.5px solid #cbd5e1;background:#fff;font-size:12px;font-weight:700;color:#334155;padding:5px 10px;border-radius:8px;min-width:140px;cursor:pointer}
 .team-bar-agent:focus{outline:none;border-color:#1e3a8a;box-shadow:0 0 0 3px rgba(30,58,138,.15)}
-/* 헤더 부제목·모드 배너 숨김 (중복 제거) */
-.hdr-sub-row{display:none}
+/* 모드 배너 숨김 (중복 제거) — hdr-sub-row 는 챔피언 부제로 사용 중이라 보이게 둠 */
 .mode-banner{display:none}
 
 /* 2-b) 팀 바 (2행): scope-bar 바로 아래 */
@@ -1737,18 +1758,25 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 
 <div id="page-main">
 
-<!-- 헤더 - 가운데 정렬 + 에너지 넘치는 디자인 -->
+<!-- 헤더 - 챔피언 트로피 스타일 (영업팀 경쟁심 자극) -->
 <div class="hdr"><div class="hdr-in">
   <div class="hdr-center">
+    <span class="hdr-trophy hdr-trophy-l">🏆</span>
     <span class="hdr-flame">🔥</span>
     <div class="hdr-title-wrap">
       <div class="hdr-title" data-t="title">영업팀 통합 대시보드</div>
       <div class="hdr-sub-row">
+        <span class="hdr-bolt">⚡</span>
+        <span class="hdr-champ-sub" data-t="champ_sub">CHAMPION'S PERFORMANCE CENTER</span>
+        <span class="hdr-bolt">⚡</span>
+      </div>
+      <div class="hdr-live-row">
         <span class="live-badge">● LIVE</span>
         <span class="hdr-sub" id="hdr-sub" data-t="subtitle">실시간 방문영업 현황</span>
       </div>
     </div>
     <span class="hdr-flame">🔥</span>
+    <span class="hdr-trophy hdr-trophy-r">🏆</span>
   </div>
   <span style="display:none" id="hdr-score"></span>
 </div></div>
@@ -2141,7 +2169,7 @@ function teamShortName(team){
 // 🌍 다국어 사전 (한국어/인도네시아어)
 const LANG = {
   ko: {
-    title:'영업팀 통합 대시보드', subtitle:'실시간 방문영업 현황',
+    title:'영업팀 통합 대시보드', subtitle:'실시간 방문영업 현황', champ_sub:"CHAMPION'S PERFORMANCE CENTER",
     score_lbl:'총 점수 (클로징×5 + 방문×1)',
     all_unified:'전체DB(OFF+MKT)', all_period:'전체 기간', all_agents:'전체 에이전트',
     today:'오늘', last_n:'최근', this_month:'이번달', last_month:'지난달', all:'전체',
@@ -2430,7 +2458,7 @@ const LANG = {
     mem_total_count:'총 {n}건',
   },
   id: {
-    title:'Dashboard Penjualan Terpadu', subtitle:'Status Penjualan Kunjungan Real-time',
+    title:'Dashboard Penjualan Terpadu', subtitle:'Status Penjualan Kunjungan Real-time', champ_sub:"CHAMPION'S PERFORMANCE CENTER",
     score_lbl:'Total Skor (Closing×5 + Visit×1)',
     all_unified:'Semua DB (OFF+MKT)', all_period:'Semua Periode', all_agents:'Semua Agen',
     today:'Hari ini', last_n:'Terakhir', this_month:'Bulan ini', last_month:'Bulan lalu', all:'Semua',
