@@ -2040,7 +2040,7 @@ const LANG = {
     // 추가 — Bahasa 전환 시 누락 항목
     tab_agent_insight:'에이전트별 토탈관리',
     tab_analytics:'📊 통계',
-    sec_analytics:'📊 월별 통계 (업무 보고용)',
+    sec_analytics:'📊 월별 통계 (업무 보고용 · 2026)',
     sec_analytics_sub:'OFF · 마케팅 · 토탈 — 월별 배정 / 예약 / 방문 / 결제 추이 · 발생주의 (배정일 기준)',
     alyt_off_label:'OFF DB (콜렉터+Sales)',
     alyt_mkt_label:'마케팅 DB',
@@ -2260,7 +2260,7 @@ const LANG = {
     // Tambahan — item yang tertinggal saat ganti bahasa
     tab_agent_insight:'Manajemen Total per Agen',
     tab_analytics:'📊 Statistik',
-    sec_analytics:'📊 Statistik Bulanan (Laporan)',
+    sec_analytics:'📊 Statistik Bulanan (Laporan · 2026)',
     sec_analytics_sub:'OFF · Marketing · Total — Alokasi / Jadwal / Visit / Closing per bulan · Basis Akrual (Tgl Alokasi)',
     alyt_off_label:'OFF DB (Collector+Sales)',
     alyt_mkt_label:'Marketing DB',
@@ -4449,8 +4449,10 @@ function renderTab(){
 function renderAnalytics(){
   const wrap = document.getElementById('analytics-wrap');
   if(!wrap) return;
-  const monthsList = (D.months || []).slice().sort();
+  // 보고용: 올해(D.today 기준 연도) 데이터만 — 현재는 2026
   const today = D.today || '';
+  const curYear = today.slice(0,4) || '2026';
+  const monthsList = (D.months || []).filter(m => m.startsWith(curYear)).sort();
   const init = ()=>({db:0, sched:0, d:0, vc:0, ls:0, cl:0});
   const data = {};
   monthsList.forEach(m=>{ data[m] = {OFF:init(), MKT:init(), TOTAL:init()}; });
