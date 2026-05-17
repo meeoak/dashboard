@@ -2094,8 +2094,8 @@ const LANG = {
     sec_analytics:'📐 DB 코호트 분석 (재경 보고용 · 2025~현재)',
     sec_analytics_sub:'배정월 × 클로징 발생월 매트릭스 — "이전 달 DB 가 매월 매출의 몇 %를 만드는지" 시각화',
     cohort_no_data:'2025년 이후 데이터 없음',
-    alyt_off_label:'OFF DB (콜렉터+Sales)',
-    alyt_mkt_label:'마케팅 DB',
+    alyt_off_label:'OFF DB',
+    alyt_mkt_label:'MKT DB',
     alyt_total_label:'토탈',
     alyt_h_kind:'구분', alyt_h_period:'월 (기간)',
     alyt_h_db:'배정 DB', alyt_h_booking:'예약', alyt_h_db_to_book:'DB 대비 예약율',
@@ -2338,8 +2338,8 @@ const LANG = {
     sec_analytics:'📐 Analisis Kohor DB (Laporan Keuangan · 2025~Sekarang)',
     sec_analytics_sub:'Matriks Bulan Alokasi × Bulan Closing — Visualisasi "berapa % omzet bulan ini berasal dari DB bulan-bulan lalu"',
     cohort_no_data:'Tidak ada data sejak 2025',
-    alyt_off_label:'OFF DB (Collector+Sales)',
-    alyt_mkt_label:'Marketing DB',
+    alyt_off_label:'OFF DB',
+    alyt_mkt_label:'MKT DB',
     alyt_total_label:'Total',
     alyt_h_kind:'Tipe', alyt_h_period:'Bulan (Periode)',
     alyt_h_db:'Alokasi DB', alyt_h_booking:'Jadwal', alyt_h_db_to_book:'Tk. Jadwal vs DB',
@@ -4595,11 +4595,13 @@ function renderAnalytics(){
       kinds.forEach(kk=>{ dbCount[cohM][kk]++; });
     }
     if(r.cl !== 1) return;
-    const closeM = toYM(r.vd);
-    if(!closeM || closeM < yearStart || closeM > todayM) return;   // 미래 클로징 무시
+    // vd(방문일) 없으면 cohort 배정월(ad) 로 떨어뜨림 — 대시보드의 cl 합계와
+    // 일치시키기 위함 (시트 데이터에서 cl=1 인데 vd 가 비어있는 케이스 많음)
+    let closeM = toYM(r.vd) || cohM;
+    if(closeM < yearStart || closeM > todayM) return;
 
     if(cohM >= yearStart){
-      if(cohM > todayM) return;                                     // 미래 배정 무시
+      if(cohM > todayM) return;
       kinds.forEach(kk=>{
         if(!cohort[kk][cohM]) cohort[kk][cohM] = {};
         cohort[kk][cohM][closeM] = (cohort[kk][cohM][closeM]||0) + 1;
@@ -4735,11 +4737,6 @@ function renderAnalytics(){
   let h = `<div class="cohort-section-hd">
     <div class="cohort-section-title">📐 ${T('cohort_section_title')}</div>
     <div class="cohort-section-sub">${T('cohort_section_sub')}</div>
-    <div class="cohort-legend">
-      <span class="lg-chip lg-diag">${T('cohort_lg_diag')}</span>
-      <span class="lg-chip lg-off">${T('cohort_lg_off')}</span>
-      <span class="lg-chip lg-pre">${T('cohort_lg_pre')}</span>
-    </div>
   </div>`;
   h += buildCohortTable('OFF',   T('alyt_off_label'),   '#a855f7', '#faf5ff');
   h += buildCohortTable('MKT',   T('alyt_mkt_label'),   '#0891b2', '#ecfeff');
