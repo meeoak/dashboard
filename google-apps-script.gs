@@ -79,9 +79,31 @@ function doPost(e){
   }
 }
 
-// health check + 배포 진단
+// health check + 배포 진단 + 테스트 메일 발송 endpoint
 // 브라우저로 직접 열어서 SPREADSHEET_ID / 시트 접근 가능 여부 확인 가능
-function doGet(){
+//
+// 테스트 메일 발송:
+//   {WEBHOOK_URL}?action=testmail                              → 기본 (devi → meeoak0512@gmail.com)
+//   {WEBHOOK_URL}?action=testmail&agent=devi&to=you@gmail.com  → 커스텀
+function doGet(e){
+  const params = (e && e.parameter) || {};
+
+  // 테스트 메일 발송
+  if(params.action === 'testmail'){
+    const to = params.to || 'meeoak0512@gmail.com';
+    const q  = params.agent || 'devi';
+    try {
+      const result = sendTestReport_(q, to);
+      return ContentService
+        .createTextOutput(JSON.stringify({ok:true, action:'testmail', ...result}, null, 2))
+        .setMimeType(ContentService.MimeType.JSON);
+    } catch(err){
+      return ContentService
+        .createTextOutput(JSON.stringify({ok:false, action:'testmail', error: String(err)}, null, 2))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
   const info = {
     ok: true,
     msg: 'webhook alive',
