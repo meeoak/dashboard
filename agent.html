@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1e3a8a">
+<title>WINK 에이전트</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f0ede8;color:#0f172a;font-size:15px;line-height:1.4;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,textarea,select{font-family:inherit;font-size:inherit}
+
+/* ===== 공통 ===== */
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:#f0ede8;display:flex;flex-direction:column;position:relative}
+.screen{display:none;flex:1;flex-direction:column}
+.screen.on{display:flex}
+.hdr{background:linear-gradient(135deg,#0a0a1a,#1a1a2e,#2d1b4e,#0f3460);color:#fff;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.hdr-title{font-size:17px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:8px}
+.hdr-flame{font-size:20px;filter:drop-shadow(0 0 8px #fbbf24)}
+.hdr-meta{font-size:11px;color:#cbd5e1;font-weight:700}
+.hdr-back{font-size:22px;color:#fff;padding:4px 8px;margin-left:-8px}
+
+/* ===== 로그인 ===== */
+.login{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 28px;background:linear-gradient(180deg,#0a0a1a 0%,#1a1a2e 30%,#2d1b4e 70%,#0f3460 100%);color:#fff;min-height:100vh}
+.login-brand{text-align:center;margin-bottom:48px}
+.login-flame{font-size:56px;filter:drop-shadow(0 0 20px #fbbf24);margin-bottom:12px}
+.login-title{font-size:32px;font-weight:900;letter-spacing:-.8px;background:linear-gradient(135deg,#fff 0%,#fde68a 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.login-sub{font-size:13px;color:#cbd5e1;font-weight:600}
+.login-form{display:flex;flex-direction:column;gap:14px}
+.login-field{display:flex;flex-direction:column;gap:6px}
+.login-label{font-size:12px;font-weight:800;color:#cbd5e1;letter-spacing:.3px;padding-left:4px}
+.login-input{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);color:#fff;padding:14px 16px;border-radius:12px;font-size:16px;font-weight:700;outline:none;transition:all .15s}
+.login-input::placeholder{color:rgba(255,255,255,.4);font-weight:500}
+.login-input:focus{background:rgba(255,255,255,.12);border-color:#fbbf24}
+.login-btn{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0a1a;padding:16px;border-radius:12px;font-size:16px;font-weight:900;letter-spacing:-.3px;margin-top:8px;box-shadow:0 4px 14px rgba(251,191,36,.3)}
+.login-btn:active{transform:scale(.98)}
+.login-hint{font-size:11px;color:#94a3b8;text-align:center;margin-top:18px;font-weight:600;line-height:1.6}
+.login-err{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5;padding:10px 14px;border-radius:8px;font-size:12.5px;font-weight:700;text-align:center;display:none}
+.login-err.on{display:block}
+
+/* ===== 리드 리스트 ===== */
+.list-summary{background:#fff;padding:14px 18px;border-bottom:1.5px solid #e5e7eb;display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.kpi{flex:0 0 auto;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:8px 14px;min-width:75px;text-align:center}
+.kpi-n{font-size:18px;font-weight:900;color:#0f172a;letter-spacing:-.5px;line-height:1}
+.kpi-l{font-size:10.5px;font-weight:800;color:#64748b;margin-top:4px;letter-spacing:-.1px}
+.kpi.urg{background:#fef2f2;border-color:#fecaca}
+.kpi.urg .kpi-n{color:#dc2626}
+.kpi.urg .kpi-l{color:#991b1b}
+.kpi.tod{background:#fef9c3;border-color:#fde047}
+.kpi.tod .kpi-n{color:#a16207}
+.kpi.tod .kpi-l{color:#854d0e}
+
+.filter-bar{background:#fff;padding:10px 18px;border-bottom:1.5px solid #e5e7eb;display:flex;gap:6px;overflow-x:auto}
+.chip{flex:0 0 auto;background:#f1f5f9;border:1.5px solid #cbd5e1;color:#475569;font-size:12.5px;font-weight:800;padding:6px 13px;border-radius:18px;letter-spacing:-.2px}
+.chip.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
+
+.list{flex:1;overflow-y:auto;padding:12px 14px 100px;display:flex;flex-direction:column;gap:10px}
+.lead{background:#fff;border:1.5px solid #e5e7eb;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;transition:transform .12s}
+.lead:active{transform:scale(.98)}
+.lead.urg{border-left:4px solid #dc2626}
+.lead.tod{border-left:4px solid #f59e0b;background:#fffbeb}
+.lead-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.lead-name{font-size:16px;font-weight:900;color:#0f172a;letter-spacing:-.3px}
+.lead-sev{font-size:11px;font-weight:900;padding:3px 8px;border-radius:6px;letter-spacing:-.2px;white-space:nowrap}
+.sev-h{background:#fef2f2;color:#dc2626}
+.sev-m{background:#fef9c3;color:#a16207}
+.sev-l{background:#f0fdf4;color:#16a34a}
+.lead-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:#64748b;font-weight:700}
+.lead-meta b{color:#0f172a;font-weight:800}
+.lead-status{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px dashed #e5e7eb;font-size:12px}
+.status-pill{font-size:11px;font-weight:900;padding:4px 9px;border-radius:6px;letter-spacing:-.2px}
+.st-s{background:#dbeafe;color:#1e40af}
+.st-d{background:#dcfce7;color:#166534}
+.st-w{background:#fef3c7;color:#92400e}
+.st-none{background:#f1f5f9;color:#475569}
+.st-cl{background:#fae8ff;color:#86198f}
+.lead-dday{font-weight:900;color:#dc2626;font-size:13px}
+.lead-dday.ok{color:#16a34a}
+
+.fab{position:fixed;bottom:20px;right:50%;transform:translateX(220px);background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;width:56px;height:56px;border-radius:50%;font-size:26px;font-weight:900;box-shadow:0 6px 20px rgba(30,58,138,.4);display:flex;align-items:center;justify-content:center;z-index:50}
+@media(max-width:480px){.fab{transform:none;right:20px}}
+
+/* ===== 디테일 / 입력 ===== */
+.detail{flex:1;overflow-y:auto;padding-bottom:140px}
+.card{background:#fff;margin:12px 14px;border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1.5px solid #e5e7eb}
+.card-h{font-size:11px;font-weight:900;color:#64748b;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.card-h .badge{font-size:10.5px;background:#1e3a8a;color:#fff;padding:2px 8px;border-radius:10px;letter-spacing:-.1px}
+
+.profile{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.profile-av{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#0a0a1a;flex-shrink:0}
+.profile-info{flex:1;min-width:0}
+.profile-name{font-size:20px;font-weight:900;letter-spacing:-.4px}
+.profile-sub{font-size:12px;color:#64748b;font-weight:700;margin-top:2px}
+
+.kv{display:grid;grid-template-columns:90px 1fr;gap:6px 12px;font-size:13px}
+.kv .k{color:#64748b;font-weight:700}
+.kv .v{color:#0f172a;font-weight:800}
+
+.timeline{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.tl-row{display:flex;gap:10px;align-items:flex-start}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-top:6px;flex-shrink:0;position:relative}
+.tl-row.done .tl-dot{background:#16a34a}
+.tl-row.now .tl-dot{background:#1e3a8a;box-shadow:0 0 0 4px rgba(30,58,138,.2)}
+.tl-body{flex:1;font-size:13px}
+.tl-when{font-size:11px;color:#64748b;font-weight:700;margin-bottom:1px}
+.tl-what{color:#0f172a;font-weight:700;line-height:1.45}
+
+.memos{display:flex;flex-direction:column;gap:8px}
+.memo{background:#f8fafc;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}
+.memo-when{font-size:10.5px;color:#64748b;font-weight:800;margin-bottom:3px}
+.memo-text{color:#0f172a;font-weight:600}
+
+/* ===== 입력 폼 ===== */
+.form-card{background:#fff;margin:12px 14px;border-radius:14px;padding:16px 18px;border:2px solid #fbbf24;box-shadow:0 4px 14px rgba(251,191,36,.15)}
+.form-title{font-size:14px;font-weight:900;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;gap:6px;letter-spacing:-.3px}
+
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.status-opt{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 6px;font-size:12px;font-weight:900;color:#475569;text-align:center;letter-spacing:-.2px;transition:all .12s}
+.status-opt:active{transform:scale(.96)}
+.status-opt.on{color:#fff}
+.status-opt.on[data-st="s"]{background:#1e40af;border-color:#1e40af}
+.status-opt.on[data-st="d"]{background:#166534;border-color:#166534}
+.status-opt.on[data-st="w"]{background:#92400e;border-color:#92400e}
+.status-opt.on[data-st="ls"]{background:#7c3aed;border-color:#7c3aed}
+.status-opt.on[data-st="vc"]{background:#0891b2;border-color:#0891b2}
+.status-opt.on[data-st="cl"]{background:#86198f;border-color:#86198f}
+
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.photo-add{width:84px;height:84px;background:#f1f5f9;border:2px dashed #94a3b8;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#64748b;font-size:11px;font-weight:800;gap:4px;letter-spacing:-.2px}
+.photo-add .ico{font-size:22px}
+.photo-thumb{width:84px;height:84px;border-radius:10px;background-size:cover;background-position:center;position:relative;border:1.5px solid #e5e7eb}
+.photo-rm{position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:#dc2626;color:#fff;border-radius:50%;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.photo-count{font-size:11.5px;color:#64748b;font-weight:700;margin-bottom:14px}
+
+.memo-input{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 14px;font-size:14px;font-weight:600;color:#0f172a;line-height:1.5;resize:none;outline:none;min-height:80px;transition:border-color .15s}
+.memo-input:focus{border-color:#1e3a8a;background:#fff}
+.memo-input::placeholder{color:#94a3b8;font-weight:500}
+
+.submit-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid #e5e7eb;padding:12px 14px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -4px 14px rgba(0,0,0,.05);z-index:40}
+.submit-bar-inner{max-width:480px;margin:0 auto}
+.submit-btn{width:100%;background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;padding:15px;border-radius:12px;font-size:16px;font-weight:900;letter-spacing:-.3px;box-shadow:0 4px 14px rgba(30,58,138,.3);display:flex;align-items:center;justify-content:center;gap:6px}
+.submit-btn:active{transform:scale(.98)}
+.submit-btn:disabled{background:#cbd5e1;color:#94a3b8;box-shadow:none}
+
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(15,23,42,.95);color:#fff;padding:20px 28px;border-radius:14px;font-size:15px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 40px rgba(0,0,0,.3);opacity:0;transition:all .25s;pointer-events:none;z-index:100}
+.toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.toast .ico{font-size:24px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ============ Screen 1: 로그인 ============ -->
+<div class="screen on" id="s-login">
+  <div class="login">
+    <div class="login-brand">
+      <div class="login-flame">🔥</div>
+      <div class="login-title">WINK</div>
+      <div class="login-sub">에이전트 전용 · 모바일</div>
+    </div>
+    <div class="login-form">
+      <div class="login-err" id="login-err">이름 또는 PIN이 맞지 않아요</div>
+      <div class="login-field">
+        <div class="login-label">이름</div>
+        <input class="login-input" id="i-name" placeholder="devi" autocomplete="off">
+      </div>
+      <div class="login-field">
+        <div class="login-label">PIN (4자리)</div>
+        <input class="login-input" id="i-pin" type="tel" inputmode="numeric" maxlength="4" placeholder="••••">
+      </div>
+      <button class="login-btn" onclick="login()">시작하기</button>
+      <div class="login-hint">PIN은 관리자에게 받으세요<br>· · ·<br>이 mockup: 이름 <b>devi</b> / PIN <b>1234</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Screen 2: 리드 리스트 ============ -->
+<div class="screen" id="s-list">
+  <div class="hdr">
+    <div>
+      <div class="hdr-title"><span class="hdr-flame">🔥</span><span id="greet">안녕하세요</span></div>
+      <div class="hdr-meta" id="today-meta">오늘 · 내 리드</div>
+    </div>
+    <button class="hdr-back" onclick="logout()" title="로그아웃">⎋</button>
+  </div>
+
+  <div class="list-summary">
+    <div class="kpi urg"><div class="kpi-n">3</div><div class="kpi-l">긴급</div></div>
+    <div class="kpi tod"><div class="kpi-n">2</div><div class="kpi-l">오늘 방문</div></div>
+    <div class="kpi"><div class="kpi-n">8</div><div class="kpi-l">진행중</div></div>
+    <div class="kpi"><div class="kpi-n">12</div><div class="kpi-l">전체</div></div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="chip on" onclick="filterLeads(this,'all')">전체</button>
+    <button class="chip" onclick="filterLeads(this,'urg')">🔴 긴급</button>
+    <button class="chip" onclick="filterLeads(this,'today')">📅 오늘</button>
+    <button class="chip" onclick="filterLeads(this,'none')">미진행</button>
+    <button class="chip" onclick="filterLeads(this,'s')">방문예약</button>
+  </div>
+
+  <div class="list" id="lead-list"></div>
+  <button class="fab" onclick="alert('새 리드 추가 — Phase 2')" title="새 리드">+</button>
+</div>
+
+<!-- ============ Screen 3: 디테일 + 입력 ============ -->
+<div class="screen" id="s-detail">
+  <div class="hdr">
+    <div style="display:flex;align-items:center;gap:6px">
+      <button class="hdr-back" onclick="show('s-list')">←</button>
+      <div>
+        <div class="hdr-title" id="d-name">회원명</div>
+        <div class="hdr-meta" id="d-meta">상세</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail">
+    <!-- 프로필 -->
+    <div class="card">
+      <div class="profile">
+        <div class="profile-av" id="d-av">?</div>
+        <div class="profile-info">
+          <div class="profile-name" id="d-pname">—</div>
+          <div class="profile-sub" id="d-psub">—</div>
+        </div>
+      </div>
+      <div class="kv" id="d-kv"></div>
+    </div>
+
+    <!-- 진행 단계 -->
+    <div class="card">
+      <div class="card-h">진행 단계 <span class="badge" id="d-stage-badge">진행중</span></div>
+      <div class="timeline" id="d-timeline"></div>
+    </div>
+
+    <!-- 이전 메모 -->
+    <div class="card">
+      <div class="card-h">이전 메모</div>
+      <div class="memos" id="d-memos"></div>
+    </div>
+
+    <!-- ▶ 방문 결과 입력 (핵심!) -->
+    <div class="form-card">
+      <div class="form-title">📝 오늘 방문 결과</div>
+
+      <!-- 상태 변경 -->
+      <div style="font-size:11px;font-weight:900;color:#64748b;letter-spacing:.5px;margin-bottom:8px">진행 상태 변경</div>
+      <div class="status-grid" id="status-grid">
+        <button class="status-opt" data-st="s" onclick="pickStatus(this)">📅 방문예약</button>
+        <button class="status-opt" data-st="d" onclick="pickStatus(this)">✅ 방문완료</button>
+        <button class="status-opt" data-st="ls" onclick="pickStatus(this)">🏢 랑숭</button>
+        <button class="status-opt" data-st="vc" onclick="pickStatus(this)">📹 비디오콜</button>
+        <button class="status-opt" data-st="w" onclick="pickStatus(this)">⏳ 일정대기</button>
+        <button class="status-opt" data-st="cl" onclick="pickStatus(this)">🎉 클로징</button>
+      </div>
+
+      <!-- 사진 -->
+      <div style="font-size:11px;font-weight:900;color:#64748b;letter-spacing:.5px;margin-bottom:8px">사진 (최대 5장)</div>
+      <div class="photos" id="photos">
+        <label class="photo-add" for="photo-input">
+          <span class="ico">📷</span><span>추가</span>
+        </label>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="addPhotos(this.files)">
+      <div class="photo-count" id="photo-count">0 / 5장</div>
+
+      <!-- 메모 -->
+      <div style="font-size:11px;font-weight:900;color:#64748b;letter-spacing:.5px;margin-bottom:8px">메모</div>
+      <textarea class="memo-input" id="memo-input" placeholder="오늘 방문에서 있었던 일을 짧게 적어주세요"></textarea>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+
+  <div class="submit-bar">
+    <div class="submit-bar-inner">
+      <button class="submit-btn" id="submit-btn" onclick="submitVisit()">
+        <span>💾</span><span>제출하기</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="ico">✅</span><span id="toast-msg">저장됐어요!</span></div>
+
+</div><!-- /.app -->
+
+<script>
+// ===== mock 데이터 =====
+const LEADS = [
+  {id:1, name:'박지영', sponsor:'김민수', assigned:'05/10', visit:'05/17', status:'s', dday:0, severity:3, reason:'오늘 방문예정 · 13시', tag:'today',
+   timeline:[
+     {when:'05/10',what:'DB 배정',done:true},
+     {when:'05/12',what:'1차 상담 통화 — 관심 있음',done:true},
+     {when:'05/17',what:'현장 방문 예약 (13시)',now:true}],
+   memos:[
+     {when:'05/12 14:30',text:'전화 잘 받으심. 이번 주 토요일 방문 가능하다고 함. 직장이 자카르타 시내라 퇴근 후 가능.'},
+     {when:'05/10 10:15',text:'DB 배정. 후원자 김민수 통해 소개받음.'}]},
+  {id:2, name:'최영호', sponsor:'이수진', assigned:'05/08', visit:'05/14', status:'d', dday:3, severity:3, reason:'방문 후 3일 미입력', tag:'urg',
+   timeline:[
+     {when:'05/08',what:'DB 배정',done:true},
+     {when:'05/11',what:'전화 상담',done:true},
+     {when:'05/14',what:'현장 방문 완료',done:true},
+     {when:'',what:'(다음 단계 미입력)',now:true}],
+   memos:[{when:'05/14 17:00',text:'방문 완료. 부인과 같이 보러 옴. 가격 부담된다고 함.'}]},
+  {id:3, name:'한미경', sponsor:'박철수', assigned:'05/05', visit:'', status:'none', dday:7, severity:3, reason:'배정 7일 경과 · 미접촉', tag:'urg',
+   timeline:[{when:'05/05',what:'DB 배정',done:true},{when:'',what:'(아직 접촉 안 됨)',now:true}], memos:[]},
+  {id:4, name:'조성민', sponsor:'김민수', assigned:'05/12', visit:'05/17', status:'s', dday:0, severity:2, reason:'오늘 방문 (16시)', tag:'today',
+   timeline:[
+     {when:'05/12',what:'DB 배정',done:true},
+     {when:'05/13',what:'카톡 상담',done:true},
+     {when:'05/17',what:'현장 방문 (16시)',now:true}], memos:[{when:'05/13 11:20',text:'카톡으로 자료 보내드림. 토요일 오후 가능.'}]},
+  {id:5, name:'정수영', sponsor:'이수진', assigned:'05/03', visit:'05/09', status:'ls', dday:0, severity:2, reason:'랑숭 진행중', tag:'ls',
+   timeline:[
+     {when:'05/03',what:'DB 배정',done:true},
+     {when:'05/06',what:'전화 상담',done:true},
+     {when:'05/09',what:'랑숭 진행',now:true}], memos:[{when:'05/09 15:00',text:'사무실 방문. 계약서 검토 중.'}]},
+  {id:6, name:'윤재현', sponsor:'박철수', assigned:'05/14', visit:'', status:'w', dday:0, severity:1, reason:'일정 조율 중', tag:'w',
+   timeline:[{when:'05/14',what:'DB 배정',done:true},{when:'05/15',what:'1차 통화 — 일정대기',now:true}], memos:[]},
+  {id:7, name:'서지훈', sponsor:'김민수', assigned:'05/06', visit:'05/13', status:'d', dday:0, severity:1, reason:'재방문 일정 중', tag:'d',
+   timeline:[{when:'05/06',what:'DB 배정',done:true},{when:'05/13',what:'1차 방문 완료',now:true}],
+   memos:[{when:'05/13 18:00',text:'관심 있음. 다음 주 재방문 일정 조율 중.'}]},
+  {id:8, name:'노유진', sponsor:'이수진', assigned:'04/28', visit:'05/05', status:'cl', dday:0, severity:1, reason:'클로징 완료 🎉', tag:'cl',
+   timeline:[
+     {when:'04/28',what:'DB 배정',done:true},
+     {when:'05/02',what:'상담',done:true},
+     {when:'05/05',what:'방문',done:true},
+     {when:'05/15',what:'클로징 완료 🎉',done:true}], memos:[{when:'05/15 14:00',text:'계약 완료!'}]},
+];
+
+const STAT_LBL = {s:'방문예약',d:'방문완료',w:'일정대기',ls:'랑숭',vc:'비디오콜',none:'미진행',cl:'클로징'};
+const STAT_CLS = {s:'st-s',d:'st-d',w:'st-w',ls:'st-w',vc:'st-s',none:'st-none',cl:'st-cl'};
+
+let me = null;
+let curLead = null;
+let pickedStatus = null;
+let photos = [];
+let curFilter = 'all';
+
+// ===== 화면 전환 =====
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+
+// ===== 로그인 (mockup용 간단 검증) =====
+function login(){
+  const name = document.getElementById('i-name').value.trim();
+  const pin  = document.getElementById('i-pin').value.trim();
+  const err  = document.getElementById('login-err');
+  if(name.toLowerCase()==='devi' && pin==='1234'){
+    me = {name:'devi', display:'데비'};
+    err.classList.remove('on');
+    document.getElementById('greet').textContent = `안녕하세요, ${me.display}님`;
+    document.getElementById('today-meta').textContent = todayStr() + ' · 내 리드 12명';
+    renderList();
+    show('s-list');
+  } else {
+    err.classList.add('on');
+  }
+}
+function logout(){
+  if(confirm('로그아웃 할까요?')){ me=null; show('s-login'); }
+}
+
+function todayStr(){
+  const d=new Date(), w=['일','월','화','수','목','금','토'][d.getDay()];
+  return `${d.getMonth()+1}/${d.getDate()}(${w})`;
+}
+
+// ===== 리드 리스트 =====
+function renderList(){
+  const wrap = document.getElementById('lead-list');
+  const filtered = LEADS.filter(L => {
+    if(curFilter==='all') return true;
+    if(curFilter==='urg') return L.severity===3;
+    if(curFilter==='today') return L.tag==='today';
+    return L.status===curFilter;
+  });
+  wrap.innerHTML = filtered.map(L => `
+    <div class="lead ${L.tag==='urg'?'urg':L.tag==='today'?'tod':''}" onclick="openLead(${L.id})">
+      <div class="lead-top">
+        <div class="lead-name">${L.name}</div>
+        <div class="lead-sev sev-${L.severity===3?'h':L.severity===2?'m':'l'}">
+          ${L.severity===3?'🔴 긴급':L.severity===2?'🟡 주의':'🟢 양호'}
+        </div>
+      </div>
+      <div class="lead-meta">
+        <span>후원 <b>${L.sponsor}</b></span>
+        <span>배정 <b>${L.assigned}</b></span>
+        ${L.visit?`<span>방문 <b>${L.visit}</b></span>`:''}
+      </div>
+      <div class="lead-status">
+        <span class="status-pill ${STAT_CLS[L.status]}">${STAT_LBL[L.status]}</span>
+        <span style="color:#64748b;font-weight:700">${L.reason}</span>
+      </div>
+    </div>
+  `).join('');
+  if(filtered.length===0){
+    wrap.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#94a3b8;font-weight:700">조건에 맞는 리드가 없어요</div>`;
+  }
+}
+function filterLeads(btn, f){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+  curFilter = f;
+  renderList();
+}
+
+// ===== 디테일 =====
+function openLead(id){
+  curLead = LEADS.find(L => L.id===id);
+  pickedStatus = null;
+  photos = [];
+  renderDetail();
+  show('s-detail');
+}
+function renderDetail(){
+  const L = curLead;
+  document.getElementById('d-name').textContent = L.name;
+  document.getElementById('d-meta').textContent = `후원 ${L.sponsor} · 배정 ${L.assigned}`;
+  document.getElementById('d-pname').textContent = L.name;
+  document.getElementById('d-psub').textContent = `${STAT_LBL[L.status]} · ${L.reason}`;
+  document.getElementById('d-av').textContent = L.name.charAt(0);
+  document.getElementById('d-stage-badge').textContent = STAT_LBL[L.status];
+  document.getElementById('d-kv').innerHTML = `
+    <div class="k">후원자</div><div class="v">${L.sponsor}</div>
+    <div class="k">배정일</div><div class="v">${L.assigned}</div>
+    <div class="k">방문일</div><div class="v">${L.visit||'—'}</div>
+    <div class="k">현재 상태</div><div class="v">${STAT_LBL[L.status]}</div>
+  `;
+  document.getElementById('d-timeline').innerHTML = L.timeline.map(t => `
+    <div class="tl-row ${t.done?'done':t.now?'now':''}">
+      <div class="tl-dot"></div>
+      <div class="tl-body">
+        <div class="tl-when">${t.when||'—'}</div>
+        <div class="tl-what">${t.what}</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('d-memos').innerHTML = L.memos.length
+    ? L.memos.map(m => `<div class="memo"><div class="memo-when">${m.when}</div><div class="memo-text">${m.text}</div></div>`).join('')
+    : `<div style="color:#94a3b8;font-size:12.5px;font-weight:600;padding:6px 0">이전 메모 없음</div>`;
+  document.querySelectorAll('.status-opt').forEach(b=>b.classList.remove('on'));
+  document.getElementById('memo-input').value = '';
+  document.getElementById('photos').innerHTML = `
+    <label class="photo-add" for="photo-input"><span class="ico">📷</span><span>추가</span></label>`;
+  document.getElementById('photo-count').textContent = '0 / 5장';
+  document.getElementById('photo-input').value = '';
+}
+
+// ===== 폼 인터랙션 =====
+function pickStatus(btn){
+  document.querySelectorAll('.status-opt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  pickedStatus = btn.dataset.st;
+}
+
+function addPhotos(files){
+  for(const f of files){
+    if(photos.length>=5){ toast('⚠️','사진은 최대 5장까지'); break; }
+    const r = new FileReader();
+    r.onload = e => {
+      photos.push(e.target.result);
+      renderPhotos();
+    };
+    r.readAsDataURL(f);
+  }
+}
+function renderPhotos(){
+  const wrap = document.getElementById('photos');
+  wrap.innerHTML = photos.map((src,i) =>
+    `<div class="photo-thumb" style="background-image:url('${src}')">
+       <button class="photo-rm" onclick="rmPhoto(${i})">×</button>
+     </div>`
+  ).join('') + (photos.length<5
+    ? `<label class="photo-add" for="photo-input"><span class="ico">📷</span><span>추가</span></label>`
+    : '');
+  document.getElementById('photo-count').textContent = `${photos.length} / 5장`;
+}
+function rmPhoto(i){ photos.splice(i,1); renderPhotos(); }
+
+// ===== 제출 =====
+function submitVisit(){
+  const memo = document.getElementById('memo-input').value.trim();
+  if(!pickedStatus && photos.length===0 && !memo){
+    toast('⚠️','상태/사진/메모 중 하나는 입력해주세요');
+    return;
+  }
+  // mockup: 실제 API 호출 없이 콘솔에만 기록
+  const payload = {
+    agent: me.name,
+    lead_id: curLead.id,
+    lead_name: curLead.name,
+    new_status: pickedStatus,
+    memo: memo,
+    photo_count: photos.length,
+    submitted_at: new Date().toISOString(),
+  };
+  console.log('[MOCKUP 제출]', payload, '사진:', photos.length+'장');
+  toast('✅','저장됐어요! (mockup)');
+  setTimeout(()=>show('s-list'), 900);
+}
+
+// ===== 토스트 =====
+function toast(ico,msg){
+  const t = document.getElementById('toast');
+  t.querySelector('.ico').textContent = ico;
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>t.classList.remove('on'), 1600);
+}
+</script>
+</body>
+</html>
