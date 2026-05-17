@@ -1534,8 +1534,9 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .cohort-tbl th.cum{background:#7c2d12;border-left:3px solid #fb923c}
 .cohort-tbl th.eff{background:#312e81;border-left:3px solid #818cf8}
 /* 좌측 고정 컬럼 (배정월 + DB) — 폭 압축해서 한 묶음처럼 보이게 */
-.cohort-tbl th:first-child, .cohort-tbl td:first-child{width:78px;min-width:78px;padding-left:12px;padding-right:4px;white-space:nowrap}
-.cohort-tbl th:nth-child(2), .cohort-tbl td.db-col{width:80px;min-width:80px;padding-right:14px;border-right:2px solid #cbd5e1;background:#f8fafc;white-space:nowrap}
+.cohort-tbl th:first-child, .cohort-tbl td:first-child{width:90px;min-width:90px;padding-left:14px;padding-right:4px;white-space:nowrap}
+.cohort-tbl th:nth-child(2){width:110px;min-width:110px;padding-right:14px;background:#0c4a6e;color:#fef3c7;border-right:3px solid #f59e0b;font-size:13px;letter-spacing:-.3px}
+.cohort-tbl td.db-col{width:110px;min-width:110px;padding-right:16px;border-right:3px solid #f59e0b;background:#fffbeb;color:#7c2d12;font-weight:900;font-size:15.5px;white-space:nowrap;letter-spacing:-.3px}
 .cohort-tbl tfoot tr.sum-actual td.db-col, .cohort-tbl tfoot tr.sum-cum td.db-col, .cohort-tbl tfoot tr.sum-diag td.db-col, .cohort-tbl tfoot tr.sum-prev td.db-col{background:inherit}
 .cohort-tbl td{padding:8px 7px;border-bottom:1px solid #f1f5f9;vertical-align:middle;text-align:right;font-weight:800}
 .cohort-tbl td.L{text-align:left;padding-left:12px;color:#0f172a;font-size:13.5px}
@@ -1561,6 +1562,48 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .cohort-tbl tfoot tr.sum-prev td small{color:#854d0e;font-weight:700;font-size:10.5px}
 .cohort-tbl tfoot tr td.L{font-weight:900;font-size:13px;line-height:1.3}
 .cohort-tbl tfoot tr td.L small{font-size:10.5px;font-weight:600}
+.cohort-tbl tr.unmatched-row td{background:#fef3c7!important;border-top:2px dashed #f59e0b;border-bottom:2px dashed #f59e0b}
+.cohort-tbl tr.unmatched-row td.L b{color:#92400e;font-weight:900}
+
+/* 📌 자동 인사이트 박스 (재경 보고용) */
+.insight-box{margin:14px 18px 22px;padding:18px 20px;background:linear-gradient(135deg,#fef3c7 0%,#fef9c3 50%,#fffbeb 100%);border:2px solid #f59e0b;border-radius:14px;box-shadow:0 4px 12px rgba(245,158,11,.18)}
+.insight-title{font-size:16px;font-weight:900;color:#78350f;letter-spacing:-.4px;margin-bottom:12px}
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:14px}
+.insight-card{background:rgba(255,255,255,.85);padding:13px 16px;border-radius:10px;border-left:5px solid;backdrop-filter:blur(4px)}
+.insight-card.insight-prev{border-left-color:#f59e0b}
+.insight-card.insight-lag{border-left-color:#2563eb}
+.insight-card.insight-eff{border-left-color:#16a34a}
+.insight-card.insight-last{border-left-color:#dc2626}
+.insight-label{font-size:11.5px;font-weight:700;color:#64748b;letter-spacing:-.2px;text-transform:uppercase;margin-bottom:4px}
+.insight-value{font-size:28px;font-weight:900;color:#0f172a;letter-spacing:-.8px;line-height:1.1;margin-bottom:4px}
+.insight-card.insight-prev .insight-value{color:#d97706}
+.insight-card.insight-lag .insight-value{color:#1d4ed8}
+.insight-card.insight-eff .insight-value{color:#15803d}
+.insight-card.insight-last .insight-value{color:#b91c1c}
+.insight-desc{font-size:11.5px;color:#475569;font-weight:600;line-height:1.4}
+.insight-msg{padding:11px 14px;background:rgba(255,255,255,.65);border-radius:8px;font-size:13px;font-weight:600;color:#78350f;line-height:1.5;border:1px solid rgba(245,158,11,.4)}
+.insight-msg b{color:#92400e;font-weight:900}
+
+/* 📈 월별 추이 / 💳 결제 종류 / ⏱ lag — 공통 wrapper */
+.extra-section{margin:0 18px 22px;padding:16px 18px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.extra-hd{font-size:16px;font-weight:900;color:#0f172a;letter-spacing:-.4px;margin-bottom:4px}
+.extra-sub{font-size:12px;color:#64748b;font-weight:600;margin-bottom:14px;line-height:1.5}
+
+/* 월별 closing 추이 */
+.trend-wrap{display:flex;flex-direction:column;gap:5px}
+.trend-row{display:grid;grid-template-columns:70px 1fr 50px;gap:10px;align-items:center;padding:3px 0}
+.trend-mLbl{font-size:11.5px;font-weight:800;color:#64748b;letter-spacing:-.2px}
+.trend-barWrap{height:18px;background:#f1f5f9;border-radius:5px;overflow:hidden}
+.trend-bar{height:100%;border-radius:5px;transition:width .25s}
+.trend-val{font-size:13px;font-weight:900;color:#0f172a;text-align:right;letter-spacing:-.3px}
+
+/* 결제 종류 카드 */
+.pt-grid, .lag-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.pt-card, .lag-card{padding:12px 14px;background:#f8fafc;border-radius:10px;border-left:5px solid #94a3b8}
+.pt-name, .lag-name{font-size:12px;font-weight:700;color:#475569;letter-spacing:-.2px;margin-bottom:6px}
+.pt-val, .lag-val{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.pt-val b, .lag-val b{font-size:22px;font-weight:900;letter-spacing:-.5px}
+.pt-pct, .lag-pct{font-size:13px;font-weight:800;color:#64748b}
 /* 프리셋 버튼 (오늘 / 최근 N일 등) */
 .preset-btn{background:#fff;color:var(--c-navy);border:1.5px solid #cbd5e1;font-weight:700}
 .preset-btn:hover{background:var(--c-yellow-bg);border-color:var(--c-yellow)}
@@ -2114,6 +2157,24 @@ const LANG = {
     cohort_section_title:'DB 코호트 매트릭스 — 배정월 × 통장입금 결제월',
     cohort_section_sub:'결제일 = 통장입금일 (Buku Setoran Bank · CSV) · 배정월 = 시트 DB · 매칭 안 된 결제는 \"cohort 미상\" 행에 분리',
     cohort_unmatched:'cohort 미상 (DB 매칭 X)',
+    insight_box_title:'핵심 인사이트 — 재경 보고용 자동 요약',
+    insight_label_prev:'이전월 DB 기여율',
+    insight_label_lag:'배정 → 결제 평균 lag',
+    insight_label_eff:'전체 DB → 결제 효율',
+    insight_label_last:'당월 클로징',
+    insight_days:'일',
+    insight_desc_prev:'전체 {t}건 결제 중 {n}건이 이전 달 DB',
+    insight_desc_lag:'중간값 {med}일 — 우리 비즈니스의 본질적 lag',
+    insight_desc_eff:'DB {db}건 중 {cl}건 결제 완료',
+    insight_desc_last:'당월 DB {diag}건 + 이전월 기여 {prev}건',
+    insight_msg_title:'재경 보고 핵심 메시지',
+    insight_msg_body:'현재 매출의 <b>{p}%</b> 가 이전 달 배정 DB 에서 발생합니다 — "DB 관리 안한다" 가 아니라 "방문상담 비즈니스 특성상 lag 가 길 뿐" 이라는 직접 증거.',
+    trend_title:'월별 클로징 추이 (2024-11 ~ 현재)',
+    trend_sub:'월평균 {avg}건 · 회색=과거 / 파랑=현재 연도',
+    pt_title:'결제 종류 분포 (당해)',
+    pt_sub:'총 {n}건의 결제 종류별 비중',
+    lag_title:'배정 → 결제 lag 분포',
+    lag_sub:'평균 {avg}일 · 중간값 {med}일 · 매칭된 {n}건 기준',
     cohort_lg_diag:'■ 대각선 (즉시 전환)',
     cohort_lg_off:'■ 비대각선 (이전 달 DB · 늦게 클로징)',
     cohort_lg_pre:'■ 2024 이전 배정 cohort',
@@ -2359,6 +2420,24 @@ const LANG = {
     cohort_section_title:'Matriks Kohor DB — Bulan Alokasi × Bulan Setoran Bank',
     cohort_section_sub:'Tanggal Closing = Tgl Setoran Bank (Buku Setoran · CSV) · Bulan Alokasi = DB Sheet · Closing tanpa match DB → baris \"Kohor Tidak Match\"',
     cohort_unmatched:'Kohor Tidak Match (DB tidak ditemukan)',
+    insight_box_title:'Insight Utama — Ringkasan Otomatis Laporan Keuangan',
+    insight_label_prev:'Kontribusi DB Bulan Lalu',
+    insight_label_lag:'Rata-rata Lag Alokasi → Closing',
+    insight_label_eff:'Efisiensi DB → Closing',
+    insight_label_last:'Closing Bulan Ini',
+    insight_days:'hari',
+    insight_desc_prev:'Dari total {t} closing, {n} dari DB bulan lalu',
+    insight_desc_lag:'Median {med} hari — karakteristik bisnis kita',
+    insight_desc_eff:'Dari {db} DB, {cl} berhasil closing',
+    insight_desc_last:'DB bulan ini {diag} + Kontribusi bulan lalu {prev}',
+    insight_msg_title:'Pesan Inti Laporan Keuangan',
+    insight_msg_body:'<b>{p}%</b> omzet saat ini berasal dari DB yang dialokasikan bulan sebelumnya — Bukti langsung bahwa ini bukan "manajemen DB buruk", tapi karena bisnis konsultasi visit memang lag-nya panjang.',
+    trend_title:'Tren Closing Bulanan (2024-11 ~ Sekarang)',
+    trend_sub:'Rata-rata {avg}/bulan · Abu-abu=lampau / Biru=tahun ini',
+    pt_title:'Distribusi Jenis Pembayaran (Tahun ini)',
+    pt_sub:'Bobot jenis pembayaran dari total {n} closing',
+    lag_title:'Distribusi Lag Alokasi → Closing',
+    lag_sub:'Rata-rata {avg} hari · Median {med} hari · Berdasar {n} yang match',
     cohort_lg_diag:'■ Diagonal (Konversi Instan)',
     cohort_lg_off:'■ Non-Diagonal (DB Bulan Lalu · Closing Terlambat)',
     cohort_lg_pre:'■ Kohor alokasi sebelum 2024',
@@ -4759,13 +4838,166 @@ function renderAnalytics(){
     return h;
   };
 
-  let h = `<div class="cohort-section-hd">
+  // ─── 추가 분석: 월별 closing 추이 (2024-11 ~ 현재) ────────────
+  const trendByMonth = {};
+  csvClosings.forEach(c=>{
+    const m = c[0].slice(0,7);
+    if(m < '2024-11' || m > todayM) return;
+    trendByMonth[m] = (trendByMonth[m]||0) + 1;
+  });
+  const trendMonths = Object.keys(trendByMonth).sort();
+  const trendMax = Math.max(1, ...Object.values(trendByMonth));
+  const trendAvg = Math.round(Object.values(trendByMonth).reduce((s,v)=>s+v,0) / trendMonths.length);
+
+  // ─── 추가 분석: 결제 종류별 분포 (2026년만) ──────────────────
+  const ptDist = {};
+  csvClosings.forEach(c=>{
+    const m = c[0].slice(0,7);
+    if(m < yearStart || m > todayM) return;
+    const pt = c[5] || '미지정';
+    ptDist[pt] = (ptDist[pt]||0) + 1;
+  });
+  const ptTotal = Object.values(ptDist).reduce((s,v)=>s+v,0);
+  const ptSorted = Object.entries(ptDist).sort((a,b)=>b[1]-a[1]);
+
+  // ─── 추가 분석: 평균 lag (배정 → 결제) 매칭된 case 만 ─────────
+  const lags = [];
+  csvClosings.forEach(c=>{
+    const closeM = c[0].slice(0,7);
+    if(closeM < yearStart || closeM > todayM) return;
+    const r = recPairIdx[norm(c[2])+'|'+norm(c[4])] || recChildIdx[norm(c[2])];
+    if(!r || !r.ad) return;
+    const closeDate = new Date(c[0]);
+    const adDate = new Date(r.ad);
+    if(adDate > closeDate) return; // 비논리적
+    const days = Math.floor((closeDate - adDate)/86400000);
+    lags.push(days);
+  });
+  lags.sort((a,b)=>a-b);
+  const lagAvg = lags.length ? Math.round(lags.reduce((s,v)=>s+v,0) / lags.length) : 0;
+  const lagMed = lags.length ? lags[Math.floor(lags.length/2)] : 0;
+  const lagBuckets = {'당일(0)':0, '1주이내':0, '2주이내':0, '1개월이내':0, '2개월이내':0, '3개월+':0};
+  lags.forEach(d=>{
+    if(d===0) lagBuckets['당일(0)']++;
+    else if(d<=7) lagBuckets['1주이내']++;
+    else if(d<=14) lagBuckets['2주이내']++;
+    else if(d<=30) lagBuckets['1개월이내']++;
+    else if(d<=60) lagBuckets['2개월이내']++;
+    else lagBuckets['3개월+']++;
+  });
+
+  // ─── 자동 인사이트 메시지 생성 ─────────────────────────────
+  const totalCohort = cohort.TOTAL;
+  let totalActualSum = 0, totalDiagSum = 0, totalDb = 0;
+  monthsList.forEach(m => {
+    totalDb += dbCount[m].TOTAL || 0;
+    totalDiagSum += (totalCohort[m] && totalCohort[m][m]) || 0;
+    let colSum = unmatched[m] || 0;
+    monthsList.forEach(cm => { colSum += (totalCohort[cm] && totalCohort[cm][m]) || 0; });
+    totalActualSum += colSum;
+  });
+  const prevContribPct = totalActualSum ? Math.round((totalActualSum - totalDiagSum) / totalActualSum * 100) : 0;
+  const overallEff = totalDb ? (totalActualSum / totalDb * 100).toFixed(1) : 0;
+  const matchPct = (matchCnt + unmatchCnt) ? Math.round(matchCnt / (matchCnt + unmatchCnt) * 100) : 0;
+  const lastM = monthsList[monthsList.length-1];
+  const lastMLbl = (D.mlabels && D.mlabels[lastM]) || lastM;
+  const lastColTotal = (function(){
+    let s = unmatched[lastM]||0;
+    monthsList.forEach(cm=>{ s+=(totalCohort[cm] && totalCohort[cm][lastM])||0; });
+    return s;
+  })();
+  const lastDiag = (totalCohort[lastM] && totalCohort[lastM][lastM]) || 0;
+  const lastPrev = lastColTotal - lastDiag;
+
+  let h = `
+  <!-- 📌 자동 인사이트 박스 (재경 보고용) -->
+  <div class="insight-box">
+    <div class="insight-title">📌 ${T('insight_box_title')}</div>
+    <div class="insight-grid">
+      <div class="insight-card insight-prev">
+        <div class="insight-label">${T('insight_label_prev')}</div>
+        <div class="insight-value">${prevContribPct}%</div>
+        <div class="insight-desc">${T('insight_desc_prev').replace('{n}', String(totalActualSum - totalDiagSum)).replace('{t}', String(totalActualSum))}</div>
+      </div>
+      <div class="insight-card insight-lag">
+        <div class="insight-label">${T('insight_label_lag')}</div>
+        <div class="insight-value">${lagAvg}${T('insight_days')}</div>
+        <div class="insight-desc">${T('insight_desc_lag').replace('{med}', String(lagMed))}</div>
+      </div>
+      <div class="insight-card insight-eff">
+        <div class="insight-label">${T('insight_label_eff')}</div>
+        <div class="insight-value">${overallEff}%</div>
+        <div class="insight-desc">${T('insight_desc_eff').replace('{cl}', String(totalActualSum)).replace('{db}', f(totalDb))}</div>
+      </div>
+      <div class="insight-card insight-last">
+        <div class="insight-label">${lastMLbl} ${T('insight_label_last')}</div>
+        <div class="insight-value">${lastColTotal}</div>
+        <div class="insight-desc">${T('insight_desc_last').replace('{diag}', String(lastDiag)).replace('{prev}', String(lastPrev))}</div>
+      </div>
+    </div>
+    <div class="insight-msg">
+      💡 <b>${T('insight_msg_title')}</b>: ${T('insight_msg_body').replace('{p}', String(prevContribPct))}
+    </div>
+  </div>
+
+  <div class="cohort-section-hd">
     <div class="cohort-section-title">📐 ${T('cohort_section_title')}</div>
     <div class="cohort-section-sub">${T('cohort_section_sub')}</div>
   </div>`;
   h += buildCohortTable('OFF',   T('alyt_off_label'),   '#a855f7', '#faf5ff');
   h += buildCohortTable('MKT',   T('alyt_mkt_label'),   '#0891b2', '#ecfeff');
   h += buildCohortTable('TOTAL', T('alyt_total_label'), '#1e3a8a', '#eff6ff');
+
+  // 📈 월별 closing 추이 (2024-11 ~ 현재)
+  h += `<div class="extra-section">
+    <div class="extra-hd">📈 ${T('trend_title')}</div>
+    <div class="extra-sub">${T('trend_sub').replace('{avg}', String(trendAvg))}</div>
+    <div class="trend-wrap">`;
+  trendMonths.forEach(m=>{
+    const v = trendByMonth[m];
+    const pct = Math.round(v/trendMax*100);
+    const isCurYr = m >= yearStart;
+    const barColor = isCurYr ? '#2563eb' : '#94a3b8';
+    h += `<div class="trend-row">
+      <div class="trend-mLbl">${m}</div>
+      <div class="trend-barWrap"><div class="trend-bar" style="width:${pct}%;background:${barColor}"></div></div>
+      <div class="trend-val">${f(v)}</div>
+    </div>`;
+  });
+  h += `</div></div>`;
+
+  // 💳 결제 종류 분포 (2026년)
+  h += `<div class="extra-section">
+    <div class="extra-hd">💳 ${T('pt_title')}</div>
+    <div class="extra-sub">${T('pt_sub').replace('{n}', String(ptTotal))}</div>
+    <div class="pt-grid">`;
+  const ptColors = ['#7c3aed','#0891b2','#16a34a','#d97706','#dc2626','#9333ea','#64748b','#0369a1'];
+  ptSorted.forEach((entry, i)=>{
+    const [pt, cnt] = entry;
+    const pct = Math.round(cnt/ptTotal*1000)/10;
+    h += `<div class="pt-card" style="border-left:5px solid ${ptColors[i%ptColors.length]}">
+      <div class="pt-name">${pt||'미지정'}</div>
+      <div class="pt-val"><b style="color:${ptColors[i%ptColors.length]}">${f(cnt)}</b><span class="pt-pct">${pct}%</span></div>
+    </div>`;
+  });
+  h += `</div></div>`;
+
+  // ⏱ 배정 → 결제 lag 분포
+  const lagTotal = Object.values(lagBuckets).reduce((s,v)=>s+v,0);
+  h += `<div class="extra-section">
+    <div class="extra-hd">⏱ ${T('lag_title')}</div>
+    <div class="extra-sub">${T('lag_sub').replace('{avg}', String(lagAvg)).replace('{med}', String(lagMed)).replace('{n}', String(lagTotal))}</div>
+    <div class="lag-grid">`;
+  const lagColors = ['#16a34a','#22c55e','#84cc16','#eab308','#f97316','#dc2626'];
+  Object.entries(lagBuckets).forEach((entry, i)=>{
+    const [k, v] = entry;
+    const pct = lagTotal ? Math.round(v/lagTotal*100) : 0;
+    h += `<div class="lag-card" style="border-left:5px solid ${lagColors[i]}">
+      <div class="lag-name">${k}</div>
+      <div class="lag-val"><b style="color:${lagColors[i]}">${f(v)}</b><span class="lag-pct">${pct}%</span></div>
+    </div>`;
+  });
+  h += `</div></div>`;
 
   wrap.innerHTML = h;
 }
