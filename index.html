@@ -1526,11 +1526,16 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .cohort-title{font-size:15.5px;font-weight:900;letter-spacing:-.3px;margin-bottom:3px}
 .cohort-sub{font-size:11.5px;color:#64748b;font-weight:600}
 .cohort-wrap{overflow-x:auto}
-.cohort-tbl{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:auto}
+.cohort-tbl{width:100%;min-width:920px;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed}
+/* 모든 closing 월 컬럼 동일 폭 강제 — 표끼리 시각적 alignment 통일 */
+.cohort-tbl th:not(:first-child):not(:nth-child(2)):not(.cum):not(.eff),
+.cohort-tbl td:not(:first-child):not(.db-col):not(.cum):not(.eff){width:55px;min-width:55px;max-width:55px}
 .cohort-tbl th{background:#1e293b;color:#fff;padding:6px 5px;font-weight:800;letter-spacing:-.2px;font-size:11.5px;text-align:center;border-bottom:none;line-height:1.25}
 .cohort-tbl th.L{text-align:left;padding-left:12px}
 .cohort-tbl th.R{text-align:right;padding-right:8px}
 .cohort-tbl th small{font-weight:700;color:#94a3b8;font-size:10px}
+.cohort-tbl th.cum, .cohort-tbl td.cum{width:90px;min-width:90px;max-width:90px}
+.cohort-tbl th.eff, .cohort-tbl td.eff{width:75px;min-width:75px;max-width:75px}
 .cohort-tbl th.cum{background:#7c2d12;border-left:3px solid #fb923c}
 .cohort-tbl th.eff{background:#312e81;border-left:3px solid #818cf8}
 /* 좌측 고정 컬럼 (배정월 + DB) — 폭 압축해서 한 묶음처럼 보이게 */
