@@ -68,6 +68,17 @@ function doPost(e){
   try {
     const body = e.postData ? e.postData.contents : '{}';
     const payload = JSON.parse(body);
+    const action = payload && payload.action;
+
+    // WINK 에이전트 앱 (agent.html) — action 으로 라우팅
+    if(typeof action === 'string' && action.indexOf('wink:') === 0){
+      const result = wink_handle_(action.slice(5), payload);
+      return ContentService
+        .createTextOutput(JSON.stringify({ok:true, ...result}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 레거시: 대시보드 일일 보고서 누적
     const result = writeAgentReport(payload);
     return ContentService
       .createTextOutput(JSON.stringify({ok:true, ...result}))
@@ -857,4 +868,228 @@ function sendTestReport_(agentNameQuery, toEmail) {
   });
   Logger.log('✅ 테스트 메일 발송 완료 → ' + toEmail);
   return {ok: true, agent: agentName, to: toEmail, today, stats};
+}
+
+// ════════════════════════════════════════════════════════════════
+//  🔥 WINK 에이전트 모바일 웹앱 — 백엔드
+// ════════════════════════════════════════════════════════════════
+//
+// 역할:
+//  - agent.html (모바일 웹) 에서 fetch POST 요청을 받음
+//  - 에이전트 인증 (이름 + PIN)
+//  - 에이전트별 리드 리스트 조회
+//  - 방문 결과 입력 (사진은 Drive, 메타데이터는 시트)
+//
+// 시트 자동 생성 (첫 호출 시):
+//  - _wink_agents : name | pin | display_name | active
+//  - _wink_leads  : agent | id | name | sponsor | assigned | visit | status | reason | severity
+//  - _wink_visits : submitted_at | agent | lead_id | lead_name | new_status | memo | photo_urls
+//
+// 같이 자동 생성되는 Drive 폴더: "WINK_사진" (스크립트 소유자의 마이드라이브 루트)
+// ────────────────────────────────────────────────────────────────
+
+const WINK_CFG = {
+  SPREADSHEET_ID: SPREADSHEET_ID,        // 같은 시트 사용 (탭만 추가)
+  DRIVE_FOLDER_NAME: 'WINK_사진',         // Drive 폴더 이름 (자동 생성)
+  TAB_AGENTS: '_wink_agents',
+  TAB_LEADS:  '_wink_leads',
+  TAB_VISITS: '_wink_visits',
+};
+
+const WINK_HEADERS = {
+  agents: ['name','pin','display_name','active'],
+  leads:  ['agent','id','name','sponsor','assigned','visit','status','reason','severity'],
+  visits: ['submitted_at','agent','lead_id','lead_name','new_status','memo','photo_count','photo_urls'],
+};
+
+// 첫 사용 시 자동 채우는 샘플 데이터 (테스트용)
+const WINK_SEED_AGENTS = [
+  ['devi',  '1234', '데비',  true],
+  ['siti',  '5678', '시티',  true],
+  ['rina',  '9999', '리나',  true],
+];
+const WINK_SEED_LEADS = [
+  ['devi', 'L001', '박지영', '김민수', '05/10', '05/17', 's',  '오늘 13시 방문예정',     3],
+  ['devi', 'L002', '최영호', '이수진', '05/08', '05/14', 'd',  '방문 후 3일 미입력',     3],
+  ['devi', 'L003', '한미경', '박철수', '05/05', '',     'none','배정 7일 경과 · 미접촉', 3],
+  ['devi', 'L004', '조성민', '김민수', '05/12', '05/17', 's',  '오늘 16시 방문',         2],
+  ['devi', 'L005', '정수영', '이수진', '05/03', '05/09', 'ls', '랑숭 진행중',            2],
+  ['devi', 'L006', '윤재현', '박철수', '05/14', '',     'w',  '일정 조율 중',            1],
+  ['devi', 'L007', '서지훈', '김민수', '05/06', '05/13', 'd',  '재방문 일정 중',          1],
+  ['devi', 'L008', '노유진', '이수진', '04/28', '05/05', 'cl', '클로징 완료',             1],
+  ['siti', 'L101', '김민지', '박철수', '05/11', '05/17', 's',  '오늘 방문',               3],
+  ['siti', 'L102', '이성준', '김민수', '05/09', '',     'w',  '연락 안 됨 3일',          2],
+];
+
+// ───── 액션 라우터 ─────
+function wink_handle_(action, payload){
+  switch(action){
+    case 'login':  return wink_login_(payload);
+    case 'leads':  return wink_leads_(payload);
+    case 'submit': return wink_submit_(payload);
+    case 'ping':   return {pong:true, ver: '1.0'};
+    default: throw new Error('알 수 없는 action: wink:' + action);
+  }
+}
+
+// ───── 로그인 ─────
+function wink_login_(p){
+  const name = String(p.name||'').trim().toLowerCase();
+  const pin  = String(p.pin||'').trim();
+  if(!name || !pin) throw new Error('이름과 PIN을 입력하세요');
+
+  const sh = wink_sheet_(WINK_CFG.TAB_AGENTS, WINK_HEADERS.agents, WINK_SEED_AGENTS);
+  const rows = sh.getDataRange().getValues();
+  for(let i = 1; i < rows.length; i++){
+    const rName    = String(rows[i][0]||'').trim().toLowerCase();
+    const rPin     = String(rows[i][1]||'').trim();
+    const rDisplay = String(rows[i][2]||'').trim();
+    const rActive  = rows[i][3];
+    if(rName === name && rPin === pin){
+      if(rActive === false || rActive === 'FALSE' || rActive === 'false'){
+        throw new Error('비활성 계정입니다. 관리자에게 문의하세요');
+      }
+      return {name: rName, display: rDisplay || rName};
+    }
+  }
+  throw new Error('이름 또는 PIN이 맞지 않아요');
+}
+
+// ───── 리드 리스트 ─────
+function wink_leads_(p){
+  const agent = String(p.agent||'').trim().toLowerCase();
+  if(!agent) throw new Error('agent 누락');
+  const sh = wink_sheet_(WINK_CFG.TAB_LEADS, WINK_HEADERS.leads, WINK_SEED_LEADS);
+  const rows = sh.getDataRange().getValues();
+  const leads = [];
+  for(let i = 1; i < rows.length; i++){
+    const r = rows[i];
+    if(String(r[0]||'').trim().toLowerCase() !== agent) continue;
+    leads.push({
+      agent:    String(r[0]||''),
+      id:       String(r[1]||''),
+      name:     String(r[2]||''),
+      sponsor:  String(r[3]||''),
+      assigned: String(r[4]||''),
+      visit:    String(r[5]||''),
+      status:   String(r[6]||'none'),
+      reason:   String(r[7]||''),
+      severity: Number(r[8]||1),
+    });
+  }
+  // 정렬: 긴급(severity 3) → 오늘 → 나머지
+  const today = wink_today_();
+  leads.sort((a,b)=>{
+    const aT = a.visit === today ? 1 : 0;
+    const bT = b.visit === today ? 1 : 0;
+    if(b.severity !== a.severity) return b.severity - a.severity;
+    if(bT !== aT) return bT - aT;
+    return 0;
+  });
+  return {leads};
+}
+
+// ───── 방문 결과 제출 ─────
+function wink_submit_(p){
+  const agent     = String(p.agent||'').trim().toLowerCase();
+  const lead_id   = String(p.lead_id||'').trim();
+  const lead_name = String(p.lead_name||'').trim();
+  const new_st    = String(p.new_status||'').trim();
+  const memo      = String(p.memo||'').trim();
+  const photos    = Array.isArray(p.photos) ? p.photos : [];
+  if(!agent || !lead_id) throw new Error('agent 또는 lead_id 누락');
+  if(!new_st && photos.length === 0 && !memo){
+    throw new Error('상태·사진·메모 중 하나는 있어야 해요');
+  }
+
+  // 사진을 Drive에 저장
+  const folder = wink_folder_();
+  const urls = [];
+  const tz = Session.getScriptTimeZone() || 'Asia/Jakarta';
+  const stamp = Utilities.formatDate(new Date(), tz, 'yyyyMMdd_HHmmss');
+  for(let i = 0; i < photos.length && i < 5; i++){
+    const dataUrl = photos[i];
+    const m = /^data:(image\/[a-z+]+);base64,(.+)$/i.exec(String(dataUrl));
+    if(!m) continue;
+    const bytes = Utilities.base64Decode(m[2]);
+    const ext   = (m[1].split('/')[1] || 'jpg').replace('jpeg','jpg');
+    const blob  = Utilities.newBlob(bytes, m[1], `${stamp}_${agent}_${lead_id}_${i+1}.${ext}`);
+    const file  = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    urls.push(file.getUrl());
+  }
+
+  // 시트에 기록
+  const sh = wink_sheet_(WINK_CFG.TAB_VISITS, WINK_HEADERS.visits, []);
+  sh.appendRow([
+    Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd HH:mm:ss'),
+    agent, lead_id, lead_name, new_st, memo,
+    urls.length, urls.join('\n'),
+  ]);
+
+  // 새 상태가 있으면 리드 시트도 업데이트
+  if(new_st){
+    wink_update_lead_status_(agent, lead_id, new_st);
+  }
+
+  return {
+    photo_count: urls.length,
+    photo_urls: urls,
+    saved_to: WINK_CFG.TAB_VISITS,
+  };
+}
+
+function wink_update_lead_status_(agent, lead_id, new_status){
+  const sh = wink_sheet_(WINK_CFG.TAB_LEADS, WINK_HEADERS.leads, []);
+  const range = sh.getDataRange();
+  const rows = range.getValues();
+  for(let i = 1; i < rows.length; i++){
+    if(String(rows[i][0]||'').trim().toLowerCase() === agent &&
+       String(rows[i][1]||'').trim() === lead_id){
+      sh.getRange(i+1, 7).setValue(new_status);   // status 컬럼 = 7번째
+      return;
+    }
+  }
+}
+
+// ───── 헬퍼 ─────
+function wink_sheet_(name, headers, seedRows){
+  const ss = SpreadsheetApp.openById(WINK_CFG.SPREADSHEET_ID);
+  let sh = ss.getSheetByName(name);
+  if(!sh){
+    sh = ss.insertSheet(name);
+    sh.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sh.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#0f172a').setFontColor('#fff');
+    sh.setFrozenRows(1);
+    if(seedRows && seedRows.length){
+      sh.getRange(2, 1, seedRows.length, headers.length).setValues(seedRows);
+    }
+  }
+  return sh;
+}
+
+function wink_folder_(){
+  const it = DriveApp.getFoldersByName(WINK_CFG.DRIVE_FOLDER_NAME);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(WINK_CFG.DRIVE_FOLDER_NAME);
+}
+
+function wink_today_(){
+  const tz = Session.getScriptTimeZone() || 'Asia/Jakarta';
+  return Utilities.formatDate(new Date(), tz, 'MM/dd');
+}
+
+// ───── 초기 설치 도우미 (GAS 콘솔에서 1번만 실행하면 시트가 만들어짐) ─────
+function wink_setup(){
+  wink_sheet_(WINK_CFG.TAB_AGENTS, WINK_HEADERS.agents, WINK_SEED_AGENTS);
+  wink_sheet_(WINK_CFG.TAB_LEADS,  WINK_HEADERS.leads,  WINK_SEED_LEADS);
+  wink_sheet_(WINK_CFG.TAB_VISITS, WINK_HEADERS.visits, []);
+  const folder = wink_folder_();
+  Logger.log('✅ WINK 초기 설치 완료');
+  Logger.log('   · 스프레드시트: ' + SpreadsheetApp.openById(WINK_CFG.SPREADSHEET_ID).getUrl());
+  Logger.log('   · 사진 폴더:    ' + folder.getUrl());
+  Logger.log('');
+  Logger.log('테스트 로그인:');
+  Logger.log('   · devi / 1234');
+  Logger.log('   · siti / 5678');
+  Logger.log('   · rina / 9999');
 }

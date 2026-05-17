@@ -2,519 +2,594 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#1e3a8a">
-<title>WINK 에이전트</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>WINK</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f0ede8;color:#0f172a;font-size:15px;line-height:1.4;overflow-x:hidden}
-button{font-family:inherit;cursor:pointer;border:none;background:none}
-input,textarea,select{font-family:inherit;font-size:inherit}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#faf8f5;color:#0f172a;font-size:16px;line-height:1.4;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font-family:inherit;font-size:inherit;border:none;outline:none;background:none}
+button{cursor:pointer}
 
-/* ===== 공통 ===== */
-.app{max-width:480px;margin:0 auto;min-height:100vh;background:#f0ede8;display:flex;flex-direction:column;position:relative}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative;padding-bottom:env(safe-area-inset-bottom)}
 .screen{display:none;flex:1;flex-direction:column}
 .screen.on{display:flex}
-.hdr{background:linear-gradient(135deg,#0a0a1a,#1a1a2e,#2d1b4e,#0f3460);color:#fff;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-.hdr-title{font-size:17px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:8px}
-.hdr-flame{font-size:20px;filter:drop-shadow(0 0 8px #fbbf24)}
-.hdr-meta{font-size:11px;color:#cbd5e1;font-weight:700}
-.hdr-back{font-size:22px;color:#fff;padding:4px 8px;margin-left:-8px}
 
-/* ===== 로그인 ===== */
-.login{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 28px;background:linear-gradient(180deg,#0a0a1a 0%,#1a1a2e 30%,#2d1b4e 70%,#0f3460 100%);color:#fff;min-height:100vh}
-.login-brand{text-align:center;margin-bottom:48px}
-.login-flame{font-size:56px;filter:drop-shadow(0 0 20px #fbbf24);margin-bottom:12px}
-.login-title{font-size:32px;font-weight:900;letter-spacing:-.8px;background:linear-gradient(135deg,#fff 0%,#fde68a 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
-.login-sub{font-size:13px;color:#cbd5e1;font-weight:600}
+/* ─── 헤더 ─── */
+.hdr{padding:18px 22px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#faf8f5;position:sticky;top:0;z-index:10}
+.hdr-back{font-size:24px;color:#0f172a;padding:6px 10px 6px 0;margin-left:-10px;font-weight:300}
+.hdr-title{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.hdr-sub{font-size:12.5px;color:#94a3b8;font-weight:700;margin-top:2px}
+.hdr-right{font-size:13px;color:#94a3b8;font-weight:700;padding:6px 10px}
+
+/* ═════════ Screen 1: 로그인 ═════════ */
+.login{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 32px;min-height:100vh;background:#faf8f5}
+.login-brand{text-align:center;margin-bottom:56px}
+.login-logo{width:80px;height:80px;background:#0f172a;border-radius:24px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;color:#fbbf24;font-size:34px;box-shadow:0 8px 24px rgba(15,23,42,.15)}
+.login-name{font-size:34px;font-weight:900;letter-spacing:-1px;color:#0f172a;line-height:1}
+.login-tag{font-size:13px;color:#94a3b8;font-weight:700;margin-top:10px;letter-spacing:.2px}
 .login-form{display:flex;flex-direction:column;gap:14px}
-.login-field{display:flex;flex-direction:column;gap:6px}
-.login-label{font-size:12px;font-weight:800;color:#cbd5e1;letter-spacing:.3px;padding-left:4px}
-.login-input{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);color:#fff;padding:14px 16px;border-radius:12px;font-size:16px;font-weight:700;outline:none;transition:all .15s}
-.login-input::placeholder{color:rgba(255,255,255,.4);font-weight:500}
-.login-input:focus{background:rgba(255,255,255,.12);border-color:#fbbf24}
-.login-btn{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0a1a;padding:16px;border-radius:12px;font-size:16px;font-weight:900;letter-spacing:-.3px;margin-top:8px;box-shadow:0 4px 14px rgba(251,191,36,.3)}
+.login-input{background:#fff;border:1.5px solid #e8e3dc;color:#0f172a;padding:18px 20px;border-radius:16px;font-size:16px;font-weight:700;transition:all .15s;box-shadow:0 1px 2px rgba(0,0,0,.02)}
+.login-input::placeholder{color:#cbd5e1;font-weight:500}
+.login-input:focus{border-color:#0f172a;box-shadow:0 0 0 4px rgba(15,23,42,.06)}
+.login-btn{background:#0f172a;color:#fff;padding:20px;border-radius:16px;font-size:17px;font-weight:800;letter-spacing:-.3px;margin-top:10px;transition:all .12s;box-shadow:0 4px 14px rgba(15,23,42,.18)}
 .login-btn:active{transform:scale(.98)}
-.login-hint{font-size:11px;color:#94a3b8;text-align:center;margin-top:18px;font-weight:600;line-height:1.6}
-.login-err{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5;padding:10px 14px;border-radius:8px;font-size:12.5px;font-weight:700;text-align:center;display:none}
+.login-btn:disabled{background:#cbd5e1;box-shadow:none}
+.login-err{background:#fef2f2;color:#dc2626;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:700;text-align:center;display:none}
 .login-err.on{display:block}
+.login-hint{font-size:12px;color:#cbd5e1;text-align:center;margin-top:20px;font-weight:600;line-height:1.7}
 
-/* ===== 리드 리스트 ===== */
-.list-summary{background:#fff;padding:14px 18px;border-bottom:1.5px solid #e5e7eb;display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.kpi{flex:0 0 auto;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:8px 14px;min-width:75px;text-align:center}
-.kpi-n{font-size:18px;font-weight:900;color:#0f172a;letter-spacing:-.5px;line-height:1}
-.kpi-l{font-size:10.5px;font-weight:800;color:#64748b;margin-top:4px;letter-spacing:-.1px}
-.kpi.urg{background:#fef2f2;border-color:#fecaca}
-.kpi.urg .kpi-n{color:#dc2626}
-.kpi.urg .kpi-l{color:#991b1b}
-.kpi.tod{background:#fef9c3;border-color:#fde047}
-.kpi.tod .kpi-n{color:#a16207}
-.kpi.tod .kpi-l{color:#854d0e}
+/* ═════════ Screen 2: 오늘 할 일 ═════════ */
+.home-greet{padding:8px 22px 18px}
+.home-hi{font-size:14px;color:#94a3b8;font-weight:700;margin-bottom:4px}
+.home-cnt{font-size:30px;font-weight:900;letter-spacing:-.8px;color:#0f172a;line-height:1.1}
+.home-cnt b{color:#dc2626}
 
-.filter-bar{background:#fff;padding:10px 18px;border-bottom:1.5px solid #e5e7eb;display:flex;gap:6px;overflow-x:auto}
-.chip{flex:0 0 auto;background:#f1f5f9;border:1.5px solid #cbd5e1;color:#475569;font-size:12.5px;font-weight:800;padding:6px 13px;border-radius:18px;letter-spacing:-.2px}
-.chip.on{background:#1e3a8a;color:#fff;border-color:#1e3a8a}
+.tab-bar{padding:0 22px;display:flex;gap:8px;margin-bottom:14px}
+.tab{flex:1;background:#fff;border:1.5px solid #e8e3dc;color:#64748b;font-size:13px;font-weight:800;padding:10px 0;border-radius:12px;letter-spacing:-.2px}
+.tab.on{background:#0f172a;color:#fff;border-color:#0f172a}
 
-.list{flex:1;overflow-y:auto;padding:12px 14px 100px;display:flex;flex-direction:column;gap:10px}
-.lead{background:#fff;border:1.5px solid #e5e7eb;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;transition:transform .12s}
-.lead:active{transform:scale(.98)}
-.lead.urg{border-left:4px solid #dc2626}
-.lead.tod{border-left:4px solid #f59e0b;background:#fffbeb}
-.lead-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-.lead-name{font-size:16px;font-weight:900;color:#0f172a;letter-spacing:-.3px}
-.lead-sev{font-size:11px;font-weight:900;padding:3px 8px;border-radius:6px;letter-spacing:-.2px;white-space:nowrap}
-.sev-h{background:#fef2f2;color:#dc2626}
-.sev-m{background:#fef9c3;color:#a16207}
-.sev-l{background:#f0fdf4;color:#16a34a}
-.lead-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:#64748b;font-weight:700}
-.lead-meta b{color:#0f172a;font-weight:800}
-.lead-status{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px dashed #e5e7eb;font-size:12px}
-.status-pill{font-size:11px;font-weight:900;padding:4px 9px;border-radius:6px;letter-spacing:-.2px}
+.list{flex:1;padding:0 16px 90px;display:flex;flex-direction:column;gap:10px}
+.lead{background:#fff;border:1.5px solid #f0eae0;border-radius:18px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:transform .12s;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.lead:active{transform:scale(.985)}
+.lead-av{width:48px;height:48px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#92400e;flex-shrink:0}
+.lead-av.urg{background:#fee2e2;color:#dc2626}
+.lead-av.ok{background:#dcfce7;color:#16a34a}
+.lead-mid{flex:1;min-width:0}
+.lead-name{font-size:17px;font-weight:900;color:#0f172a;letter-spacing:-.3px;line-height:1.2}
+.lead-reason{font-size:12.5px;color:#94a3b8;font-weight:700;margin-top:3px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead-status{font-size:11px;font-weight:900;padding:5px 10px;border-radius:8px;letter-spacing:-.2px;flex-shrink:0}
 .st-s{background:#dbeafe;color:#1e40af}
 .st-d{background:#dcfce7;color:#166534}
 .st-w{background:#fef3c7;color:#92400e}
-.st-none{background:#f1f5f9;color:#475569}
+.st-ls{background:#ede9fe;color:#6d28d9}
+.st-vc{background:#cffafe;color:#0e7490}
 .st-cl{background:#fae8ff;color:#86198f}
-.lead-dday{font-weight:900;color:#dc2626;font-size:13px}
-.lead-dday.ok{color:#16a34a}
+.st-none{background:#f1f5f9;color:#64748b}
+.st-x{background:#fee2e2;color:#991b1b}
+.lead-arrow{font-size:18px;color:#cbd5e1;flex-shrink:0;font-weight:300}
 
-.fab{position:fixed;bottom:20px;right:50%;transform:translateX(220px);background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;width:56px;height:56px;border-radius:50%;font-size:26px;font-weight:900;box-shadow:0 6px 20px rgba(30,58,138,.4);display:flex;align-items:center;justify-content:center;z-index:50}
-@media(max-width:480px){.fab{transform:none;right:20px}}
+.empty{padding:60px 30px;text-align:center;color:#94a3b8;font-weight:700;font-size:14px}
+.empty-ico{font-size:48px;margin-bottom:12px;opacity:.4}
 
-/* ===== 디테일 / 입력 ===== */
-.detail{flex:1;overflow-y:auto;padding-bottom:140px}
-.card{background:#fff;margin:12px 14px;border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1.5px solid #e5e7eb}
-.card-h{font-size:11px;font-weight:900;color:#64748b;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.card-h .badge{font-size:10.5px;background:#1e3a8a;color:#fff;padding:2px 8px;border-radius:10px;letter-spacing:-.1px}
+/* ═════════ Screen 3: 입력 ═════════ */
+.form{flex:1;padding:0 22px 120px}
+.form-who{background:#fff;border-radius:20px;padding:20px 22px;margin-bottom:18px;border:1.5px solid #f0eae0;display:flex;align-items:center;gap:14px}
+.form-who-av{width:54px;height:54px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#92400e}
+.form-who-info{flex:1}
+.form-who-name{font-size:20px;font-weight:900;letter-spacing:-.3px}
+.form-who-sub{font-size:12px;color:#94a3b8;font-weight:700;margin-top:2px}
 
-.profile{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.profile-av{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#0a0a1a;flex-shrink:0}
-.profile-info{flex:1;min-width:0}
-.profile-name{font-size:20px;font-weight:900;letter-spacing:-.4px}
-.profile-sub{font-size:12px;color:#64748b;font-weight:700;margin-top:2px}
+.section{margin-bottom:24px}
+.section-h{font-size:13px;font-weight:900;color:#475569;letter-spacing:-.2px;margin-bottom:12px;padding-left:4px;display:flex;justify-content:space-between;align-items:center}
+.section-h .cnt{color:#94a3b8;font-size:11.5px;font-weight:700}
 
-.kv{display:grid;grid-template-columns:90px 1fr;gap:6px 12px;font-size:13px}
-.kv .k{color:#64748b;font-weight:700}
-.kv .v{color:#0f172a;font-weight:800}
+/* 상태 4개 큰 버튼 */
+.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.status-opt{background:#fff;border:2px solid #f0eae0;border-radius:16px;padding:18px 12px;font-size:14.5px;font-weight:900;color:#475569;text-align:center;letter-spacing:-.3px;transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:6px}
+.status-opt:active{transform:scale(.97)}
+.status-opt .ico{font-size:24px}
+.status-opt.on{color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.status-opt.on[data-st="d"]{background:#16a34a}
+.status-opt.on[data-st="s"]{background:#1e40af}
+.status-opt.on[data-st="w"]{background:#d97706}
+.status-opt.on[data-st="x"]{background:#dc2626}
 
-.timeline{display:flex;flex-direction:column;gap:10px;margin-top:4px}
-.tl-row{display:flex;gap:10px;align-items:flex-start}
-.tl-dot{width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-top:6px;flex-shrink:0;position:relative}
-.tl-row.done .tl-dot{background:#16a34a}
-.tl-row.now .tl-dot{background:#1e3a8a;box-shadow:0 0 0 4px rgba(30,58,138,.2)}
-.tl-body{flex:1;font-size:13px}
-.tl-when{font-size:11px;color:#64748b;font-weight:700;margin-bottom:1px}
-.tl-what{color:#0f172a;font-weight:700;line-height:1.45}
+/* 사진 그리드 */
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photo-add{aspect-ratio:1;background:#fff;border:2px dashed #cbd5e1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#94a3b8;font-size:11.5px;font-weight:800;gap:4px}
+.photo-add .ico{font-size:28px;font-weight:300}
+.photo-thumb{aspect-ratio:1;border-radius:14px;background-size:cover;background-position:center;position:relative;border:1.5px solid #e8e3dc}
+.photo-rm{position:absolute;top:-6px;right:-6px;width:24px;height:24px;background:#0f172a;color:#fff;border-radius:50%;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 
-.memos{display:flex;flex-direction:column;gap:8px}
-.memo{background:#f8fafc;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}
-.memo-when{font-size:10.5px;color:#64748b;font-weight:800;margin-bottom:3px}
-.memo-text{color:#0f172a;font-weight:600}
+/* 메모 */
+.memo-box{width:100%;background:#fff;border:1.5px solid #f0eae0;border-radius:16px;padding:16px 18px;font-size:15px;font-weight:600;color:#0f172a;line-height:1.55;resize:none;min-height:100px;transition:border-color .15s}
+.memo-box:focus{border-color:#0f172a}
+.memo-box::placeholder{color:#cbd5e1;font-weight:500}
 
-/* ===== 입력 폼 ===== */
-.form-card{background:#fff;margin:12px 14px;border-radius:14px;padding:16px 18px;border:2px solid #fbbf24;box-shadow:0 4px 14px rgba(251,191,36,.15)}
-.form-title{font-size:14px;font-weight:900;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;gap:6px;letter-spacing:-.3px}
-
-.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.status-opt{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 6px;font-size:12px;font-weight:900;color:#475569;text-align:center;letter-spacing:-.2px;transition:all .12s}
-.status-opt:active{transform:scale(.96)}
-.status-opt.on{color:#fff}
-.status-opt.on[data-st="s"]{background:#1e40af;border-color:#1e40af}
-.status-opt.on[data-st="d"]{background:#166534;border-color:#166534}
-.status-opt.on[data-st="w"]{background:#92400e;border-color:#92400e}
-.status-opt.on[data-st="ls"]{background:#7c3aed;border-color:#7c3aed}
-.status-opt.on[data-st="vc"]{background:#0891b2;border-color:#0891b2}
-.status-opt.on[data-st="cl"]{background:#86198f;border-color:#86198f}
-
-.photos{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.photo-add{width:84px;height:84px;background:#f1f5f9;border:2px dashed #94a3b8;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#64748b;font-size:11px;font-weight:800;gap:4px;letter-spacing:-.2px}
-.photo-add .ico{font-size:22px}
-.photo-thumb{width:84px;height:84px;border-radius:10px;background-size:cover;background-position:center;position:relative;border:1.5px solid #e5e7eb}
-.photo-rm{position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:#dc2626;color:#fff;border-radius:50%;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-.photo-count{font-size:11.5px;color:#64748b;font-weight:700;margin-bottom:14px}
-
-.memo-input{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 14px;font-size:14px;font-weight:600;color:#0f172a;line-height:1.5;resize:none;outline:none;min-height:80px;transition:border-color .15s}
-.memo-input:focus{border-color:#1e3a8a;background:#fff}
-.memo-input::placeholder{color:#94a3b8;font-weight:500}
-
-.submit-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid #e5e7eb;padding:12px 14px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -4px 14px rgba(0,0,0,.05);z-index:40}
-.submit-bar-inner{max-width:480px;margin:0 auto}
-.submit-btn{width:100%;background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;padding:15px;border-radius:12px;font-size:16px;font-weight:900;letter-spacing:-.3px;box-shadow:0 4px 14px rgba(30,58,138,.3);display:flex;align-items:center;justify-content:center;gap:6px}
+/* 제출 바 */
+.submit-bar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,rgba(250,248,245,0) 0%,#faf8f5 24%);padding:30px 22px calc(20px + env(safe-area-inset-bottom));z-index:40;pointer-events:none}
+.submit-bar-inner{max-width:480px;margin:0 auto;pointer-events:auto}
+.submit-btn{width:100%;background:#0f172a;color:#fff;padding:20px;border-radius:18px;font-size:17px;font-weight:900;letter-spacing:-.3px;transition:all .12s;box-shadow:0 8px 28px rgba(15,23,42,.25);display:flex;align-items:center;justify-content:center;gap:8px}
 .submit-btn:active{transform:scale(.98)}
-.submit-btn:disabled{background:#cbd5e1;color:#94a3b8;box-shadow:none}
+.submit-btn:disabled{background:#cbd5e1;color:#fff;box-shadow:none}
+.submit-btn .spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(15,23,42,.95);color:#fff;padding:20px 28px;border-radius:14px;font-size:15px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 40px rgba(0,0,0,.3);opacity:0;transition:all .25s;pointer-events:none;z-index:100}
+/* 토스트 */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(15,23,42,.96);color:#fff;padding:22px 30px;border-radius:18px;font-size:15px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:12px;box-shadow:0 14px 50px rgba(0,0,0,.3);opacity:0;transition:all .22s;pointer-events:none;z-index:200;max-width:80%}
 .toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .toast .ico{font-size:24px}
+
+/* 로딩 */
+.loading{position:fixed;inset:0;background:rgba(250,248,245,.85);display:none;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(6px)}
+.loading.on{display:flex}
+.loading-spin{width:48px;height:48px;border:4px solid #e8e3dc;border-top-color:#0f172a;border-radius:50%;animation:spin .7s linear infinite}
+
+/* 설정 모달 */
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:flex-end;z-index:180;backdrop-filter:blur(4px)}
+.modal.on{display:flex}
+.modal-card{background:#faf8f5;width:100%;max-width:480px;margin:0 auto;border-radius:24px 24px 0 0;padding:28px 24px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow-y:auto}
+.modal-h{font-size:18px;font-weight:900;margin-bottom:6px;letter-spacing:-.4px}
+.modal-sub{font-size:12.5px;color:#94a3b8;font-weight:700;margin-bottom:18px;line-height:1.5}
+.modal-input{width:100%;background:#fff;border:1.5px solid #e8e3dc;padding:14px 16px;border-radius:12px;font-size:13.5px;font-weight:600;color:#0f172a;margin-bottom:14px;word-break:break-all}
+.modal-btns{display:flex;gap:10px;margin-top:8px}
+.modal-btn{flex:1;padding:15px;border-radius:14px;font-size:14.5px;font-weight:800;letter-spacing:-.2px}
+.modal-btn.pri{background:#0f172a;color:#fff}
+.modal-btn.sec{background:#fff;border:1.5px solid #e8e3dc;color:#475569}
 </style>
 </head>
 <body>
+
+<!-- 🔧 환경설정: WEBHOOK_URL은 첫 사용 시 화면에서 입력하거나 여기에 하드코딩 -->
+
 <div class="app">
 
-<!-- ============ Screen 1: 로그인 ============ -->
+<!-- ════════ Screen 1: 로그인 ════════ -->
 <div class="screen on" id="s-login">
   <div class="login">
     <div class="login-brand">
-      <div class="login-flame">🔥</div>
-      <div class="login-title">WINK</div>
-      <div class="login-sub">에이전트 전용 · 모바일</div>
+      <div class="login-logo">🔥</div>
+      <div class="login-name">WINK</div>
+      <div class="login-tag">에이전트 · Agent</div>
     </div>
     <div class="login-form">
-      <div class="login-err" id="login-err">이름 또는 PIN이 맞지 않아요</div>
-      <div class="login-field">
-        <div class="login-label">이름</div>
-        <input class="login-input" id="i-name" placeholder="devi" autocomplete="off">
-      </div>
-      <div class="login-field">
-        <div class="login-label">PIN (4자리)</div>
-        <input class="login-input" id="i-pin" type="tel" inputmode="numeric" maxlength="4" placeholder="••••">
-      </div>
-      <button class="login-btn" onclick="login()">시작하기</button>
-      <div class="login-hint">PIN은 관리자에게 받으세요<br>· · ·<br>이 mockup: 이름 <b>devi</b> / PIN <b>1234</b></div>
+      <div class="login-err" id="login-err"></div>
+      <input class="login-input" id="i-name" placeholder="이름 / Nama" autocomplete="off" autocapitalize="off">
+      <input class="login-input" id="i-pin" type="tel" inputmode="numeric" maxlength="6" placeholder="PIN">
+      <button class="login-btn" id="login-btn" onclick="login()">시작하기</button>
+      <div class="login-hint" id="login-hint">PIN은 관리자에게 받으세요</div>
+    </div>
+    <div style="position:absolute;top:20px;right:20px">
+      <button onclick="openSettings()" style="font-size:20px;color:#cbd5e1;padding:8px">⚙</button>
     </div>
   </div>
 </div>
 
-<!-- ============ Screen 2: 리드 리스트 ============ -->
-<div class="screen" id="s-list">
+<!-- ════════ Screen 2: 오늘 할 일 ════════ -->
+<div class="screen" id="s-home">
   <div class="hdr">
     <div>
-      <div class="hdr-title"><span class="hdr-flame">🔥</span><span id="greet">안녕하세요</span></div>
-      <div class="hdr-meta" id="today-meta">오늘 · 내 리드</div>
+      <div class="hdr-title" id="h-greet">안녕하세요</div>
+      <div class="hdr-sub" id="h-date">—</div>
     </div>
-    <button class="hdr-back" onclick="logout()" title="로그아웃">⎋</button>
+    <button class="hdr-right" onclick="logout()">로그아웃</button>
   </div>
 
-  <div class="list-summary">
-    <div class="kpi urg"><div class="kpi-n">3</div><div class="kpi-l">긴급</div></div>
-    <div class="kpi tod"><div class="kpi-n">2</div><div class="kpi-l">오늘 방문</div></div>
-    <div class="kpi"><div class="kpi-n">8</div><div class="kpi-l">진행중</div></div>
-    <div class="kpi"><div class="kpi-n">12</div><div class="kpi-l">전체</div></div>
+  <div class="home-greet">
+    <div class="home-hi">오늘 할 일</div>
+    <div class="home-cnt"><b id="h-todo-cnt">0</b>건 남았어요</div>
   </div>
 
-  <div class="filter-bar">
-    <button class="chip on" onclick="filterLeads(this,'all')">전체</button>
-    <button class="chip" onclick="filterLeads(this,'urg')">🔴 긴급</button>
-    <button class="chip" onclick="filterLeads(this,'today')">📅 오늘</button>
-    <button class="chip" onclick="filterLeads(this,'none')">미진행</button>
-    <button class="chip" onclick="filterLeads(this,'s')">방문예약</button>
+  <div class="tab-bar">
+    <button class="tab on" data-tab="today" onclick="switchTab(this)">📅 오늘</button>
+    <button class="tab" data-tab="urgent" onclick="switchTab(this)">🔴 긴급</button>
+    <button class="tab" data-tab="all" onclick="switchTab(this)">전체</button>
   </div>
 
   <div class="list" id="lead-list"></div>
-  <button class="fab" onclick="alert('새 리드 추가 — Phase 2')" title="새 리드">+</button>
 </div>
 
-<!-- ============ Screen 3: 디테일 + 입력 ============ -->
-<div class="screen" id="s-detail">
+<!-- ════════ Screen 3: 방문 입력 ════════ -->
+<div class="screen" id="s-form">
   <div class="hdr">
-    <div style="display:flex;align-items:center;gap:6px">
-      <button class="hdr-back" onclick="show('s-list')">←</button>
-      <div>
-        <div class="hdr-title" id="d-name">회원명</div>
-        <div class="hdr-meta" id="d-meta">상세</div>
-      </div>
+    <button class="hdr-back" onclick="goHome()">←</button>
+    <div style="flex:1">
+      <div class="hdr-title">방문 결과</div>
+      <div class="hdr-sub">한 화면에서 끝</div>
     </div>
   </div>
 
-  <div class="detail">
-    <!-- 프로필 -->
-    <div class="card">
-      <div class="profile">
-        <div class="profile-av" id="d-av">?</div>
-        <div class="profile-info">
-          <div class="profile-name" id="d-pname">—</div>
-          <div class="profile-sub" id="d-psub">—</div>
-        </div>
+  <div class="form">
+    <!-- 회원 정보 -->
+    <div class="form-who">
+      <div class="form-who-av" id="f-av">?</div>
+      <div class="form-who-info">
+        <div class="form-who-name" id="f-name">—</div>
+        <div class="form-who-sub" id="f-sub">—</div>
       </div>
-      <div class="kv" id="d-kv"></div>
     </div>
 
-    <!-- 진행 단계 -->
-    <div class="card">
-      <div class="card-h">진행 단계 <span class="badge" id="d-stage-badge">진행중</span></div>
-      <div class="timeline" id="d-timeline"></div>
-    </div>
-
-    <!-- 이전 메모 -->
-    <div class="card">
-      <div class="card-h">이전 메모</div>
-      <div class="memos" id="d-memos"></div>
-    </div>
-
-    <!-- ▶ 방문 결과 입력 (핵심!) -->
-    <div class="form-card">
-      <div class="form-title">📝 오늘 방문 결과</div>
-
-      <!-- 상태 변경 -->
-      <div style="font-size:11px;font-weight:900;color:#64748b;letter-spacing:.5px;margin-bottom:8px">진행 상태 변경</div>
-      <div class="status-grid" id="status-grid">
-        <button class="status-opt" data-st="s" onclick="pickStatus(this)">📅 방문예약</button>
-        <button class="status-opt" data-st="d" onclick="pickStatus(this)">✅ 방문완료</button>
-        <button class="status-opt" data-st="ls" onclick="pickStatus(this)">🏢 랑숭</button>
-        <button class="status-opt" data-st="vc" onclick="pickStatus(this)">📹 비디오콜</button>
-        <button class="status-opt" data-st="w" onclick="pickStatus(this)">⏳ 일정대기</button>
-        <button class="status-opt" data-st="cl" onclick="pickStatus(this)">🎉 클로징</button>
+    <!-- 결과 (상태) -->
+    <div class="section">
+      <div class="section-h">결과는요?</div>
+      <div class="status-grid">
+        <button class="status-opt" data-st="d" onclick="pickStatus(this)"><span class="ico">✅</span><span>방문완료</span></button>
+        <button class="status-opt" data-st="s" onclick="pickStatus(this)"><span class="ico">📅</span><span>방문예약</span></button>
+        <button class="status-opt" data-st="w" onclick="pickStatus(this)"><span class="ico">⏳</span><span>일정대기</span></button>
+        <button class="status-opt" data-st="x" onclick="pickStatus(this)"><span class="ico">❌</span><span>취소/거절</span></button>
       </div>
+    </div>
 
-      <!-- 사진 -->
-      <div style="font-size:11px;font-weight:900;color:#64748b;letter-spacing:.5px;margin-bottom:8px">사진 (최대 5장)</div>
+    <!-- 사진 -->
+    <div class="section">
+      <div class="section-h">사진 <span class="cnt" id="ph-cnt">0 / 5</span></div>
       <div class="photos" id="photos">
         <label class="photo-add" for="photo-input">
-          <span class="ico">📷</span><span>추가</span>
+          <span class="ico">+</span><span>사진</span>
         </label>
       </div>
-      <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="addPhotos(this.files)">
-      <div class="photo-count" id="photo-count">0 / 5장</div>
-
-      <!-- 메모 -->
-      <div style="font-size:11px;font-weight:900;color:#64748b;letter-spacing:.5px;margin-bottom:8px">메모</div>
-      <textarea class="memo-input" id="memo-input" placeholder="오늘 방문에서 있었던 일을 짧게 적어주세요"></textarea>
+      <input type="file" id="photo-input" accept="image/*" multiple capture="environment" style="display:none" onchange="addPhotos(this.files)">
     </div>
 
-    <div style="height:20px"></div>
+    <!-- 메모 -->
+    <div class="section">
+      <div class="section-h">메모 (선택)</div>
+      <textarea class="memo-box" id="memo-input" placeholder="한 줄로 짧게 적어도 좋아요"></textarea>
+    </div>
   </div>
 
   <div class="submit-bar">
     <div class="submit-bar-inner">
       <button class="submit-btn" id="submit-btn" onclick="submitVisit()">
-        <span>💾</span><span>제출하기</span>
+        <span id="sb-ico">💾</span>
+        <span id="sb-txt">제출하기</span>
       </button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"><span class="ico">✅</span><span id="toast-msg">저장됐어요!</span></div>
+<!-- 토스트 / 로딩 / 모달 -->
+<div class="toast" id="toast"><span class="ico" id="t-ico">✅</span><span id="t-msg">—</span></div>
+<div class="loading" id="loading"><div class="loading-spin"></div></div>
+
+<div class="modal" id="settings-modal">
+  <div class="modal-card">
+    <div class="modal-h">⚙ 서버 주소 설정</div>
+    <div class="modal-sub">Google Apps Script 웹앱 URL을 입력하세요.<br>관리자가 처음 한 번만 설정하면 됩니다.</div>
+    <input class="modal-input" id="m-url" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="modal-btns">
+      <button class="modal-btn sec" onclick="closeSettings()">취소</button>
+      <button class="modal-btn pri" onclick="saveSettings()">저장</button>
+    </div>
+  </div>
+</div>
 
 </div><!-- /.app -->
 
 <script>
-// ===== mock 데이터 =====
-const LEADS = [
-  {id:1, name:'박지영', sponsor:'김민수', assigned:'05/10', visit:'05/17', status:'s', dday:0, severity:3, reason:'오늘 방문예정 · 13시', tag:'today',
-   timeline:[
-     {when:'05/10',what:'DB 배정',done:true},
-     {when:'05/12',what:'1차 상담 통화 — 관심 있음',done:true},
-     {when:'05/17',what:'현장 방문 예약 (13시)',now:true}],
-   memos:[
-     {when:'05/12 14:30',text:'전화 잘 받으심. 이번 주 토요일 방문 가능하다고 함. 직장이 자카르타 시내라 퇴근 후 가능.'},
-     {when:'05/10 10:15',text:'DB 배정. 후원자 김민수 통해 소개받음.'}]},
-  {id:2, name:'최영호', sponsor:'이수진', assigned:'05/08', visit:'05/14', status:'d', dday:3, severity:3, reason:'방문 후 3일 미입력', tag:'urg',
-   timeline:[
-     {when:'05/08',what:'DB 배정',done:true},
-     {when:'05/11',what:'전화 상담',done:true},
-     {when:'05/14',what:'현장 방문 완료',done:true},
-     {when:'',what:'(다음 단계 미입력)',now:true}],
-   memos:[{when:'05/14 17:00',text:'방문 완료. 부인과 같이 보러 옴. 가격 부담된다고 함.'}]},
-  {id:3, name:'한미경', sponsor:'박철수', assigned:'05/05', visit:'', status:'none', dday:7, severity:3, reason:'배정 7일 경과 · 미접촉', tag:'urg',
-   timeline:[{when:'05/05',what:'DB 배정',done:true},{when:'',what:'(아직 접촉 안 됨)',now:true}], memos:[]},
-  {id:4, name:'조성민', sponsor:'김민수', assigned:'05/12', visit:'05/17', status:'s', dday:0, severity:2, reason:'오늘 방문 (16시)', tag:'today',
-   timeline:[
-     {when:'05/12',what:'DB 배정',done:true},
-     {when:'05/13',what:'카톡 상담',done:true},
-     {when:'05/17',what:'현장 방문 (16시)',now:true}], memos:[{when:'05/13 11:20',text:'카톡으로 자료 보내드림. 토요일 오후 가능.'}]},
-  {id:5, name:'정수영', sponsor:'이수진', assigned:'05/03', visit:'05/09', status:'ls', dday:0, severity:2, reason:'랑숭 진행중', tag:'ls',
-   timeline:[
-     {when:'05/03',what:'DB 배정',done:true},
-     {when:'05/06',what:'전화 상담',done:true},
-     {when:'05/09',what:'랑숭 진행',now:true}], memos:[{when:'05/09 15:00',text:'사무실 방문. 계약서 검토 중.'}]},
-  {id:6, name:'윤재현', sponsor:'박철수', assigned:'05/14', visit:'', status:'w', dday:0, severity:1, reason:'일정 조율 중', tag:'w',
-   timeline:[{when:'05/14',what:'DB 배정',done:true},{when:'05/15',what:'1차 통화 — 일정대기',now:true}], memos:[]},
-  {id:7, name:'서지훈', sponsor:'김민수', assigned:'05/06', visit:'05/13', status:'d', dday:0, severity:1, reason:'재방문 일정 중', tag:'d',
-   timeline:[{when:'05/06',what:'DB 배정',done:true},{when:'05/13',what:'1차 방문 완료',now:true}],
-   memos:[{when:'05/13 18:00',text:'관심 있음. 다음 주 재방문 일정 조율 중.'}]},
-  {id:8, name:'노유진', sponsor:'이수진', assigned:'04/28', visit:'05/05', status:'cl', dday:0, severity:1, reason:'클로징 완료 🎉', tag:'cl',
-   timeline:[
-     {when:'04/28',what:'DB 배정',done:true},
-     {when:'05/02',what:'상담',done:true},
-     {when:'05/05',what:'방문',done:true},
-     {when:'05/15',what:'클로징 완료 🎉',done:true}], memos:[{when:'05/15 14:00',text:'계약 완료!'}]},
-];
+// ═════════════════════════════════════════════
+//  WINK 에이전트 앱 (테스트 버전)
+// ═════════════════════════════════════════════
 
-const STAT_LBL = {s:'방문예약',d:'방문완료',w:'일정대기',ls:'랑숭',vc:'비디오콜',none:'미진행',cl:'클로징'};
-const STAT_CLS = {s:'st-s',d:'st-d',w:'st-w',ls:'st-w',vc:'st-s',none:'st-none',cl:'st-cl'};
+const APP_VERSION = '0.1.0-test';
+const LS = {
+  url: 'wink_url',
+  session: 'wink_session',
+};
 
-let me = null;
+let me = null;            // {name, display}
+let leads = [];           // 서버에서 받은 내 리드들
 let curLead = null;
 let pickedStatus = null;
-let photos = [];
-let curFilter = 'all';
+let photos = [];          // [{dataUrl, name}]
+let curTab = 'today';
 
-// ===== 화면 전환 =====
+// ───── 화면 전환 ─────
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   window.scrollTo(0,0);
 }
 
-// ===== 로그인 (mockup용 간단 검증) =====
-function login(){
+// ───── 초기화 ─────
+(function init(){
+  // 저장된 세션 복구
+  try {
+    const sess = JSON.parse(localStorage.getItem(LS.session) || 'null');
+    if(sess && sess.name){
+      me = sess;
+      gotoHome();
+      return;
+    }
+  } catch(e){}
+  show('s-login');
+})();
+
+// ───── 서버 통신 ─────
+function getUrl(){
+  return localStorage.getItem(LS.url) || '';
+}
+async function api(action, payload){
+  const url = getUrl();
+  if(!url){
+    openSettings();
+    throw new Error('서버 주소가 설정되지 않았어요. ⚙ 버튼으로 설정하세요.');
+  }
+  // GAS는 사전요청(preflight)을 안 받음 → text/plain 으로 보내야 CORS 통과
+  const res = await fetch(url, {
+    method:'POST',
+    redirect:'follow',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action, ...payload}),
+  });
+  if(!res.ok) throw new Error('서버 오류 ('+res.status+')');
+  const j = await res.json();
+  if(!j.ok) throw new Error(j.error || '서버에서 거부했어요');
+  return j;
+}
+
+// ───── 로그인 ─────
+async function login(){
   const name = document.getElementById('i-name').value.trim();
   const pin  = document.getElementById('i-pin').value.trim();
   const err  = document.getElementById('login-err');
-  if(name.toLowerCase()==='devi' && pin==='1234'){
-    me = {name:'devi', display:'데비'};
-    err.classList.remove('on');
-    document.getElementById('greet').textContent = `안녕하세요, ${me.display}님`;
-    document.getElementById('today-meta').textContent = todayStr() + ' · 내 리드 12명';
-    renderList();
-    show('s-list');
-  } else {
+  err.classList.remove('on');
+  if(!name || !pin){
+    err.textContent = '이름과 PIN을 모두 입력해주세요';
     err.classList.add('on');
+    return;
+  }
+  setLoading(true);
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = '확인 중...';
+  try {
+    const r = await api('wink:login', {name, pin});
+    me = {name: r.name, display: r.display || r.name};
+    localStorage.setItem(LS.session, JSON.stringify(me));
+    document.getElementById('i-pin').value = '';
+    await gotoHome();
+  } catch(e){
+    err.textContent = e.message || '로그인 실패';
+    err.classList.add('on');
+  } finally {
+    setLoading(false);
+    btn.disabled = false;
+    btn.textContent = '시작하기';
   }
 }
 function logout(){
-  if(confirm('로그아웃 할까요?')){ me=null; show('s-login'); }
+  if(!confirm('로그아웃 할까요?')) return;
+  localStorage.removeItem(LS.session);
+  me = null; leads = []; curLead = null;
+  show('s-login');
 }
 
-function todayStr(){
-  const d=new Date(), w=['일','월','화','수','목','금','토'][d.getDay()];
-  return `${d.getMonth()+1}/${d.getDate()}(${w})`;
-}
-
-// ===== 리드 리스트 =====
-function renderList(){
-  const wrap = document.getElementById('lead-list');
-  const filtered = LEADS.filter(L => {
-    if(curFilter==='all') return true;
-    if(curFilter==='urg') return L.severity===3;
-    if(curFilter==='today') return L.tag==='today';
-    return L.status===curFilter;
-  });
-  wrap.innerHTML = filtered.map(L => `
-    <div class="lead ${L.tag==='urg'?'urg':L.tag==='today'?'tod':''}" onclick="openLead(${L.id})">
-      <div class="lead-top">
-        <div class="lead-name">${L.name}</div>
-        <div class="lead-sev sev-${L.severity===3?'h':L.severity===2?'m':'l'}">
-          ${L.severity===3?'🔴 긴급':L.severity===2?'🟡 주의':'🟢 양호'}
-        </div>
-      </div>
-      <div class="lead-meta">
-        <span>후원 <b>${L.sponsor}</b></span>
-        <span>배정 <b>${L.assigned}</b></span>
-        ${L.visit?`<span>방문 <b>${L.visit}</b></span>`:''}
-      </div>
-      <div class="lead-status">
-        <span class="status-pill ${STAT_CLS[L.status]}">${STAT_LBL[L.status]}</span>
-        <span style="color:#64748b;font-weight:700">${L.reason}</span>
-      </div>
-    </div>
-  `).join('');
-  if(filtered.length===0){
-    wrap.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#94a3b8;font-weight:700">조건에 맞는 리드가 없어요</div>`;
+// ───── 홈 (리드 리스트) ─────
+async function gotoHome(){
+  show('s-home');
+  document.getElementById('h-greet').textContent = `안녕하세요, ${me.display}님`;
+  document.getElementById('h-date').textContent = todayStr();
+  document.getElementById('lead-list').innerHTML = `<div class="empty"><div class="empty-ico">⏳</div>리드를 불러오는 중...</div>`;
+  document.getElementById('h-todo-cnt').textContent = '...';
+  try {
+    const r = await api('wink:leads', {agent: me.name});
+    leads = r.leads || [];
+    renderLeads();
+  } catch(e){
+    document.getElementById('lead-list').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div>${escapeHtml(e.message)}<br><br><button class="login-btn" style="padding:12px 20px;font-size:13px" onclick="gotoHome()">다시 시도</button></div>`;
+    document.getElementById('h-todo-cnt').textContent = '?';
   }
 }
-function filterLeads(btn, f){
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+
+function switchTab(btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
-  curFilter = f;
-  renderList();
+  curTab = btn.dataset.tab;
+  renderLeads();
 }
 
-// ===== 디테일 =====
+function renderLeads(){
+  const list = document.getElementById('lead-list');
+  const today = todayKey();
+  let filtered = leads.slice();
+  if(curTab === 'today'){
+    filtered = filtered.filter(L => L.visit === today || L.severity >= 3);
+  } else if(curTab === 'urgent'){
+    filtered = filtered.filter(L => L.severity >= 3);
+  }
+  document.getElementById('h-todo-cnt').textContent = filtered.length;
+
+  if(filtered.length === 0){
+    list.innerHTML = `<div class="empty"><div class="empty-ico">🎉</div>${curTab==='today'?'오늘 할 일이 없어요!':curTab==='urgent'?'긴급 항목 없음':'리드가 없어요'}</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map((L,i) => {
+    const avClass = L.severity>=3?'urg':L.status==='cl'?'ok':'';
+    const stClass = 'st-' + (L.status || 'none');
+    const stLbl = STAT_LBL[L.status] || '미진행';
+    return `
+      <div class="lead" onclick="openLead('${escapeAttr(L.id)}')">
+        <div class="lead-av ${avClass}">${escapeHtml(L.name.charAt(0))}</div>
+        <div class="lead-mid">
+          <div class="lead-name">${escapeHtml(L.name)}</div>
+          <div class="lead-reason">${escapeHtml(L.reason || L.sponsor || '—')}</div>
+        </div>
+        <div class="lead-status ${stClass}">${stLbl}</div>
+        <div class="lead-arrow">›</div>
+      </div>`;
+  }).join('');
+}
+
+const STAT_LBL = {s:'예약',d:'방문',w:'대기',ls:'랑숭',vc:'비디오',none:'미진행',cl:'클로',x:'취소'};
+
+// ───── 디테일/입력 ─────
 function openLead(id){
-  curLead = LEADS.find(L => L.id===id);
+  curLead = leads.find(L => String(L.id) === String(id));
+  if(!curLead) return;
   pickedStatus = null;
   photos = [];
-  renderDetail();
-  show('s-detail');
-}
-function renderDetail(){
-  const L = curLead;
-  document.getElementById('d-name').textContent = L.name;
-  document.getElementById('d-meta').textContent = `후원 ${L.sponsor} · 배정 ${L.assigned}`;
-  document.getElementById('d-pname').textContent = L.name;
-  document.getElementById('d-psub').textContent = `${STAT_LBL[L.status]} · ${L.reason}`;
-  document.getElementById('d-av').textContent = L.name.charAt(0);
-  document.getElementById('d-stage-badge').textContent = STAT_LBL[L.status];
-  document.getElementById('d-kv').innerHTML = `
-    <div class="k">후원자</div><div class="v">${L.sponsor}</div>
-    <div class="k">배정일</div><div class="v">${L.assigned}</div>
-    <div class="k">방문일</div><div class="v">${L.visit||'—'}</div>
-    <div class="k">현재 상태</div><div class="v">${STAT_LBL[L.status]}</div>
-  `;
-  document.getElementById('d-timeline').innerHTML = L.timeline.map(t => `
-    <div class="tl-row ${t.done?'done':t.now?'now':''}">
-      <div class="tl-dot"></div>
-      <div class="tl-body">
-        <div class="tl-when">${t.when||'—'}</div>
-        <div class="tl-what">${t.what}</div>
-      </div>
-    </div>
-  `).join('');
-  document.getElementById('d-memos').innerHTML = L.memos.length
-    ? L.memos.map(m => `<div class="memo"><div class="memo-when">${m.when}</div><div class="memo-text">${m.text}</div></div>`).join('')
-    : `<div style="color:#94a3b8;font-size:12.5px;font-weight:600;padding:6px 0">이전 메모 없음</div>`;
+  document.getElementById('f-name').textContent = curLead.name;
+  document.getElementById('f-sub').textContent =
+    [curLead.sponsor ? '후원 '+curLead.sponsor : '', curLead.assigned ? '배정 '+curLead.assigned : '', curLead.visit ? '방문 '+curLead.visit : ''].filter(Boolean).join(' · ') || '—';
+  document.getElementById('f-av').textContent = curLead.name.charAt(0);
   document.querySelectorAll('.status-opt').forEach(b=>b.classList.remove('on'));
   document.getElementById('memo-input').value = '';
-  document.getElementById('photos').innerHTML = `
-    <label class="photo-add" for="photo-input"><span class="ico">📷</span><span>추가</span></label>`;
-  document.getElementById('photo-count').textContent = '0 / 5장';
-  document.getElementById('photo-input').value = '';
+  renderPhotos();
+  show('s-form');
 }
 
-// ===== 폼 인터랙션 =====
+function goHome(){
+  if(pickedStatus || photos.length || document.getElementById('memo-input').value.trim()){
+    if(!confirm('입력 중인 내용이 있어요. 정말 돌아갈까요?')) return;
+  }
+  show('s-home');
+}
+
 function pickStatus(btn){
   document.querySelectorAll('.status-opt').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   pickedStatus = btn.dataset.st;
 }
 
-function addPhotos(files){
+// ───── 사진 처리 (자동 리사이즈) ─────
+async function addPhotos(files){
   for(const f of files){
-    if(photos.length>=5){ toast('⚠️','사진은 최대 5장까지'); break; }
-    const r = new FileReader();
-    r.onload = e => {
-      photos.push(e.target.result);
+    if(photos.length >= 5){ toast('⚠️','사진은 최대 5장까지'); break; }
+    try {
+      const resized = await resizeImage(f, 1600, 0.85);
+      photos.push({dataUrl: resized, name: f.name});
       renderPhotos();
-    };
-    r.readAsDataURL(f);
+    } catch(e){
+      toast('⚠️','사진 처리 실패: ' + (e.message||''));
+    }
   }
+  document.getElementById('photo-input').value = '';
 }
+
+function resizeImage(file, maxDim, quality){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const fr = new FileReader();
+    fr.onerror = () => reject(new Error('파일 읽기 실패'));
+    fr.onload = e => {
+      img.onerror = () => reject(new Error('이미지 디코드 실패'));
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if(w > maxDim || h > maxDim){
+          if(w >= h){ h = Math.round(h * maxDim / w); w = maxDim; }
+          else      { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
 function renderPhotos(){
   const wrap = document.getElementById('photos');
-  wrap.innerHTML = photos.map((src,i) =>
-    `<div class="photo-thumb" style="background-image:url('${src}')">
-       <button class="photo-rm" onclick="rmPhoto(${i})">×</button>
+  wrap.innerHTML = photos.map((p,i) =>
+    `<div class="photo-thumb" style="background-image:url('${p.dataUrl}')">
+       <button class="photo-rm" onclick="rmPhoto(${i})" aria-label="삭제">×</button>
      </div>`
   ).join('') + (photos.length<5
-    ? `<label class="photo-add" for="photo-input"><span class="ico">📷</span><span>추가</span></label>`
+    ? `<label class="photo-add" for="photo-input"><span class="ico">+</span><span>사진</span></label>`
     : '');
-  document.getElementById('photo-count').textContent = `${photos.length} / 5장`;
+  document.getElementById('ph-cnt').textContent = `${photos.length} / 5`;
 }
 function rmPhoto(i){ photos.splice(i,1); renderPhotos(); }
 
-// ===== 제출 =====
-function submitVisit(){
+// ───── 제출 ─────
+async function submitVisit(){
   const memo = document.getElementById('memo-input').value.trim();
-  if(!pickedStatus && photos.length===0 && !memo){
-    toast('⚠️','상태/사진/메모 중 하나는 입력해주세요');
+  if(!pickedStatus && photos.length === 0 && !memo){
+    toast('⚠️','결과·사진·메모 중 하나는 필요해요');
     return;
   }
-  // mockup: 실제 API 호출 없이 콘솔에만 기록
-  const payload = {
-    agent: me.name,
-    lead_id: curLead.id,
-    lead_name: curLead.name,
-    new_status: pickedStatus,
-    memo: memo,
-    photo_count: photos.length,
-    submitted_at: new Date().toISOString(),
-  };
-  console.log('[MOCKUP 제출]', payload, '사진:', photos.length+'장');
-  toast('✅','저장됐어요! (mockup)');
-  setTimeout(()=>show('s-list'), 900);
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  document.getElementById('sb-ico').outerHTML = '<span class="spin" id="sb-ico"></span>';
+  document.getElementById('sb-txt').textContent = '제출 중...';
+  try {
+    const r = await api('wink:submit', {
+      agent: me.name,
+      lead_id: curLead.id,
+      lead_name: curLead.name,
+      new_status: pickedStatus || '',
+      memo,
+      photos: photos.map(p => p.dataUrl),
+      submitted_at: new Date().toISOString(),
+    });
+    toast('✅', `저장됐어요! (사진 ${r.photo_count||photos.length}장)`);
+    // 로컬에서 리드 상태 즉시 반영
+    if(pickedStatus){
+      const idx = leads.findIndex(L => String(L.id)===String(curLead.id));
+      if(idx>=0) leads[idx].status = pickedStatus;
+    }
+    setTimeout(()=>{ show('s-home'); renderLeads(); }, 900);
+  } catch(e){
+    toast('⚠️', e.message || '제출 실패');
+  } finally {
+    btn.disabled = false;
+    document.getElementById('sb-ico').outerHTML = '<span id="sb-ico">💾</span>';
+    document.getElementById('sb-txt').textContent = '제출하기';
+  }
 }
 
-// ===== 토스트 =====
+// ───── 설정 모달 ─────
+function openSettings(){
+  document.getElementById('m-url').value = getUrl();
+  document.getElementById('settings-modal').classList.add('on');
+}
+function closeSettings(){
+  document.getElementById('settings-modal').classList.remove('on');
+}
+function saveSettings(){
+  const v = document.getElementById('m-url').value.trim();
+  if(!v.startsWith('https://script.google.com/')){
+    if(!confirm('Google Apps Script URL이 아닌 것 같아요. 그래도 저장할까요?')) return;
+  }
+  localStorage.setItem(LS.url, v);
+  closeSettings();
+  toast('✅', '저장됐어요');
+}
+
+// ───── 유틸 ─────
+function todayStr(){
+  const d=new Date(), w=['일','월','화','수','목','금','토'][d.getDay()];
+  return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} (${w})`;
+}
+function todayKey(){
+  const d=new Date();
+  return `${pad(d.getMonth()+1)}/${pad(d.getDate())}`;
+}
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+function setLoading(b){ document.getElementById('loading').classList.toggle('on', !!b); }
 function toast(ico,msg){
   const t = document.getElementById('toast');
-  t.querySelector('.ico').textContent = ico;
-  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('t-ico').textContent = ico;
+  document.getElementById('t-msg').textContent = msg;
   t.classList.add('on');
   clearTimeout(toast._t);
-  toast._t = setTimeout(()=>t.classList.remove('on'), 1600);
+  toast._t = setTimeout(()=>t.classList.remove('on'), 2000);
 }
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, m =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function escapeAttr(s){ return escapeHtml(s).replace(/'/g, "\\'"); }
+
+// PIN 입력 → 엔터로 로그인
+document.getElementById('i-pin').addEventListener('keydown', e => {
+  if(e.key === 'Enter') login();
+});
 </script>
 </body>
 </html>
