@@ -1977,6 +1977,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 </div></div>
 
 <script src="data.js"></script>
+<script src="closings.js"></script>
 <script>
 // 월 라벨·요일을 영어로 통일 (한국어/인니어 공통). data.js 가 한국어 값으로 들어와도 즉시 변환.
 // data.js 는 'let D = ...' 로 선언되어 window.D 가 아닌 모듈 스코프에 있음 → typeof D 로 확인
@@ -2110,8 +2111,9 @@ const LANG = {
     alyt_note_booking:'· 예약 = 상담예약 sched (status s/d/vc/ls 또는 cl=1 — 랑숭 walk-in 포함)',
     alyt_note_cl_actual:'· 당월 클로징 = 그 달에 실제로 발생한 클로징 (cl=1 AND 방문일 vd 가 해당 월) — 현금주의 시점 보고용',
     alyt_note_close_rate:'· 방문 대비 전환율 = 결제(발생주의) ÷ (예약 방문완료) · 분모에 랑숭 미포함',
-    cohort_section_title:'DB 코호트 매트릭스 — 배정월 × 클로징 발생월',
-    cohort_section_sub:'재경 보고용 — "이전 달 배정 DB 가 현재 매출의 몇 %를 만드는지" 직접 증명 · 우리 비즈니스 특성(긴 lag)을 시각화',
+    cohort_section_title:'DB 코호트 매트릭스 — 배정월 × 통장입금 결제월',
+    cohort_section_sub:'결제일 = 통장입금일 (Buku Setoran Bank · CSV) · 배정월 = 시트 DB · 매칭 안 된 결제는 \"cohort 미상\" 행에 분리',
+    cohort_unmatched:'cohort 미상 (DB 매칭 X)',
     cohort_lg_diag:'■ 대각선 (즉시 전환)',
     cohort_lg_off:'■ 비대각선 (이전 달 DB · 늦게 클로징)',
     cohort_lg_pre:'■ 2024 이전 배정 cohort',
@@ -2354,8 +2356,9 @@ const LANG = {
     alyt_note_booking:'· Jadwal = jadwal konsultasi sched (status s/d/vc/ls atau cl=1 — termasuk walk-in Langsung)',
     alyt_note_cl_actual:'· Closing Aktual = closing yang benar-benar terjadi di bulan tsb (cl=1 AND Tgl Kunjungan vd di bulan tsb) — basis kas',
     alyt_note_close_rate:'· Tingkat Konversi vs Visit = Closing(Akrual) ÷ (Visit dari Jadwal) · Langsung tidak masuk penyebut',
-    cohort_section_title:'Matriks Kohor DB — Bulan Alokasi × Bulan Closing Aktual',
-    cohort_section_sub:'Untuk Laporan Keuangan — Bukti langsung "berapa % omzet bulan ini berasal dari DB bulan lalu" · Visualisasi karakter bisnis kita (lag panjang)',
+    cohort_section_title:'Matriks Kohor DB — Bulan Alokasi × Bulan Setoran Bank',
+    cohort_section_sub:'Tanggal Closing = Tgl Setoran Bank (Buku Setoran · CSV) · Bulan Alokasi = DB Sheet · Closing tanpa match DB → baris \"Kohor Tidak Match\"',
+    cohort_unmatched:'Kohor Tidak Match (DB tidak ditemukan)',
     cohort_lg_diag:'■ Diagonal (Konversi Instan)',
     cohort_lg_off:'■ Non-Diagonal (DB Bulan Lalu · Closing Terlambat)',
     cohort_lg_pre:'■ Kohor alokasi sebelum 2024',
@@ -4542,85 +4545,102 @@ function renderTab(){
 }
 
 // ── 📐 통계 탭 — DB 코호트 매트릭스 (재경 보고용) ──────────
-// 배정월(ad) × 클로징 발생월(vd) 매트릭스로 "이전 달 DB 가 계속 익어가는"
-// 우리 비즈니스의 본질을 시각화. 2025-01 이후 모든 월을 가로/세로로 깔아둠.
+// 데이터 소스:
+//   - CSV CLOSING (closings.js · 통장입금 기준 진짜 결제일) → column total 의 진실
+//   - D.records (시트 데이터 · ad 배정월 · dk OFF/MKT) → cohort 행과 DB count
+// 매칭 키: childName + parentName (정규화) — 64% 엄격 매칭, 7% child만 매칭, 28% 미상.
+// 미상 closing 은 'cohort 미상' 행에 따로 모아서 column total 보존.
 function renderAnalytics(){
   const wrap = document.getElementById('analytics-wrap');
   if(!wrap) return;
 
-  // 날짜 → YYYY-MM 정규화 (vd 는 일부 DD-MM-YYYY 형식이 섞여있음)
-  const toYM = (s)=>{
-    if(!s || typeof s !== 'string') return null;
-    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,7);             // YYYY-MM-DD
-    if(/^\d{2}-\d{2}-\d{4}$/.test(s)){                                // DD-MM-YYYY
-      const [d, mo, y] = s.split('-'); return `${y}-${mo}`;
-    }
-    return null;
-  };
+  const csvClosings = window.CSV_CLOSINGS || [];
+  if(csvClosings.length === 0){
+    wrap.innerHTML = `<div style="padding:40px;text-align:center;color:#dc2626;font-weight:800">⚠️ closings.js 미로드 — 통장입금 데이터가 필요합니다</div>`;
+    return;
+  }
 
-  // 2025-01 ~ 당월 (오늘 기준) 사이의 활성 월만 (미래 데이터 무시)
-  const yearStart = '2025-01';
+  // 2026-01 ~ 당월 까지 (CSV ↔ D.records 매칭이 안정적인 범위)
+  const yearStart = '2026-01';
   const todayM = (D.today || new Date().toISOString().slice(0,10)).slice(0,7);
-  const inRange = (ym)=> ym && ym >= yearStart && ym <= todayM;
-  const monthSet = new Set();
-  (D.records||[]).forEach(r=>{
-    const am = toYM(r.ad);
-    if(inRange(am)) monthSet.add(am);
-    if(r.cl===1){
-      const vm = toYM(r.vd);
-      if(inRange(vm)) monthSet.add(vm);
-    }
-  });
-  const monthsList = Array.from(monthSet).sort();
+  const monthsList = [];
+  let cur = yearStart;
+  while(cur <= todayM){
+    monthsList.push(cur);
+    const [y, mo] = cur.split('-').map(Number);
+    cur = mo === 12 ? `${y+1}-01` : `${y}-${String(mo+1).padStart(2,'0')}`;
+  }
   if(monthsList.length === 0){
     wrap.innerHTML = `<div style="padding:40px;text-align:center;color:#94a3b8;font-weight:700">${T('cohort_no_data')}</div>`;
     return;
   }
 
-  // 배정월별 DB 카운트 (cohort 행의 'DB' 컬럼용)
+  // 1) D.records 의 ad 월별 DB 카운트
   const dbCount = {};
   monthsList.forEach(m=>{ dbCount[m] = {OFF:0, MKT:0, TOTAL:0}; });
-
-  // 코호트 매트릭스 데이터
-  const cohort    = { OFF:{}, MKT:{}, TOTAL:{} };
-  const cohortPre = { OFF:{count:0,byMonth:{}}, MKT:{count:0,byMonth:{}}, TOTAL:{count:0,byMonth:{}} };
-
   (D.records||[]).forEach(r=>{
-    const cohM = toYM(r.ad);
-    if(!cohM) return;
+    const m = (r.ad||'').slice(0,7);
+    if(!dbCount[m]) return;
     const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
     const kinds = k ? [k, 'TOTAL'] : ['TOTAL'];
+    kinds.forEach(kk=>{ dbCount[m][kk]++; });
+  });
 
-    if(inRange(cohM) && dbCount[cohM]){
-      kinds.forEach(kk=>{ dbCount[cohM][kk]++; });
-    }
-    if(r.cl !== 1) return;
-    // vd(방문일) 없으면 cohort 배정월(ad) 로 떨어뜨림 — 대시보드의 cl 합계와
-    // 일치시키기 위함 (시트 데이터에서 cl=1 인데 vd 가 비어있는 케이스 많음)
-    let closeM = toYM(r.vd) || cohM;
+  // 2) D.records 매칭 인덱스 (이름+부모, 이름만)
+  const norm = (s)=>(s||'').toLowerCase().replace(/[^a-z가-힣0-9]/g,'');
+  const recPairIdx = {};
+  const recChildIdx = {};
+  (D.records||[]).forEach(r=>{
+    const kp = norm(r.nm)+'|'+norm(r.pa);
+    const kc = norm(r.nm);
+    if(!recPairIdx[kp]) recPairIdx[kp] = r;
+    if(!recChildIdx[kc]) recChildIdx[kc] = r;
+  });
+
+  // 3) CSV CLOSING 을 매트릭스에 배치
+  //    cohort[kindKey][cohortMonth][closeMonth] = count
+  //    unmatched[closeMonth] = count (D.records 에 매칭 안 됨 — TOTAL 표에 cohort 미상 행)
+  const cohort    = { OFF:{}, MKT:{}, TOTAL:{} };
+  const unmatched = {};
+  monthsList.forEach(m=>{
+    cohort.OFF[m]={}; cohort.MKT[m]={}; cohort.TOTAL[m]={};
+    unmatched[m] = 0;
+  });
+  let matchCnt = 0, unmatchCnt = 0;
+
+  csvClosings.forEach(c=>{
+    // c = [date 'YYYY-MM-DD', childId, childName, parentId, parentName, paymentType]
+    const closeM = c[0].slice(0,7);
     if(closeM < yearStart || closeM > todayM) return;
-
-    if(cohM >= yearStart){
-      if(cohM > todayM) return;
-      kinds.forEach(kk=>{
-        if(!cohort[kk][cohM]) cohort[kk][cohM] = {};
-        cohort[kk][cohM][closeM] = (cohort[kk][cohM][closeM]||0) + 1;
-      });
-    } else {
-      kinds.forEach(kk=>{
-        cohortPre[kk].count++;
-        cohortPre[kk].byMonth[closeM] = (cohortPre[kk].byMonth[closeM]||0) + 1;
-      });
+    const cn = c[2], pn = c[4];
+    const kp = norm(cn)+'|'+norm(pn);
+    const kc = norm(cn);
+    const r = recPairIdx[kp] || recChildIdx[kc];
+    if(r){
+      const cohM = (r.ad||'').slice(0,7);
+      // 매칭 record 의 배정월이 cohort 범위 안에 있고 + 결제일이 배정일 이후일 때만 유효
+      // (cohM > closeM 이면 다른 사람을 잘못 매칭한 거 — 결제가 배정보다 먼저 일 수 없음)
+      if(monthsList.includes(cohM) && cohM <= closeM){
+        const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
+        const kinds = k ? [k, 'TOTAL'] : ['TOTAL'];
+        kinds.forEach(kk=>{
+          cohort[kk][cohM][closeM] = (cohort[kk][cohM][closeM]||0) + 1;
+        });
+        matchCnt++;
+        return;
+      }
     }
+    unmatched[closeM] = (unmatched[closeM]||0) + 1;
+    unmatchCnt++;
   });
 
   const buildCohortTable = (kindKey, kindLabel, color, bgColor)=>{
     const coh = cohort[kindKey];
-    const pre = cohortPre[kindKey];
+    const isTotal = (kindKey === 'TOTAL');
 
     let maxVal = 0;
     Object.values(coh).forEach(row => Object.values(row).forEach(v => { if(v>maxVal) maxVal = v; }));
-    Object.values(pre.byMonth).forEach(v => { if(v>maxVal) maxVal = v; });
+    if(isTotal) Object.values(unmatched).forEach(v => { if(v>maxVal) maxVal = v; });
     if(maxVal === 0) maxVal = 1;
     const cellBg = (val, isDiag)=>{
       if(val === 0) return 'transparent';
@@ -4631,14 +4651,14 @@ function renderAnalytics(){
     };
     const mLbl = (m)=> (D.mlabels && D.mlabels[m]) || m;
 
+    // 컬럼 합계 & 대각선 — TOTAL 표만 unmatched 포함
     const colTotals = {}, diagTotals = {};
     monthsList.forEach(m => {
-      colTotals[m]  = (pre.byMonth[m] || 0);
+      colTotals[m]  = isTotal ? (unmatched[m] || 0) : 0;
       diagTotals[m] = (coh[m] && coh[m][m]) || 0;
     });
     monthsList.forEach(cohM => {
-      if(!coh[cohM]) return;
-      monthsList.forEach(closeM => { colTotals[closeM] += (coh[cohM][closeM]||0); });
+      monthsList.forEach(closeM => { colTotals[closeM] += (coh[cohM] && coh[cohM][closeM]) || 0; });
     });
 
     let h = `<div class="cohort-section">
@@ -4656,17 +4676,7 @@ function renderAnalytics(){
     h += `<th class="R cum">${T('cohort_h_cum')}</th>`;
     h += `<th class="R eff">${T('cohort_h_eff')}</th></tr></thead><tbody>`;
 
-    if(pre.count > 0){
-      h += `<tr class="pre-row"><td class="L"><b>${T('cohort_pre')}</b></td><td class="R db-col" style="color:#94a3b8">—</td>`;
-      monthsList.forEach(m => {
-        const v = pre.byMonth[m] || 0;
-        h += `<td class="R" style="background:${v?'rgba(251,191,36,.30)':'transparent'};color:${v?'#92400e':'#cbd5e1'};font-weight:800">${v||'—'}</td>`;
-      });
-      h += `<td class="R cum">${f(pre.count)}</td>`;
-      h += `<td class="R eff" style="color:#94a3b8">—</td></tr>`;
-    }
-
-    // 누적 DB·클로징 (효율 푸터용)
+    // cohort 행들 (배정월)
     let grandDb = 0, grandCohClosing = 0;
     monthsList.forEach((cohM, ci)=>{
       const db = dbCount[cohM][kindKey] || 0;
@@ -4691,6 +4701,21 @@ function renderAnalytics(){
       h += `<td class="R cum">${f(cohSum)}</td>`;
       h += `<td class="R eff ${effCls}">${eff}%</td></tr>`;
     });
+
+    // TOTAL 표만: 'cohort 미상' 행 (D.records 에 매칭 안 된 CSV closing)
+    if(isTotal){
+      let umSum = 0;
+      monthsList.forEach(m => { umSum += (unmatched[m]||0); });
+      if(umSum > 0){
+        h += `<tr class="unmatched-row"><td class="L" style="color:#92400e"><b>${T('cohort_unmatched')}</b></td><td class="R db-col" style="color:#94a3b8">—</td>`;
+        monthsList.forEach(m => {
+          const v = unmatched[m] || 0;
+          h += `<td class="R" style="background:${v?'rgba(251,191,36,.30)':'transparent'};color:${v?'#92400e':'#cbd5e1'};font-weight:800">${v||'—'}</td>`;
+        });
+        h += `<td class="R cum">${f(umSum)}</td>`;
+        h += `<td class="R eff" style="color:#94a3b8">—</td></tr>`;
+      }
+    }
 
     h += `</tbody><tfoot>`;
     let grandActual = 0, grandDiag = 0;
