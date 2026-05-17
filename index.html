@@ -1163,6 +1163,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 }
 @media print{
   /* 보고서 모드 (단일 에이전트): 보고서 영역만 노출 */
+  /* A4 가로 + 페이지 너비에 맞게 컨텐츠 스케일 */
+  @page { size: A4 landscape; margin: 6mm; }
   body.printing-report .top-tabs,
   body.printing-report .scope-bar,
   body.printing-report .team-bar,
@@ -1171,8 +1173,15 @@ body.focus-mode #detail-section-hd{display:none!important}
   body.printing-report .floating-side,
   body.printing-report .header{display:none !important}
   body.printing-report .ai-rpt-hd{background:#1e3a8a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  body.printing-report{background:#fff !important}
+  body.printing-report{background:#fff !important;margin:0 !important;padding:0 !important;width:1180px !important;zoom:0.74}
+  /* 메인 컨테이너가 가로 페이지 너비에 맞도록 강제 */
+  body.printing-report #page-main{max-width:1180px !important;width:1180px !important;margin:0 !important}
+  body.printing-report #content-agent_insight{max-width:100% !important;width:100% !important;padding:0 8px !important}
+  /* 가로 스크롤 컨테이너 — 인쇄 시 잘리지 않도록 전체 표시 */
+  body.printing-report #content-agent_insight [style*="overflow-x"]{overflow:visible !important}
+  body.printing-report .month-tbl{font-size:10.5px}
   /* 색상 카드/배지 등 인쇄 시 배경 보존 */
+  body.printing-report .ai-rpt-hd,
   body.printing-report .db-total,
   body.printing-report .db-card,
   body.printing-report .rank-row,
@@ -1182,7 +1191,18 @@ body.focus-mode #detail-section-hd{display:none!important}
   body.printing-report .mgmt-stack-bar,
   body.printing-report .ms-seg,
   body.printing-report .rbar,
-  body.printing-report .bc-idx-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.printing-report .bc-idx-fill,
+  body.printing-report .sec-hd,
+  body.printing-report .ag-mission,
+  body.printing-report .ag-m-item,
+  body.printing-report .ins-team-card,
+  body.printing-report .ins-ag-detail{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* 섹션 페이지 분할 — 카드 중간 잘림 방지 */
+  body.printing-report .sec-hd,
+  body.printing-report .ai-rpt-hd,
+  body.printing-report .ins-ag-detail,
+  body.printing-report .ag-mission,
+  body.printing-report .r3d-agent-card{page-break-inside:avoid;break-inside:avoid}
   .ai-rpt-btn{display:none}
 }
 
