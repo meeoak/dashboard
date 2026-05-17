@@ -2049,12 +2049,15 @@ const LANG = {
     alyt_h_db:'배정 DB', alyt_h_booking:'예약', alyt_h_db_to_book:'DB 대비 예약율',
     alyt_h_book_visit:'예약 방문완료', alyt_h_book_to_visit:'예약대비 방문율',
     alyt_h_langsung:'예약없이 방문완료', alyt_h_langsung_sub:'(포함 →)',
-    alyt_h_closing:'결제', alyt_h_visit_to_close:'방문 대비 전환율',
+    alyt_h_closing:'결제', alyt_h_closing_sub:'(배정월 귀속)',
+    alyt_h_cl_actual:'당월 클로징', alyt_h_cl_actual_sub:'(방문일 기준)',
+    alyt_h_visit_to_close:'방문 대비 전환율',
     alyt_h_db_to_close:'DB 대비 전환율',
     alyt_note_title:'📌 집계 기준',
-    alyt_note_basis:'· 발생주의 — 모든 지표는 DB 배정일(ad) 의 월에 귀속 (3월 배정 DB 가 4월 결제돼도 3월 행에 잡힘)',
+    alyt_note_basis:'· 발생주의 — 결제·예약·방문 등 funnel 지표는 모두 DB 배정일(ad) 의 월에 귀속 (3월 배정 DB 가 4월 결제돼도 3월 행에 잡힘)',
     alyt_note_booking:'· 예약 = 상담예약 sched (status s/d/vc/ls 또는 cl=1 — 랑숭 walk-in 포함)',
-    alyt_note_close_rate:'· 방문 대비 전환율 = 결제 ÷ (예약 방문완료) · 분모에 랑숭 미포함',
+    alyt_note_cl_actual:'· 당월 클로징 = 그 달에 실제로 발생한 클로징 (cl=1 AND 방문일 vd 가 해당 월) — 현금주의 시점 보고용',
+    alyt_note_close_rate:'· 방문 대비 전환율 = 결제(발생주의) ÷ (예약 방문완료) · 분모에 랑숭 미포함',
     quick_nav:'📂 빠른 이동:',
     all_agents_btn:'👥 전체 에이전트',
     sec_db_agent_sub:'선택한 에이전트의 DB 종류 · 활동 상태 분포',
@@ -2269,12 +2272,15 @@ const LANG = {
     alyt_h_db:'Alokasi DB', alyt_h_booking:'Jadwal', alyt_h_db_to_book:'Tk. Jadwal vs DB',
     alyt_h_book_visit:'Visit dari Jadwal', alyt_h_book_to_visit:'Tk. Visit vs Jadwal',
     alyt_h_langsung:'Visit Langsung', alyt_h_langsung_sub:'(termasuk →)',
-    alyt_h_closing:'Closing', alyt_h_visit_to_close:'Tk. Konversi vs Visit',
+    alyt_h_closing:'Closing', alyt_h_closing_sub:'(Bulan Alokasi)',
+    alyt_h_cl_actual:'Closing Aktual', alyt_h_cl_actual_sub:'(Tgl Kunjungan)',
+    alyt_h_visit_to_close:'Tk. Konversi vs Visit',
     alyt_h_db_to_close:'Tk. Konversi vs DB',
     alyt_note_title:'📌 Dasar Perhitungan',
-    alyt_note_basis:'· Basis Akrual — Semua indikator dibukukan pada bulan Tgl Alokasi DB (DB Maret di-closing April tetap masuk baris Maret)',
+    alyt_note_basis:'· Basis Akrual — Closing/Jadwal/Visit dibukukan pada bulan Tgl Alokasi DB (DB Maret di-closing April tetap masuk baris Maret)',
     alyt_note_booking:'· Jadwal = jadwal konsultasi sched (status s/d/vc/ls atau cl=1 — termasuk walk-in Langsung)',
-    alyt_note_close_rate:'· Tingkat Konversi vs Visit = Closing ÷ (Visit dari Jadwal) · Langsung tidak masuk penyebut',
+    alyt_note_cl_actual:'· Closing Aktual = closing yang benar-benar terjadi di bulan tsb (cl=1 AND Tgl Kunjungan vd di bulan tsb) — basis kas',
+    alyt_note_close_rate:'· Tingkat Konversi vs Visit = Closing(Akrual) ÷ (Visit dari Jadwal) · Langsung tidak masuk penyebut',
     quick_nav:'📂 Navigasi Cepat:',
     all_agents_btn:'👥 Semua Agen',
     sec_db_agent_sub:'Distribusi Jenis DB & Status Aktivitas Agen Terpilih',
@@ -4453,24 +4459,37 @@ function renderAnalytics(){
   const today = D.today || '';
   const curYear = today.slice(0,4) || '2026';
   const monthsList = (D.months || []).filter(m => m.startsWith(curYear)).sort();
-  const init = ()=>({db:0, sched:0, d:0, vc:0, ls:0, cl:0});
+  //  - cl       : 발생주의 (배정월 기준) — 배정월에 들어온 DB 중 결국 클로징된 건수
+  //  - clByVd   : 현금주의 (방문/클로징일 기준) — 그 달에 실제로 발생한 클로징 건수
+  const init = ()=>({db:0, sched:0, d:0, vc:0, ls:0, cl:0, clByVd:0});
   const data = {};
   monthsList.forEach(m=>{ data[m] = {OFF:init(), MKT:init(), TOTAL:init()}; });
 
   (D.records||[]).forEach(r=>{
-    if(!r.ad) return;
-    const m = r.ad.slice(0,7);          // 배정일 → 월 (발생주의)
-    if(!data[m]) return;
     const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
-    const targets = k ? [data[m][k], data[m].TOTAL] : [data[m].TOTAL];
-    targets.forEach(t => t.db++);
-    if(r.st==='s' || r.st==='d' || r.st==='vc' || r.st==='ls' || r.cl===1){
-      targets.forEach(t => t.sched++);
+    // 발생주의 — 배정일(ad) 기준
+    if(r.ad){
+      const m = r.ad.slice(0,7);
+      if(data[m]){
+        const targets = k ? [data[m][k], data[m].TOTAL] : [data[m].TOTAL];
+        targets.forEach(t => t.db++);
+        if(r.st==='s' || r.st==='d' || r.st==='vc' || r.st==='ls' || r.cl===1){
+          targets.forEach(t => t.sched++);
+        }
+        if(r.st==='d')  targets.forEach(t => t.d++);
+        if(r.st==='vc') targets.forEach(t => t.vc++);
+        if(r.st==='ls') targets.forEach(t => t.ls++);
+        if(r.cl===1)    targets.forEach(t => t.cl++);
+      }
     }
-    if(r.st==='d')  targets.forEach(t => t.d++);
-    if(r.st==='vc') targets.forEach(t => t.vc++);
-    if(r.st==='ls') targets.forEach(t => t.ls++);
-    if(r.cl===1)    targets.forEach(t => t.cl++);
+    // 현금주의 — 클로징이 실제 발생한 월(방문일 vd 기준)
+    if(r.cl===1 && r.vd){
+      const vm = r.vd.slice(0,7);
+      if(data[vm]){
+        const targets = k ? [data[vm][k], data[vm].TOTAL] : [data[vm].TOTAL];
+        targets.forEach(t => t.clByVd++);
+      }
+    }
   });
 
   // 월별 실제 집계 기간 (1일 ~ 말일, 단 진행 중인 월은 오늘까지)
@@ -4510,7 +4529,8 @@ function renderAnalytics(){
       <th class="R">${T('alyt_h_book_visit')}</th>
       <th class="R">${T('alyt_h_book_to_visit')}</th>
       <th class="R">${T('alyt_h_langsung')}<br><small style="font-weight:700;color:#94a3b8">${T('alyt_h_langsung_sub')}</small></th>
-      <th class="R">${T('alyt_h_closing')}</th>
+      <th class="R">${T('alyt_h_closing')}<br><small style="font-weight:700;color:#94a3b8">${T('alyt_h_closing_sub')}</small></th>
+      <th class="R" style="background:#7f1d1d">${T('alyt_h_cl_actual')}<br><small style="font-weight:700;color:#fecaca">${T('alyt_h_cl_actual_sub')}</small></th>
       <th class="R">${T('alyt_h_visit_to_close')}</th>
       <th class="R">${T('alyt_h_db_to_close')}</th>
     </tr></thead><tbody>`;
@@ -4539,6 +4559,7 @@ function renderAnalytics(){
       h += `<td class="R">${pctCell(r_book_v, false)}</td>`;
       h += `<td class="R alyt-num" style="color:#1e293b">${f(d.ls)}</td>`;
       h += `<td class="R alyt-num" style="color:#dc2626;font-weight:900">${f(d.cl)}</td>`;
+      h += `<td class="R alyt-num alyt-cl-actual" style="color:#7f1d1d;font-weight:900;background:#fee2e2">${f(d.clByVd)}</td>`;
       h += `<td class="R">${pctCell(r_v_close, true)}</td>`;
       h += `<td class="R">${pctCell(r_db_close, true)}</td>`;
       h += `</tr>`;
@@ -4550,6 +4571,7 @@ function renderAnalytics(){
       <b>${T('alyt_note_title')}</b>
       <span>${T('alyt_note_basis')}</span>
       <span>${T('alyt_note_booking')}</span>
+      <span>${T('alyt_note_cl_actual')}</span>
       <span>${T('alyt_note_close_rate')}</span>
     </div>`;
 
