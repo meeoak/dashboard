@@ -1411,15 +1411,15 @@ body.focus-mode #detail-section-hd{display:none!important}
 .team-bar{background:#f8fafc;border-bottom:1.5px solid #e5e7eb;padding:0 22px;box-shadow:0 1px 4px rgba(0,0,0,.03);position:sticky;top:46px;z-index:49}
 .team-bar .scope-in{padding:7px 0;gap:6px}
 
-/* 3) 빠른 이동 = 메인 탭 (sticky로 상단 고정) — team-bar 아래 */
-.quick-nav-bar{background:#fff;border-bottom:2px solid #fcd34d;padding:0 22px;box-shadow:0 1px 0 #fcd34d}
+/* 3) 빠른 이동 = 메인 탭 (sticky로 상단 고정) — team-bar 아래 · 가시성 강화 */
+.quick-nav-bar{background:linear-gradient(180deg,#1e3a8a 0%,#1e40af 100%);border-bottom:4px solid #fcd34d;padding:0 22px;box-shadow:0 4px 14px rgba(30,58,138,.28),inset 0 -1px 0 rgba(255,255,255,.06)}
 .quick-nav-in{padding:0;gap:0;flex-wrap:nowrap;overflow-x:auto;justify-content:stretch;width:100%}
 .quick-nav-lbl{display:none}
-.quick-nav-btn{flex:1 1 0;min-width:0;text-align:center;justify-content:center;background:transparent;border:none;border-right:1px solid #e5e7eb;color:#64748b;font-size:13px;padding:12px 16px;border-radius:0;border-bottom:3px solid transparent;letter-spacing:-.3px;position:relative;top:2px}
+.quick-nav-btn{flex:1 1 0;min-width:0;text-align:center;justify-content:center;background:transparent;border:none;border-right:1.5px solid rgba(255,255,255,.18);color:rgba(255,255,255,.82);font-size:15px;font-weight:800;padding:15px 14px;border-radius:0;border-bottom:5px solid transparent;letter-spacing:-.3px;position:relative;top:0;transition:all .15s}
 .quick-nav-btn:last-child{border-right:none}
-.quick-nav-btn:hover{background:#fef9c3;color:#1e3a8a;transform:none;box-shadow:none}
-.quick-nav-btn:hover{border-bottom-color:transparent}
-.quick-nav-btn.on{background:linear-gradient(180deg,#fff,#fef9c3);color:#1e3a8a;border-bottom-color:#1e3a8a;box-shadow:none}
+.quick-nav-btn:hover{background:rgba(255,255,255,.1);color:#fff;transform:none;box-shadow:none;border-bottom-color:rgba(252,211,77,.5)}
+.quick-nav-btn.on{background:linear-gradient(180deg,rgba(252,211,77,.22) 0%,rgba(252,211,77,.06) 100%);color:#fcd34d;border-bottom-color:#fcd34d;font-weight:900;font-size:16px;text-shadow:0 1px 4px rgba(252,211,77,.5);box-shadow:inset 0 5px 0 #fcd34d,0 -4px 18px rgba(252,211,77,.3)}
+.quick-nav-btn.on::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #fcd34d}
 
 /* 4) 콘텐츠 위 탭 바: 빠른 이동과 중복 → 항상 숨김 */
 .tabs-bar{display:none!important}
@@ -1480,14 +1480,15 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .lang-btn.on{background:var(--c-navy);border-color:var(--c-navy);color:#fff}
 .scope-refresh-btn{background:var(--c-yellow);color:var(--c-navy);border:1.5px solid var(--c-yellow);font-weight:800}
 .scope-refresh-btn:hover{background:#fde047;border-color:#facc15}
-/* 탭 바 - 남색 활성 */
-.tab{color:var(--c-gray);background:transparent;border-bottom:3px solid transparent;font-weight:700}
-.tab:hover{color:var(--c-navy);background:var(--c-yellow-bg)}
-.tab.on{color:var(--c-navy);border-bottom-color:var(--c-yellow);background:var(--c-yellow-soft);font-weight:800}
-/* 빠른 이동 버튼 */
-.quick-nav-btn{background:#fff;color:var(--c-navy);border:1.5px solid #cbd5e1;font-weight:700}
-.quick-nav-btn:hover{background:var(--c-yellow-bg);border-color:var(--c-yellow)}
-.quick-nav-btn.on{background:var(--c-navy);color:#fff;border-color:var(--c-navy)}
+/* 탭 바 - 가시성 강화 (남색 컨테이너 + 활성 노랑) */
+.tabs{background:linear-gradient(180deg,#1e3a8a 0%,#1e40af 100%);border:2.5px solid #1e3a8a;border-bottom:none;border-radius:14px 14px 0 0;box-shadow:0 -3px 14px rgba(30,58,138,.3),inset 0 -1px 0 rgba(255,255,255,.08)}
+.tab{color:rgba(255,255,255,.78);background:transparent;border-bottom:5px solid transparent;font-weight:800;padding:18px 14px 14px;font-size:16px;letter-spacing:-.3px;transition:all .15s}
+.tab:not(:last-child){border-right:1.5px solid rgba(255,255,255,.18)}
+.tab:hover:not(.on){color:#fff;background:rgba(255,255,255,.1);border-bottom-color:rgba(252,211,77,.5)}
+.tab.on{color:#fcd34d;background:linear-gradient(180deg,rgba(252,211,77,.18) 0%,rgba(252,211,77,.05) 100%);border-bottom-color:#fcd34d;font-weight:900;font-size:17px;text-shadow:0 1px 4px rgba(252,211,77,.45);box-shadow:inset 0 5px 0 #fcd34d,0 -4px 18px rgba(252,211,77,.3);z-index:2;position:relative}
+.tab.on::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #fcd34d;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
+.tab-content{border:2.5px solid #fcd34d;border-top:none;box-shadow:0 6px 22px rgba(30,58,138,.12)}
+/* 빠른 이동 버튼 — line 1418 의 강렬한 남색 배경 스타일에 위임 (이 블록은 의도적으로 비움) */
 /* 프리셋 버튼 (오늘 / 최근 N일 등) */
 .preset-btn{background:#fff;color:var(--c-navy);border:1.5px solid #cbd5e1;font-weight:700}
 .preset-btn:hover{background:var(--c-yellow-bg);border-color:var(--c-yellow)}
@@ -1611,6 +1612,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <button class="quick-nav-btn" onclick="jumpToTab('rank')" data-qnav="rank" data-t="tab_rank">에이전트 활동지수</button>
   <button class="quick-nav-btn" onclick="jumpToTab('team_insight')" data-qnav="team_insight" data-t="tab_insight">긴급관리</button>
   <button class="quick-nav-btn" onclick="jumpToTab('agent_insight')" data-qnav="agent_insight" data-t="tab_agent_insight">에이전트별 토탈관리</button>
+  <button class="quick-nav-btn" onclick="jumpToTab('analytics')" data-qnav="analytics" data-t="tab_analytics">📊 통계</button>
 </div></div>
 
 <!-- 3개월 트렌드는 KPI 카드 안에 sparkbars로 통합됨 (별도 섹션 제거) -->
@@ -1694,6 +1696,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <button class="tab"     id="tab-rank"    onclick="switchTab('rank')"    data-t="tab_rank">에이전트 활동지수</button>
   <button class="tab"     id="tab-team_insight"  onclick="switchTab('team_insight')" data-t="tab_insight">긴급관리</button>
   <button class="tab"     id="tab-agent_insight" onclick="switchTab('agent_insight')" data-t="tab_agent_insight">에이전트별 토탈관리</button>
+  <button class="tab"     id="tab-analytics"     onclick="switchTab('analytics')"    data-t="tab_analytics">📊 통계</button>
 </div></div>
 
 <div class="tab-content">
@@ -1821,6 +1824,16 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
       <div class="sec-sub" data-t="sec_calendar_sub">기간 내 일별 방문 일정 (예약/완료/비디오/랑숭)</div></div>
     </div>
     <div class="cal-wrap" id="ai-cal-wrap"></div>
+  </div>
+  <!-- 📊 통계 (별도 분석 영역 — 사용자가 채워 넣을 예정) -->
+  <div id="content-analytics" style="display:none">
+    <div class="sec-hd">
+      <div><div class="sec-title" data-t="sec_analytics">📊 통계</div>
+      <div class="sec-sub" data-t="sec_analytics_sub">상세 분석 영역</div></div>
+    </div>
+    <div id="analytics-wrap" style="padding:40px 24px;text-align:center;color:#94a3b8;font-size:14px;font-weight:700">
+      <span data-t="analytics_placeholder">준비 중 — 통계 항목은 곧 추가됩니다</span>
+    </div>
   </div>
 </div>
 </div><!-- /page-main -->
@@ -2007,6 +2020,9 @@ const LANG = {
     final_kpi:'⭐ 최종', main_kpi_label:'최종 KPI',
     // 추가 — Bahasa 전환 시 누락 항목
     tab_agent_insight:'에이전트별 토탈관리',
+    tab_analytics:'📊 통계',
+    sec_analytics:'📊 통계', sec_analytics_sub:'상세 분석 영역',
+    analytics_placeholder:'준비 중 — 통계 항목은 곧 추가됩니다',
     quick_nav:'📂 빠른 이동:',
     all_agents_btn:'👥 전체 에이전트',
     sec_db_agent_sub:'선택한 에이전트의 DB 종류 · 활동 상태 분포',
@@ -2211,6 +2227,9 @@ const LANG = {
     final_kpi:'⭐ Akhir', main_kpi_label:'KPI Akhir',
     // Tambahan — item yang tertinggal saat ganti bahasa
     tab_agent_insight:'Manajemen Total per Agen',
+    tab_analytics:'📊 Statistik',
+    sec_analytics:'📊 Statistik', sec_analytics_sub:'Area analisis detail',
+    analytics_placeholder:'Sedang disiapkan — item statistik akan ditambahkan',
     quick_nav:'📂 Navigasi Cepat:',
     all_agents_btn:'👥 Semua Agen',
     sec_db_agent_sub:'Distribusi Jenis DB & Status Aktivitas Agen Terpilih',
@@ -4323,7 +4342,7 @@ function switchTab(tab){
       if(sel){ buildAgentSelect(); sel.value = curAgent; }
     }
   }
-  ['cal','stats','rank','team_insight','agent_insight'].forEach(t=>{
+  ['cal','stats','rank','team_insight','agent_insight','analytics'].forEach(t=>{
     const tabEl = document.getElementById('tab-'+t);
     const contEl = document.getElementById('content-'+t);
     if(tabEl) tabEl.classList.toggle('on', t===tab);
@@ -4374,6 +4393,7 @@ function renderTab(){
   else if(curTab==='rank') renderRank();
   else if(curTab==='team_insight') renderTeamInsightOnly();
   else if(curTab==='agent_insight') renderAgentInsightOnly();
+  else if(curTab==='analytics'){ /* 사용자가 채워 넣을 예정 — 추후 renderAnalytics() 추가 */ }
   else if(curTab==='insight') renderTeamInsightOnly(); // legacy fallback
 }
 
