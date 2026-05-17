@@ -121,6 +121,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Segoe UI',san
   /* 회원 목록 페이지 */
   .mem-table th,.mem-table td{padding:6px 4px;font-size:11px}
 }
+
+/* ─────────── 좁은 모바일 (≤480px) — 반응형 강화 ─────────── */
+@media(max-width:480px){
+  body{font-size:12.5px}
+  /* KPI 카드 — 1열로 */
+  .kpi-targets{grid-template-columns:1fr!important;gap:6px;padding:10px 8px 12px}
+  .tcard{padding:11px 9px}
+  .tcard-lbl{-webkit-line-clamp:3;font-size:11.5px}
+  /* 탭 — 라벨 wrap 허용 (긴 Bahasa 텍스트) */
+  .tab{padding:10px 6px;font-size:11.5px;min-width:0;white-space:normal;line-height:1.2;letter-spacing:-.4px}
+  .tab.on{font-size:12.5px}
+  /* 스코프 버튼 */
+  .scope-btn{padding:7px 9px;font-size:11.5px;height:34px;gap:4px}
+  /* 헤더 시계 */
+  .hdr-title{font-size:18px}
+  .hdr-flame{font-size:20px}
+  /* DB 영역 */
+  .db-card-val{font-size:38px!important}
+  /* 코호트 매트릭스 셀 폭 — 모바일에서 더 좁게 */
+  .cohort-tbl{min-width:600px;font-size:11px}
+  .cohort-tbl th{padding:5px 3px;font-size:10.5px}
+  .cohort-tbl td{padding:4px 3px}
+  .cohort-tbl th:not(:first-child):not(:nth-child(2)):not(.cum):not(.eff),
+  .cohort-tbl td:not(:first-child):not(.db-col):not(.cum):not(.eff){width:40px;min-width:40px;max-width:40px}
+  /* 인사이트 카드 (4 카드) — 1열 */
+  .insight-grid{grid-template-columns:1fr!important}
+  .insight-value{font-size:24px}
+  /* lag 카드 */
+  .lag-grid{grid-template-columns:1fr 1fr!important}
+  /* 미매칭 원인 — 1열 */
+  .ue-causes{grid-template-columns:1fr!important}
+  /* 랭킹 — 모바일에서 한 줄에 못 들어감 */
+  .rstats{flex-wrap:wrap;justify-content:space-around}
+  .rstat{flex:0 0 22%;width:auto}
+}
 .live-badge{display:inline-flex;align-items:center;gap:5px;background:#1e3a8a;color:#fff;font-size:10px;font-weight:800;border-radius:18px;padding:3px 10px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.85;transform:scale(1.04)}}
 .hdr-row2{display:flex;gap:5px;flex-wrap:wrap}
@@ -463,14 +498,14 @@ body.focus-mode #detail-section-hd{display:none!important}
 .trend-flat{color:#888;font-size:11px;font-weight:700;margin-left:4px}
 
 /* 목표 달성 카드 (병합형) - 반응형 */
-.kpi-targets{max-width:1180px;margin:0 auto;padding:14px 20px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;border-bottom:8px solid #f0ede8}
+.kpi-targets{max-width:1180px;margin:0 auto;padding:14px 20px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:10px;border-bottom:8px solid #f0ede8}
 .tcard{min-width:0;overflow:hidden}
 .tcard.final{border-width:3px;background:linear-gradient(135deg,#eff6ff,#fff);position:relative}
 .tcard.final::after{content:'⭐ 최종';position:absolute;top:6px;right:8px;background:#1e3a8a;color:#fff;font-size:9px;font-weight:800;border-radius:10px;padding:2px 7px;z-index:2}
 .tcard.final.good{border-color:#1e3a8a;box-shadow:0 4px 16px #1e3a8a40}
 .tcard.final.bad{border-color:#dc2626;background:linear-gradient(135deg,#fef2f2,#fff)}
 .tcard-info{min-width:0;flex:1}
-.tcard-lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.tcard-lbl{white-space:normal;font-size:11px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
 .tcard-vals{flex-wrap:wrap}
 
 /* 추가/초과 숫자 강조 영역 */
