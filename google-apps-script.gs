@@ -404,49 +404,142 @@ function calcAgentStats_(records, agentName, monthStart, today) {
     }
   });
   const r_dc = db ? Math.round(cl/db*1000)/10 : 0;
-  return { db, visit, cl, r_dc, dbToday, visitToday, clToday, yesterday };
+  // 활동지수: 클로징×5 + 방문완료/랑숭/비디오콜 각 1점 (visit 에 모두 포함)
+  const score = cl * 5 + visit;
+  // 오늘 기준 페이스 (월 일수 대비)
+  const td = new Date(today);
+  const lastDay = new Date(td.getFullYear(), td.getMonth()+1, 0).getDate();
+  const pacePct = Math.round(td.getDate() / lastDay * 100);
+  const scorePct = Math.min(100, score);  // KPI 100점 기준
+  const paceDiff = scorePct - pacePct;
+  return { db, visit, cl, r_dc, dbToday, visitToday, clToday, yesterday, score, scorePct, pacePct, paceDiff, lastDay };
 }
 
-// 헬퍼: 보고서 HTML 빌더
+// 헬퍼: 보고서 HTML 빌더 (풀버전 · 인니어 · 모닝 보고)
+// 이모지는 HTML entity 로 처리하여 4byte surrogate-pair 손상 방지
 function buildReportHTML_({name, stats, today, monthStart}) {
   const monthLabel = today.slice(0,7);
-  const css = `font-family:'Segoe UI',-apple-system,sans-serif;color:#0f172a`;
+  const ff = `font-family:Segoe UI,-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;color:#0f172a`;
+  const initial = String(name||'?').charAt(0).toUpperCase();
+  const paceColor = stats.paceDiff >= 0 ? '#15803d' : '#dc2626';
+  const paceSign  = stats.paceDiff >= 0 ? '+' : '';
+
+  // 활동율 (방문완료/DB)
+  const visitRate = stats.db ? Math.round(stats.visit/stats.db*1000)/10 : 0;
+  const clRate    = stats.visit ? Math.round(stats.cl/stats.visit*1000)/10 : 0;
+
   return ''
-    + '<div style="' + css + ';max-width:600px;margin:0 auto;padding:24px;background:#f8fafc">'
-    + '  <div style="background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;padding:20px 24px;border-radius:14px 14px 0 0">'
-    + '    <div style="font-size:11px;font-weight:700;color:#fbbf24;letter-spacing:3px;margin-bottom:4px">' + today + ' · MORNING REPORT</div>'
-    + '    <div style="font-size:22px;font-weight:900;letter-spacing:-.5px">🌅 ' + name + ' 일일 보고</div>'
-    + '    <div style="font-size:12px;font-weight:600;opacity:.85;margin-top:4px">Selamat pagi · 좋은 아침 — 오늘도 화이팅!</div>'
+    + '<div style="' + ff + ';max-width:640px;margin:0 auto;padding:18px;background:#e2e8f0">'
+
+    // ─── 모닝 배너 (응원 메시지) ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 50%,#ea580c 100%);color:#fff;border-radius:14px;margin-bottom:14px">'
+    + '<tr><td style="padding:22px 24px">'
+    + '  <div style="font-size:11px;font-weight:800;letter-spacing:3px;opacity:.95">&#x1F305; ' + today + ' &middot; LAPORAN PAGI &middot; MORNING REPORT</div>'
+    + '  <div style="font-size:24px;font-weight:900;letter-spacing:-.5px;margin-top:4px">Selamat Pagi, ' + name + '! &#x2600;&#xFE0F;</div>'
+    + '  <div style="font-size:13.5px;font-weight:600;opacity:.95;margin-top:6px;line-height:1.55">'
+    + '    Setiap pagi adalah kesempatan baru untuk meraih closing!<br>'
+    + '    Hari ini adalah hari yang penuh peluang &mdash; <b>semangat dan tetap fokus!</b> &#x1F4AA;'
     + '  </div>'
-    + '  <div style="background:#fff;padding:22px 24px;border-radius:0 0 14px 14px;border:1px solid #e2e8f0;border-top:none">'
-    + '    <h2 style="font-size:12.5px;color:#64748b;margin:0 0 14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">📊 ' + monthLabel + ' 이번달 성과 · Performa Bulanan</h2>'
-    + '    <table style="width:100%;border-collapse:collapse">'
-    + statRow_('배정 DB · Alokasi DB', stats.db, '#1e3a8a')
-    + statRow_('방문 완료 · Visit Selesai', stats.visit, '#16a34a')
-    + statRow_('클로징 · Closing', stats.cl, '#dc2626')
-    + statRow_('DB → 클로징 · DB→Close', stats.r_dc + '%', '#7c3aed', true)
-    + '    </table>'
-    + '    <h2 style="font-size:12.5px;color:#64748b;margin:20px 0 12px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">📅 어제 (' + stats.yesterday + ') 활동 · Aktivitas Kemarin</h2>'
-    + '    <div style="display:flex;gap:10px;flex-wrap:wrap">'
-    + '      <div style="flex:1;min-width:120px;padding:14px;background:#eff6ff;border-radius:9px;text-align:center">'
-    + '        <div style="font-size:28px;font-weight:900;color:#1e3a8a;letter-spacing:-1px">' + stats.dbToday + '</div>'
-    + '        <div style="font-size:11px;color:#475569;font-weight:700">신규 배정</div>'
+    + '</td></tr></table>'
+
+    // ─── 헤더 ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;border-radius:14px;margin-bottom:14px">'
+    + '<tr><td style="padding:22px 24px">'
+    + '  <div style="font-size:11px;font-weight:700;color:#fbbf24;letter-spacing:2px">SALES TEAM &middot; KAIA</div>'
+    + '  <div style="font-size:22px;font-weight:900;letter-spacing:-.5px;margin-top:4px">&#x1F4CB; Laporan Manajemen Member &middot; ' + name + '</div>'
+    + '  <div style="font-size:11.5px;font-weight:600;opacity:.85;margin-top:6px">&#x1F4C5; ' + monthStart + ' ~ ' + monthLabel + '-' + stats.lastDay + ' &middot; Performa Bulanan</div>'
+    + '</td></tr></table>'
+
+    // ─── 이번달 성과 ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:14px">'
+    + '<tr><td style="padding:18px">'
+    + '  <div style="font-size:12.5px;color:#64748b;margin:0 0 14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">&#x1F4CA; ' + monthLabel + ' Performa Bulanan &middot; 이번달 성과</div>'
+    + '  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">'
+    + statRow_('Alokasi DB &middot; 배정 DB', stats.db, '#1e3a8a')
+    + statRow_('Visit Selesai &middot; 방문 완료', stats.visit + ' <span style="font-size:13px;color:#64748b;font-weight:700">(' + visitRate + '%)</span>', '#16a34a')
+    + statRow_('Closing &middot; 클로징', stats.cl + ' <span style="font-size:13px;color:#64748b;font-weight:700">(' + clRate + '%)</span>', '#dc2626')
+    + statRow_('DB &rarr; Closing &middot; DB&rarr;클로', stats.r_dc + '%', '#7c3aed', true)
+    + '  </table>'
+    + '</td></tr></table>'
+
+    // ─── 활동지수 (원본 디자인) ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(180deg,#fefce8 0%,#fff 100%);border:1px solid #fde68a;border-radius:14px;margin-bottom:14px">'
+    + '<tr><td style="padding:16px 18px">'
+    + '  <div style="display:block;margin-bottom:4px"><span style="font-size:15px;font-weight:900;color:#0f172a">&#x1F3C6; Skor Aktivitas &middot; 활동지수</span></div>'
+    + '  <div style="font-size:11.5px;color:#64748b;font-weight:700;margin-bottom:14px">Target KPI 100 pts &middot; &#x1F4CD; Pace hari ini ' + stats.pacePct + '%</div>'
+
+    + '  <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(90deg,#fefce8 0%,#fff 60%);border:1px solid #fde68a;border-radius:10px"><tr>'
+    + '    <td style="padding:13px 11px;width:46px;font-size:28px;text-align:center;vertical-align:middle">&#x1F947;</td>'
+    + '    <td style="padding:13px 4px;width:46px;vertical-align:middle">'
+    + '      <div style="width:38px;height:38px;border-radius:50%;background:#16a34a;color:#fff;text-align:center;line-height:38px;font-size:14px;font-weight:900">' + initial + '</div>'
+    + '    </td>'
+    + '    <td style="padding:13px 8px;vertical-align:middle">'
+    + '      <div style="font-size:14.5px;font-weight:900;color:#0f172a;letter-spacing:-.3px">' + name + '</div>'
+    + '      <div style="font-size:10.5px;color:#64748b;font-weight:700;margin-bottom:6px">TIM &middot; Indonesia</div>'
+    + '      <div style="position:relative;height:14px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:7px">'
+    + '        <div style="width:' + stats.scorePct + '%;height:100%;background:linear-gradient(90deg,#3b82f6,#1e40af);border-radius:7px"></div>'
+    + '        <div style="position:absolute;top:-3px;bottom:-3px;left:' + stats.pacePct + '%;width:3px;background:#0f172a;border-radius:2px"></div>'
     + '      </div>'
-    + '      <div style="flex:1;min-width:120px;padding:14px;background:#f0fdf4;border-radius:9px;text-align:center">'
-    + '        <div style="font-size:28px;font-weight:900;color:#16a34a;letter-spacing:-1px">' + stats.visitToday + '</div>'
-    + '        <div style="font-size:11px;color:#475569;font-weight:700">방문 완료</div>'
+    + '      <div style="display:block;font-size:10px;color:#94a3b8;margin-top:3px;font-weight:700">'
+    + '        <span>0 pts</span><span style="float:right">100 pts (KPI)</span>'
     + '      </div>'
-    + '      <div style="flex:1;min-width:120px;padding:14px;background:#fef2f2;border-radius:9px;text-align:center">'
-    + '        <div style="font-size:28px;font-weight:900;color:#dc2626;letter-spacing:-1px">' + stats.clToday + '</div>'
-    + '        <div style="font-size:11px;color:#475569;font-weight:700">클로징</div>'
+    + '    </td>'
+    + '    <td style="padding:13px 8px;vertical-align:middle;text-align:center;width:140px">'
+    + '      <div style="background:linear-gradient(135deg,#bfdbfe,#dbeafe);color:#1e3a8a;font-size:22px;font-weight:900;border-radius:9px;padding:8px 12px;border:1.5px solid #2563eb;letter-spacing:-.5px;line-height:1">'
+    + stats.score + '<span style="font-size:11px;font-weight:800;color:#3b82f6;margin-left:2px">pts</span>'
     + '      </div>'
-    + '    </div>'
-    + '    <div style="margin-top:22px;padding:14px;background:linear-gradient(135deg,#fef3c7,#fefce8);border-radius:9px;border-left:5px solid #f59e0b">'
-    + '      <div style="font-size:12px;font-weight:900;color:#78350f;margin-bottom:4px">💪 오늘의 한 줄</div>'
-    + '      <div style="font-size:13px;color:#92400e;font-weight:600;line-height:1.5">' + dailyMessage_(stats) + '</div>'
-    + '    </div>'
-    + '    <p style="margin:18px 0 0;color:#94a3b8;font-size:10.5px;text-align:center;letter-spacing:.5px">SALES TEAM DASHBOARD · Auto-sent at ' + REPORT_CFG.HOUR + ':00 ' + REPORT_CFG.TIMEZONE + '</p>'
+    + '      <div style="font-size:11px;font-weight:800;color:#64748b;background:#f1f5f9;padding:3px 8px;border-radius:6px;border:1px solid #e2e8f0;margin-top:4px">'
+    + '        Pace <b style="color:' + paceColor + ';font-weight:900;font-size:12px">' + paceSign + stats.paceDiff + '</b>'
+    + '      </div>'
+    + '    </td>'
+    + '  </tr></table>'
+
+    + '  <div style="margin-top:10px;padding:10px 12px;background:#fffbeb;border-left:3px solid #fbbf24;border-radius:6px;font-size:12px;color:#78350f;line-height:1.55">'
+    + '    <b>&#x1F4CD; Diagnosis:</b> Saat ini ' + stats.score + ' poin (' + stats.scorePct + '%). Pace standar hari ini ' + stats.pacePct + '%.'
+    + (stats.paceDiff < 0
+        ? ' Perlu <b>+' + Math.abs(stats.paceDiff) + ' poin</b> agar tepat waktu &mdash; <b style="color:#dc2626">1 closing = +5 poin</b>!'
+        : ' <b style="color:#15803d">Anda sudah di atas pace! Lanjutkan momentum ini!</b>')
     + '  </div>'
+
+    + '</td></tr></table>'
+
+    // ─── 어제 활동 ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;margin-bottom:14px">'
+    + '<tr><td style="padding:18px">'
+    + '  <div style="font-size:12.5px;color:#64748b;margin:0 0 14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">&#x1F4C5; Aktivitas Kemarin (' + stats.yesterday + ') &middot; 어제 활동</div>'
+    + '  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:8px 0">'
+    + '  <tr>'
+    + '    <td width="33%" style="background:#eff6ff;border-radius:10px;padding:14px;text-align:center">'
+    + '      <div style="font-size:30px;font-weight:900;color:#1e3a8a;letter-spacing:-1px;line-height:1">' + stats.dbToday + '</div>'
+    + '      <div style="font-size:11px;color:#475569;font-weight:700;margin-top:4px">Alokasi Baru</div>'
+    + '      <div style="font-size:10px;color:#94a3b8;font-weight:700">신규 배정</div>'
+    + '    </td>'
+    + '    <td width="33%" style="background:#f0fdf4;border-radius:10px;padding:14px;text-align:center">'
+    + '      <div style="font-size:30px;font-weight:900;color:#16a34a;letter-spacing:-1px;line-height:1">' + stats.visitToday + '</div>'
+    + '      <div style="font-size:11px;color:#475569;font-weight:700;margin-top:4px">Visit Selesai</div>'
+    + '      <div style="font-size:10px;color:#94a3b8;font-weight:700">방문 완료</div>'
+    + '    </td>'
+    + '    <td width="33%" style="background:#fef2f2;border-radius:10px;padding:14px;text-align:center">'
+    + '      <div style="font-size:30px;font-weight:900;color:#dc2626;letter-spacing:-1px;line-height:1">' + stats.clToday + '</div>'
+    + '      <div style="font-size:11px;color:#475569;font-weight:700;margin-top:4px">Closing</div>'
+    + '      <div style="font-size:10px;color:#94a3b8;font-weight:700">클로징</div>'
+    + '    </td>'
+    + '  </tr></table>'
+    + '</td></tr></table>'
+
+    // ─── 모닝 동기부여 ───
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border-radius:14px;margin-bottom:14px">'
+    + '<tr><td style="padding:22px 24px">'
+    + '  <div style="font-size:11px;font-weight:800;letter-spacing:3px;color:#bbf7d0">&#x1F4AA; PESAN MOTIVASI PAGI</div>'
+    + '  <div style="font-size:17px;font-weight:900;margin-top:8px;line-height:1.5">' + dailyMessage_(stats) + '</div>'
+    + '</td></tr></table>'
+
+    // ─── 푸터 ───
+    + '<div style="text-align:center;padding:10px;color:#94a3b8;font-size:10.5px;letter-spacing:.5px">'
+    + '  KAIA SALES TEAM DASHBOARD &middot; Selamat berkarya, ' + name + '! &#x1F31F;<br>'
+    + '  Laporan otomatis dikirim setiap pagi pukul ' + REPORT_CFG.HOUR + ':00 ' + REPORT_CFG.TIMEZONE
+    + '</div>'
+
     + '</div>';
 }
 
@@ -458,11 +551,11 @@ function statRow_(label, value, color, isLast) {
 }
 
 function dailyMessage_(stats) {
-  if(stats.clToday >= 2) return '🎉 어제 ' + stats.clToday + '건 클로징 — 멋진 성과입니다! Pertahankan momentum hari ini!';
-  if(stats.clToday === 1) return '🔥 어제 1건 클로징 성공! Tetap fokus — hari ini bisa lebih baik!';
-  if(stats.visitToday >= 3) return '🚀 어제 방문 ' + stats.visitToday + '건 — 다음 클로징이 멀지 않았어요! Closing menanti!';
-  if(stats.dbToday >= 3) return '📋 신규 DB ' + stats.dbToday + '건 배정 — 빠른 첫 컨택이 클로징의 80%! Hubungi segera!';
-  return '☀️ 새로운 하루입니다. 오늘은 1건이라도 더 컨택해보세요! Hari ini, hubungi member lebih banyak!';
+  if(stats.clToday >= 2) return '&#x1F389; Kemarin closing ' + stats.clToday + ' kali &mdash; performa luar biasa! Pertahankan momentum hari ini!';
+  if(stats.clToday === 1) return '&#x1F525; Closing 1 kali kemarin! Tetap fokus &mdash; hari ini bisa lebih baik!';
+  if(stats.visitToday >= 3) return '&#x1F680; Visit ' + stats.visitToday + ' kali kemarin &mdash; closing berikutnya sudah dekat! Closing menanti!';
+  if(stats.dbToday >= 3) return '&#x1F4CB; ' + stats.dbToday + ' DB baru kemarin &mdash; kontak cepat = 80% closing! Hubungi sekarang!';
+  return '&#x2600;&#xFE0F; Hari baru, peluang baru. Hari ini, hubungi minimal 1 member lebih banyak!';
 }
 
 // ════════════════════════════════════════════════════════════════
