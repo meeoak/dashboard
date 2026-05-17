@@ -1510,6 +1510,44 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .alyt-note{margin:14px 18px 0;padding:11px 14px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;font-size:11.5px;color:#854d0e;line-height:1.7}
 .alyt-note b{display:block;color:#713f12;margin-bottom:4px;font-size:12.5px}
 .alyt-note span{display:block;padding-left:6px}
+
+/* 📐 코호트 매트릭스 — 배정월 × 클로징 발생월 */
+.cohort-section-hd{margin:32px 18px 14px;padding:16px 20px;background:linear-gradient(135deg,#fef3c7,#fef9c3);border-radius:12px;border-left:6px solid #d97706;box-shadow:0 2px 6px rgba(217,119,6,.10)}
+.cohort-section-title{font-size:18px;font-weight:900;color:#78350f;letter-spacing:-.4px;margin-bottom:5px}
+.cohort-section-sub{font-size:12.5px;color:#92400e;font-weight:700;line-height:1.55}
+.cohort-legend{margin-top:9px;display:flex;flex-wrap:wrap;gap:8px}
+.lg-chip{font-size:11px;font-weight:800;padding:3px 9px;border-radius:14px;border:1px solid;letter-spacing:-.2px}
+.lg-chip.lg-diag{color:#15803d;background:rgba(34,197,94,.20);border-color:#16a34a}
+.lg-chip.lg-off{color:#581c87;background:rgba(168,85,247,.18);border-color:#a855f7}
+.lg-chip.lg-pre{color:#92400e;background:rgba(251,191,36,.25);border-color:#f59e0b}
+
+.cohort-section{margin:0 18px 22px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.cohort-hd{padding:12px 16px;border-bottom:1px solid #e2e8f0}
+.cohort-title{font-size:15.5px;font-weight:900;letter-spacing:-.3px;margin-bottom:3px}
+.cohort-sub{font-size:11.5px;color:#64748b;font-weight:600}
+.cohort-wrap{overflow-x:auto}
+.cohort-tbl{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;font-size:13px}
+.cohort-tbl th{background:#1e293b;color:#fff;padding:9px 7px;font-weight:800;letter-spacing:-.2px;font-size:12px;text-align:center;border-bottom:none}
+.cohort-tbl th.L{text-align:left;padding-left:14px}
+.cohort-tbl th.R{text-align:right;padding-right:10px}
+.cohort-tbl th small{font-weight:700;color:#94a3b8;font-size:10.5px}
+.cohort-tbl th.cum{background:#7c2d12;border-left:3px solid #fb923c}
+.cohort-tbl td{padding:8px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle;text-align:right;font-weight:800}
+.cohort-tbl td.L{text-align:left;padding-left:14px;color:#0f172a;font-size:13.5px}
+.cohort-tbl td.cum{background:#fef3c7;color:#78350f;font-weight:900;border-left:2px solid #f59e0b;font-size:14px}
+.cohort-tbl td.impossible{font-size:11px;background:#f8fafc;color:#cbd5e1}
+.cohort-tbl td.coh-diag{position:relative}
+.cohort-tbl tbody tr:hover td:not(.cum):not(.impossible){background-color:rgba(252,211,77,.18)!important}
+.cohort-tbl tr.pre-row td.L{color:#92400e}
+.cohort-tbl tfoot tr td{padding:10px 8px}
+.cohort-tbl tfoot tr.sum-actual td{background:#dbeafe;border-top:3px solid #2563eb;color:#1e3a8a;font-weight:900;font-size:14.5px}
+.cohort-tbl tfoot tr.sum-actual td small{color:#3730a3;font-weight:700;font-size:10.5px}
+.cohort-tbl tfoot tr.sum-diag td{background:#dcfce7;color:#15803d;font-weight:800}
+.cohort-tbl tfoot tr.sum-diag td small{color:#16a34a;font-weight:700;font-size:10.5px}
+.cohort-tbl tfoot tr.sum-prev td{background:#fef3c7;color:#a16207;font-weight:800;border-bottom:3px solid #ca8a04}
+.cohort-tbl tfoot tr.sum-prev td small{color:#854d0e;font-weight:700;font-size:10.5px}
+.cohort-tbl tfoot tr td.L{font-weight:900;font-size:13px;line-height:1.3}
+.cohort-tbl tfoot tr td.L small{font-size:10.5px;font-weight:600}
 /* 프리셋 버튼 (오늘 / 최근 N일 등) */
 .preset-btn{background:#fff;color:var(--c-navy);border:1.5px solid #cbd5e1;font-weight:700}
 .preset-btn:hover{background:var(--c-yellow-bg);border-color:var(--c-yellow)}
@@ -2058,6 +2096,23 @@ const LANG = {
     alyt_note_booking:'· 예약 = 상담예약 sched (status s/d/vc/ls 또는 cl=1 — 랑숭 walk-in 포함)',
     alyt_note_cl_actual:'· 당월 클로징 = 그 달에 실제로 발생한 클로징 (cl=1 AND 방문일 vd 가 해당 월) — 현금주의 시점 보고용',
     alyt_note_close_rate:'· 방문 대비 전환율 = 결제(발생주의) ÷ (예약 방문완료) · 분모에 랑숭 미포함',
+    cohort_section_title:'DB 코호트 매트릭스 — 배정월 × 클로징 발생월',
+    cohort_section_sub:'재경 보고용 — "이전 달 배정 DB 가 현재 매출의 몇 %를 만드는지" 직접 증명 · 우리 비즈니스 특성(긴 lag)을 시각화',
+    cohort_lg_diag:'■ 대각선 (즉시 전환)',
+    cohort_lg_off:'■ 비대각선 (이전 달 DB · 늦게 클로징)',
+    cohort_lg_pre:'■ 2025 이전 cohort',
+    cohort_sub:'행=DB 배정월 / 열=클로징 발생월 · 대각선=즉시 / 비대각선=이전 달 DB의 지연 클로징',
+    cohort_h_assign:'배정월',
+    cohort_h_db:'배정 DB',
+    cohort_h_close:'결제',
+    cohort_h_cum:'누적 클로징',
+    cohort_pre:'2025 이전',
+    cohort_actual:'당월 실제 클로징',
+    cohort_actual_sub:'(= 컬럼 합계 · 재경 보고 숫자)',
+    cohort_diag:'즉시 전환 (대각선)',
+    cohort_diag_sub:'(같은 달 배정 → 같은 달 클로징)',
+    cohort_prev:'이전월 기여',
+    cohort_prev_sub:'(= 실제 − 즉시 · 과거 DB 의 가치)',
     quick_nav:'📂 빠른 이동:',
     all_agents_btn:'👥 전체 에이전트',
     sec_db_agent_sub:'선택한 에이전트의 DB 종류 · 활동 상태 분포',
@@ -2281,6 +2336,23 @@ const LANG = {
     alyt_note_booking:'· Jadwal = jadwal konsultasi sched (status s/d/vc/ls atau cl=1 — termasuk walk-in Langsung)',
     alyt_note_cl_actual:'· Closing Aktual = closing yang benar-benar terjadi di bulan tsb (cl=1 AND Tgl Kunjungan vd di bulan tsb) — basis kas',
     alyt_note_close_rate:'· Tingkat Konversi vs Visit = Closing(Akrual) ÷ (Visit dari Jadwal) · Langsung tidak masuk penyebut',
+    cohort_section_title:'Matriks Kohor DB — Bulan Alokasi × Bulan Closing Aktual',
+    cohort_section_sub:'Untuk Laporan Keuangan — Bukti langsung "berapa % omzet bulan ini berasal dari DB bulan lalu" · Visualisasi karakter bisnis kita (lag panjang)',
+    cohort_lg_diag:'■ Diagonal (Konversi Instan)',
+    cohort_lg_off:'■ Non-Diagonal (DB Bulan Lalu · Closing Terlambat)',
+    cohort_lg_pre:'■ Kohor sebelum 2025',
+    cohort_sub:'Baris=Bulan Alokasi DB / Kolom=Bulan Closing · Diagonal=Instan / Non-Diagonal=Closing Tertunda dari DB Lama',
+    cohort_h_assign:'Bln Alokasi',
+    cohort_h_db:'Alokasi DB',
+    cohort_h_close:'Closing',
+    cohort_h_cum:'Total Closing',
+    cohort_pre:'Sebelum 2025',
+    cohort_actual:'Closing Aktual Bulan Tsb',
+    cohort_actual_sub:'(= Jumlah Kolom · Angka Laporan Keuangan)',
+    cohort_diag:'Konversi Instan (Diagonal)',
+    cohort_diag_sub:'(Alokasi & Closing di Bulan yg Sama)',
+    cohort_prev:'Kontribusi Bulan Lalu',
+    cohort_prev_sub:'(= Aktual − Instan · Nilai DB Lama)',
     quick_nav:'📂 Navigasi Cepat:',
     all_agents_btn:'👥 Semua Agen',
     sec_db_agent_sub:'Distribusi Jenis DB & Status Aktivitas Agen Terpilih',
@@ -4574,6 +4646,149 @@ function renderAnalytics(){
       <span>${T('alyt_note_cl_actual')}</span>
       <span>${T('alyt_note_close_rate')}</span>
     </div>`;
+
+  // ─── 📐 코호트 매트릭스 (배정월 × 클로징 발생월) ───────────────
+  //   재경 보고용 — "이전 달 DB 가 계속 익어가는 증거"
+  //   클로징은 r.cl===1 AND r.vd (방문일=클로징일) 기준으로 집계
+  const cohort     = { OFF:{}, MKT:{}, TOTAL:{} };
+  const cohortPre  = { OFF:{count:0,byMonth:{}}, MKT:{count:0,byMonth:{}}, TOTAL:{count:0,byMonth:{}} };
+
+  (D.records||[]).forEach(r=>{
+    if(r.cl!==1 || !r.vd || !r.ad) return;
+    const closeM = r.vd.slice(0,7);
+    if(!closeM.startsWith(curYear)) return;     // 클로징이 올해 발생한 것만
+    const cohM = r.ad.slice(0,7);
+    const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
+    const kindsArr = k ? [k, 'TOTAL'] : ['TOTAL'];
+    if(cohM.startsWith(curYear)){
+      kindsArr.forEach(kk=>{
+        if(!cohort[kk][cohM]) cohort[kk][cohM] = {};
+        cohort[kk][cohM][closeM] = (cohort[kk][cohM][closeM]||0) + 1;
+      });
+    } else {
+      kindsArr.forEach(kk=>{
+        cohortPre[kk].count++;
+        cohortPre[kk].byMonth[closeM] = (cohortPre[kk].byMonth[closeM]||0) + 1;
+      });
+    }
+  });
+
+  const buildCohortTable = (kindKey, kindLabel, color, bgColor)=>{
+    const coh = cohort[kindKey];
+    const pre = cohortPre[kindKey];
+
+    // 히트맵 강도 — 매트릭스 안에서의 max 기준
+    let maxVal = 0;
+    Object.values(coh).forEach(row => Object.values(row).forEach(v => { if(v>maxVal) maxVal = v; }));
+    Object.values(pre.byMonth).forEach(v => { if(v>maxVal) maxVal = v; });
+    if(maxVal === 0) maxVal = 1;
+    const cellBg = (val, isDiag)=>{
+      if(val === 0) return 'transparent';
+      const intensity = Math.min(1, val/maxVal);
+      return isDiag
+        ? `rgba(34,197,94,${0.20 + intensity*0.45})`     // 대각선 = 초록 (즉시 전환)
+        : `rgba(168,85,247,${0.15 + intensity*0.40})`;   // 비대각선 = 보라 (지연 클로징)
+    };
+    const mLbl = (m)=> (D.mlabels && D.mlabels[m]) || m;
+
+    // 컬럼 합계 (당월 실제 클로징 — 재경 보고 숫자) + 대각선 (즉시 전환)
+    const colTotals = {}; const diagTotals = {};
+    monthsList.forEach(m => {
+      colTotals[m]  = (pre.byMonth[m] || 0);
+      diagTotals[m] = (coh[m] && coh[m][m]) || 0;
+    });
+    monthsList.forEach(cohM => {
+      if(!coh[cohM]) return;
+      monthsList.forEach(closeM => { colTotals[closeM] += (coh[cohM][closeM]||0); });
+    });
+
+    let h = `<div class="cohort-section">
+      <div class="cohort-hd" style="border-left:5px solid ${color};background:${bgColor}">
+        <div class="cohort-title" style="color:${color}">📐 ${kindLabel}</div>
+        <div class="cohort-sub">${T('cohort_sub')}</div>
+      </div>
+      <div class="cohort-wrap"><table class="cohort-tbl">
+        <thead><tr>
+          <th class="L">${T('cohort_h_assign')}</th>
+          <th class="R">${T('cohort_h_db')}</th>`;
+    monthsList.forEach(m => {
+      h += `<th class="R">${mLbl(m)}<br><small>${T('cohort_h_close')}</small></th>`;
+    });
+    h += `<th class="R cum">${T('cohort_h_cum')}</th></tr></thead><tbody>`;
+
+    // 2025 이전 cohort 한 줄 (있을 때만)
+    if(pre.count > 0){
+      h += `<tr class="pre-row"><td class="L"><b>${T('cohort_pre')}</b></td><td class="R" style="color:#94a3b8">—</td>`;
+      monthsList.forEach(m => {
+        const v = pre.byMonth[m] || 0;
+        h += `<td class="R" style="background:${v?'rgba(251,191,36,.30)':'transparent'};color:${v?'#92400e':'#cbd5e1'};font-weight:800">${v||'—'}</td>`;
+      });
+      h += `<td class="R cum">${f(pre.count)}</td></tr>`;
+    }
+
+    // 올해 cohort 행들
+    monthsList.forEach((cohM, ci)=>{
+      const dbCount = (data[cohM] && data[cohM][kindKey] && data[cohM][kindKey].db) || 0;
+      let cohSum = 0;
+      monthsList.forEach(closeM => { cohSum += (coh[cohM] && coh[cohM][closeM]) || 0; });
+      h += `<tr><td class="L"><b>${mLbl(cohM)}</b></td><td class="R alyt-num">${f(dbCount)}</td>`;
+      monthsList.forEach((closeM, mi)=>{
+        if(mi < ci){
+          h += `<td class="R impossible">·</td>`;        // 클로징이 배정 이전일 수 없음
+        } else {
+          const v = (coh[cohM] && coh[cohM][closeM]) || 0;
+          const isDiag = (mi === ci);
+          const txtColor = v ? (isDiag ? '#14532d' : '#581c87') : '#cbd5e1';
+          const border  = isDiag ? 'box-shadow:inset 0 0 0 2px #16a34a;' : '';
+          h += `<td class="R coh-cell${isDiag?' coh-diag':''}" style="background:${cellBg(v, isDiag)};${border}color:${txtColor};font-weight:${isDiag?'900':'800'}">${v||'—'}</td>`;
+        }
+      });
+      h += `<td class="R cum">${f(cohSum)}</td></tr>`;
+    });
+
+    // 푸터: 당월 실제 클로징 / 즉시 전환 / 이전월 기여
+    h += `</tbody><tfoot>`;
+    let grandActual = 0, grandDiag = 0;
+    monthsList.forEach(m => { grandActual += colTotals[m]; grandDiag += diagTotals[m]; });
+    const grandPrev = grandActual - grandDiag;
+
+    h += `<tr class="sum-actual"><td class="L" colspan="2"><b>${T('cohort_actual')}</b><br><small>${T('cohort_actual_sub')}</small></td>`;
+    monthsList.forEach(m => { h += `<td class="R">${f(colTotals[m])}</td>`; });
+    h += `<td class="R cum">${f(grandActual)}</td></tr>`;
+
+    h += `<tr class="sum-diag"><td class="L" colspan="2"><b>${T('cohort_diag')}</b><br><small>${T('cohort_diag_sub')}</small></td>`;
+    monthsList.forEach(m => {
+      const ratio = colTotals[m] ? Math.round(diagTotals[m]/colTotals[m]*100) : 0;
+      h += `<td class="R">${f(diagTotals[m])}<br><small>${ratio}%</small></td>`;
+    });
+    const diagRatio = grandActual ? Math.round(grandDiag/grandActual*100) : 0;
+    h += `<td class="R cum">${f(grandDiag)}<br><small>${diagRatio}%</small></td></tr>`;
+
+    h += `<tr class="sum-prev"><td class="L" colspan="2"><b>${T('cohort_prev')}</b><br><small>${T('cohort_prev_sub')}</small></td>`;
+    monthsList.forEach(m => {
+      const prevV = colTotals[m] - diagTotals[m];
+      const ratio = colTotals[m] ? Math.round(prevV/colTotals[m]*100) : 0;
+      h += `<td class="R">${f(prevV)}<br><small>${ratio}%</small></td>`;
+    });
+    const prevRatio = grandActual ? Math.round(grandPrev/grandActual*100) : 0;
+    h += `<td class="R cum">${f(grandPrev)}<br><small>${prevRatio}%</small></td></tr>`;
+
+    h += `</tfoot></table></div></div>`;
+    return h;
+  };
+
+  h += `<div class="cohort-section-hd">
+    <div class="cohort-section-title">📐 ${T('cohort_section_title')}</div>
+    <div class="cohort-section-sub">${T('cohort_section_sub')}</div>
+    <div class="cohort-legend">
+      <span class="lg-chip lg-diag">${T('cohort_lg_diag')}</span>
+      <span class="lg-chip lg-off">${T('cohort_lg_off')}</span>
+      <span class="lg-chip lg-pre">${T('cohort_lg_pre')}</span>
+    </div>
+  </div>`;
+  h += buildCohortTable('OFF',   T('alyt_off_label'),   '#a855f7', '#faf5ff');
+  h += buildCohortTable('MKT',   T('alyt_mkt_label'),   '#0891b2', '#ecfeff');
+  h += buildCohortTable('TOTAL', T('alyt_total_label'), '#1e3a8a', '#eff6ff');
 
   wrap.innerHTML = h;
 }
