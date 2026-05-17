@@ -1,0 +1,12 @@
+# clasp / Apps Script
+.clasp.json
+.clasprc.json
+
+# Node
+node_modules/
+
+# OS / 편집기
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
