@@ -7351,7 +7351,7 @@ function showSheetStatus(msg,color){
   let el=document.getElementById('sheet-status');
   if(!el){
     el=document.createElement('div');el.id='sheet-status';
-    el.style.cssText='position:fixed;bottom:16px;right:16px;color:white;padding:7px 12px;border-radius:8px;z-index:9999;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18);max-width:340px;line-height:1.35;letter-spacing:-.2px';
+    el.style.cssText='position:fixed;bottom:16px;right:16px;color:white;padding:9px 14px;border-radius:8px;z-index:9999;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18);max-width:480px;line-height:1.45;letter-spacing:-.2px';
     document.body.appendChild(el);
   }
   el.style.background=color||'#2563eb';el.innerHTML=msg;el.style.display='block';
@@ -7403,13 +7403,78 @@ async function loadFromSheet(opts){
       hideSheetStatus();
     } else {
       const isAbort = (e.name === 'AbortError') || /aborted/i.test(e.message||'');
-      const msg = isAbort
-        ? '⚠️ 시트 응답 지연 (60초 초과) · 기존 데이터 표시 중 · 잠시 후 다시 시도'
-        : '⚠️ 시트 불러오기 실패: '+e.message+' (정적 데이터 표시 중)';
-      showSheetStatus(msg,'#dc2626');
-      setTimeout(hideSheetStatus,8000);
+      const isFetchFail = e.name === 'TypeError' && /failed to fetch/i.test(e.message||'');
+      const isHttp = /HTTP \d/.test(e.message||'');
+      let msg;
+      if(isAbort){
+        msg = '⚠️ 시트 응답 지연 (60초 초과)';
+      } else if(isFetchFail){
+        // 가장 흔한 원인 — 시트가 비공개 또는 CORS 차단
+        msg = '⚠️ 시트 접근 차단됨 — 시트 공유 설정을 확인하세요 (링크가 있는 모든 사용자: 뷰어). <a href="#" onclick="diagnoseSheetUrl();return false" style="color:#fef3c7;text-decoration:underline;font-weight:900">🔧 진단</a>';
+      } else if(isHttp){
+        msg = '⚠️ '+e.message+' — 시트 ID 또는 권한 문제. <a href="#" onclick="diagnoseSheetUrl();return false" style="color:#fef3c7;text-decoration:underline;font-weight:900">🔧 진단</a>';
+      } else {
+        msg = '⚠️ 시트 불러오기 실패: '+e.message;
+      }
+      showSheetStatus(msg+' (정적 데이터 표시 중)','#dc2626');
+      setTimeout(hideSheetStatus, 20000);  // 진단 링크 클릭할 시간 확보
     }
     return null;
+  }
+}
+
+// 🔧 시트 fetch 실패 시 사용자에게 띄우는 진단 — 가능한 원인을 좁혀줌
+async function diagnoseSheetUrl(){
+  const url = SHEET_CSV_URL;
+  const lines = [];
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push('🔧 구글 시트 fetch 진단');
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push('');
+  lines.push('시트 URL:');
+  lines.push(url);
+  lines.push('');
+  lines.push('1) 위 URL 을 새 탭에서 직접 열어보세요.');
+  lines.push('   - CSV 텍스트가 보이면 → 시트는 OK · 네트워크/CORS 문제');
+  lines.push('   - Google 로그인 페이지가 뜨면 → 시트가 비공개 상태');
+  lines.push('   - "권한 없음" 또는 404 → 시트 ID 가 틀렸거나 삭제됨');
+  lines.push('');
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push('가장 흔한 원인 (90%):');
+  lines.push('  시트가 "링크가 있는 모든 사용자: 뷰어"');
+  lines.push('  로 공유되어 있지 않음.');
+  lines.push('');
+  lines.push('해결: 시트 우측 상단 [공유] 클릭 →');
+  lines.push('     "링크 보기" → "링크가 있는 모든 사용자"');
+  lines.push('     → 권한 [뷰어] 로 설정 → 완료');
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push('');
+  // 가능하면 fetch 한번 더 시도하면서 자세한 에러 잡기
+  try {
+    const resp = await fetch(url, {cache:'no-store'});
+    lines.push('실시간 fetch 시도:');
+    lines.push('  HTTP ' + resp.status + ' ' + resp.statusText);
+    const txt = await resp.text();
+    lines.push('  응답 첫 200 chars:');
+    lines.push('  ' + txt.slice(0,200).replace(/\n/g,' '));
+  } catch(e){
+    lines.push('실시간 fetch 시도: ❌');
+    lines.push('  ' + e.name + ': ' + e.message);
+    if(e.name === 'TypeError'){
+      lines.push('  → CORS 차단 또는 네트워크 단절');
+      lines.push('  → 시트가 비공개인 경우 가장 흔함');
+    }
+  }
+  // 새 창에 결과 표시 (alert 는 줄바꿈 안 보이는 경우 있어서)
+  const w = window.open('', '_blank', 'width=700,height=600');
+  if(w){
+    w.document.write('<pre style="font-family:monospace;font-size:13px;padding:20px;line-height:1.6">' +
+      lines.join('\n') +
+      '\n\n<a href="' + url + '" target="_blank" style="color:#2563eb;font-weight:900">' +
+      '👉 시트 URL 새 탭에서 열어보기</a></pre>');
+    w.document.title = '시트 fetch 진단';
+  } else {
+    alert(lines.join('\n'));
   }
 }
 
