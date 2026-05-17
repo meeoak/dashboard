@@ -6930,11 +6930,23 @@ function printAgentReport(lang){
   }
   // 인쇄 모드 클래스 부여 → CSS로 보고서 영역만 노출
   document.body.classList.add('printing-report');
+  // 📄 PDF 파일명용 document.title 일시 변경
+  //  Chrome "PDF로 저장" 기본 파일명 = document.title
+  const origTitle = document.title;
+  if(curAgent && curAgent !== 'ALL'){
+    const meta = (D.agent_meta && D.agent_meta[curAgent]) || {};
+    const safeName = (meta.short || curAgent || '').replace(/[\\/:*?"<>|]/g, '_');
+    const suffix = (typeof T === 'function' ? T('report_title_suffix') : '') || ' - 회원관리 보고서';
+    document.title = `${safeName}${suffix} (${curFrom}~${curTo})`;
+  }
   // 인쇄 다이얼로그 열기 (브라우저에서 PDF 저장 가능)
   setTimeout(()=>{
     window.print();
-    // 인쇄 후 클래스 제거
-    setTimeout(()=>document.body.classList.remove('printing-report'), 300);
+    // 인쇄 후 클래스/제목 복원
+    setTimeout(()=>{
+      document.body.classList.remove('printing-report');
+      document.title = origTitle;
+    }, 300);
   }, 150);
 }
 
