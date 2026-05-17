@@ -1162,21 +1162,35 @@ body.focus-mode #detail-section-hd{display:none!important}
   .ai-rpt-meta{font-size:11px}
 }
 @media print{
-  /* 보고서 모드 (단일 에이전트): 보고서 영역만 노출 */
-  /* A4 가로 + 페이지 너비에 맞게 컨텐츠 스케일 */
+  /* 보고서 모드 (단일 에이전트): 보고서 영역만 노출 + A4 가로 페이지 너비에 맞춤 */
   @page { size: A4 landscape; margin: 6mm; }
-  body.printing-report .top-tabs,
+  /* 화면 chrome (헤더/탭/필터/네비) 전부 숨김 */
+  body.printing-report .hdr,
+  body.printing-report .tabs-bar,
   body.printing-report .scope-bar,
   body.printing-report .team-bar,
+  body.printing-report .filter-bar,
+  body.printing-report .quick-nav-bar,
+  body.printing-report .mode-banner,
+  body.printing-report .section-hd,
   body.printing-report .cal-controls,
   body.printing-report .ai-rpt-actions,
   body.printing-report .floating-side,
-  body.printing-report .header{display:none !important}
-  body.printing-report .ai-rpt-hd{background:#1e3a8a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  body.printing-report{background:#fff !important;margin:0 !important;padding:0 !important;width:1180px !important;zoom:0.74}
-  /* 메인 컨테이너가 가로 페이지 너비에 맞도록 강제 */
-  body.printing-report #page-main{max-width:1180px !important;width:1180px !important;margin:0 !important}
-  body.printing-report #content-agent_insight{max-width:100% !important;width:100% !important;padding:0 8px !important}
+  body.printing-report #auth-modal,
+  body.printing-report .top-tabs,
+  body.printing-report .header,
+  /* 메인 대시보드의 공통 영역도 숨김 — 단일 에이전트 보고서만 노출 */
+  body.printing-report .def-box-wrap,
+  body.printing-report .db-section,
+  body.printing-report .kpi-targets,
+  body.printing-report #gap-section-wrap,
+  body.printing-report .gap-wrap,
+  body.printing-report .kpi-banner,
+  body.printing-report .m-trend-section{display:none !important}
+  /* A4 가로 인쇄 너비(약 1077px @96dpi) 에 맞게 1180px 디자인을 축소 */
+  body.printing-report{background:#fff !important;margin:0 !important;padding:0 !important;width:1180px !important;zoom:0.91}
+  body.printing-report #page-main{max-width:1180px !important;width:1180px !important;margin:0 !important;padding:0 !important}
+  body.printing-report #content-agent_insight{max-width:100% !important;width:100% !important;padding:0 6px !important}
   /* 가로 스크롤 컨테이너 — 인쇄 시 잘리지 않도록 전체 표시 */
   body.printing-report #content-agent_insight [style*="overflow-x"]{overflow:visible !important}
   body.printing-report .month-tbl{font-size:10.5px}
@@ -1197,6 +1211,7 @@ body.focus-mode #detail-section-hd{display:none!important}
   body.printing-report .ag-m-item,
   body.printing-report .ins-team-card,
   body.printing-report .ins-ag-detail{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.printing-report .ai-rpt-hd{background:#1e3a8a !important}
   /* 섹션 페이지 분할 — 카드 중간 잘림 방지 */
   body.printing-report .sec-hd,
   body.printing-report .ai-rpt-hd,
