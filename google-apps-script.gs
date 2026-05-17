@@ -293,7 +293,7 @@ function sendDailyReports() {
       }
       const urgent = getUrgentMembers_(records, name, today);
       const cal    = getCalendarSummary_(records, name, monthStart, today);
-      const html = buildReportHTML_({name, stats, urgent, cal, today, monthStart});
+      const html = buildReportHTML_({name, stats, urgent, cal, records, today, monthStart});
       const subject = '[일일 보고 · Laporan Harian] ' + name + ' · ' + today;
       const opts = { htmlBody: html, name: REPORT_CFG.FROM_NAME };
       if(REPORT_CFG.CC) opts.cc = REPORT_CFG.CC;
@@ -486,9 +486,10 @@ function getCalendarSummary_(records, agentName, monthStart, today) {
 
 // 헬퍼: 보고서 HTML 빌더 (풀버전 · 인니어 · 모닝 보고)
 // 이모지는 HTML entity 로 처리하여 4byte surrogate-pair 손상 방지
-function buildReportHTML_({name, stats, urgent, cal, today, monthStart}) {
-  urgent = urgent || {simulasi:[], belum:[], dorman:[], menunggu:[]};
-  cal    = cal    || {visit:0, meeting:0, visual:0, jadwal:0};
+function buildReportHTML_({name, stats, urgent, cal, records, today, monthStart}) {
+  urgent  = urgent  || {simulasi:[], belum:[], dorman:[], menunggu:[]};
+  cal     = cal     || {visit:0, meeting:0, visual:0, jadwal:0};
+  records = records || [];
   const monthLabel = today.slice(0,7);
   const ff = `font-family:Segoe UI,-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;color:#0f172a`;
   const initial = String(name||'?').charAt(0).toUpperCase();
@@ -616,6 +617,7 @@ function buildReportHTML_({name, stats, urgent, cal, today, monthStart}) {
     + '      <div style="font-size:10px;color:#64748b;font-weight:700;margin-top:4px">일정</div>'
     + '    </td>'
     + '  </tr></table>'
+    + buildCalendarTable_(records, name, monthLabel, today, stats.lastDay)
     + '</td></tr></table>'
 
     // ─── 활동지수 (원본 디자인) ───
@@ -699,6 +701,56 @@ function buildReportHTML_({name, stats, urgent, cal, today, monthStart}) {
     + '</div>';
 }
 
+function buildCalendarTable_(records, agentName, monthLabel, today, lastDay) {
+  const [year, month] = monthLabel.split('-').map(Number);
+  const firstDow = new Date(year, month-1, 1).getDay();
+  const todayDay = parseInt(today.split('-')[2]);
+
+  const daily = {};
+  records.filter(r => r.agent === agentName && r.vd && r.vd.indexOf(monthLabel) === 0)
+    .forEach(r => {
+      const day = parseInt(r.vd.split('-')[2]);
+      const sB = (r.statusB||'').toLowerCase();
+      if(!daily[day]) daily[day] = {visit:0, visual:0, meeting:0};
+      if(sB.indexOf('visit selesai') >= 0) daily[day].visit++;
+      else if(sB.indexOf('langsung') >= 0) daily[day].visual++;
+      else if(sB.indexOf('video call') >= 0) daily[day].meeting++;
+      else daily[day].meeting = (daily[day].meeting||0); // jadwal 카운트는 표시 X
+    });
+
+  const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  let html = '<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:10px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-top:10px">';
+  html += '<tr style="background:#f8fafc">';
+  days.forEach(d => { html += '<th style="padding:6px;font-weight:800;color:#475569;letter-spacing:.5px;border-right:1px solid #e2e8f0;font-size:10px">' + d + '</th>'; });
+  html += '</tr>';
+
+  let row = '<tr>';
+  for(let i=0; i<firstDow; i++){
+    row += '<td style="height:48px;width:14.28%;border-right:1px solid #f1f5f9;border-top:1px solid #f1f5f9"></td>';
+  }
+  let dow = firstDow;
+  for(let d=1; d<=lastDay; d++){
+    const info = daily[d];
+    const isToday = d === todayDay;
+    let content = '<div style="font-weight:' + (isToday?'900':'700') + ';color:' + (isToday?'#92400e':'#64748b') + ';font-size:10.5px">' + d + (isToday?' &middot; Hari ini':'') + '</div>';
+    if(info){
+      if(info.visit) content += '<div style="font-size:9px;color:#dc2626;font-weight:800;line-height:1.3">&#x25CF; V ' + info.visit + '</div>';
+      if(info.visual) content += '<div style="font-size:9px;color:#16a34a;font-weight:800;line-height:1.3">&#x25CF; L ' + info.visual + '</div>';
+      if(info.meeting) content += '<div style="font-size:9px;color:#7c3aed;font-weight:800;line-height:1.3">&#x25CF; M ' + info.meeting + '</div>';
+    }
+    const bg = isToday ? 'background:#fef3c7;' : '';
+    row += '<td style="' + bg + 'height:48px;padding:4px 5px;vertical-align:top;border-right:1px solid #f1f5f9;border-top:1px solid #f1f5f9;width:14.28%">' + content + '</td>';
+    dow = (dow+1) % 7;
+    if(dow === 0 && d < lastDay){ html += row + '</tr>'; row = '<tr>'; }
+  }
+  while(dow !== 0 && dow < 7){
+    row += '<td style="height:48px;border-right:1px solid #f1f5f9;border-top:1px solid #f1f5f9"></td>';
+    dow++;
+  }
+  html += row + '</tr></table>';
+  return html;
+}
+
 function buildUrgentSection_(urgent) {
   const cats = [
     {key:'simulasi', list:urgent.simulasi, label:'Simulasi Pendapatan &middot; 수익 시뮬', icon:'&#x1F4B0;', bg:'#fef2f2', border:'#fee2e2', color:'#991b1b', pillBg:'#fee2e2'},
@@ -722,7 +774,7 @@ function buildUrgentSection_(urgent) {
   } else {
     cats.forEach(c => {
       if(c.list.length === 0) return;
-      const showList = c.list.slice(0, 5);
+      const showList = c.list.slice(0, 10);
       const more = c.list.length - showList.length;
       html += '  <div style="border:1px solid ' + c.border + ';border-radius:9px;margin-bottom:8px;overflow:hidden">';
       html += '    <div style="background:' + c.bg + ';padding:7px 12px;font-size:11px;font-weight:900;color:' + c.color + ';letter-spacing:.2px">' + c.icon + ' ' + c.label + ' (' + c.list.length + ')</div>';
@@ -797,7 +849,7 @@ function sendTestReport_(agentNameQuery, toEmail) {
   const cal = getCalendarSummary_(records, agentName, monthStart, today);
   Logger.log('  · stats: ' + JSON.stringify(stats));
   Logger.log('  · urgent: simulasi=' + urgent.simulasi.length + ' belum=' + urgent.belum.length + ' dorman=' + urgent.dorman.length + ' menunggu=' + urgent.menunggu.length);
-  const html = buildReportHTML_({name: agentName, stats, urgent, cal, today, monthStart});
+  const html = buildReportHTML_({name: agentName, stats, urgent, cal, records, today, monthStart});
   const subject = '[TEST · 일일 보고 · Laporan Harian] ' + agentName + ' · ' + today;
   GmailApp.sendEmail(toEmail, subject, '', {
     htmlBody: html,
