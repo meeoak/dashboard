@@ -442,3 +442,50 @@ function dailyMessage_(stats) {
   if(stats.dbToday >= 3) return '📋 신규 DB ' + stats.dbToday + '건 배정 — 빠른 첫 컨택이 클로징의 80%! Hubungi segera!';
   return '☀️ 새로운 하루입니다. 오늘은 1건이라도 더 컨택해보세요! Hari ini, hubungi member lebih banyak!';
 }
+
+// ════════════════════════════════════════════════════════════════
+//  🧪 테스트 발송 — 특정 에이전트 보고서를 내 이메일로 한 번 받아보기
+// ════════════════════════════════════════════════════════════════
+// GAS 콘솔에서 'sendTestToMe_DeviRahayu' 함수 ▶️ 실행
+function sendTestToMe_DeviRahayu() {
+  return sendTestReport_('devi', 'meeoak0512@gmail.com');
+}
+
+// 범용 테스트 — agentNameQuery 는 부분일치 (대소문자 무관)
+function sendTestReport_(agentNameQuery, toEmail) {
+  const today = Utilities.formatDate(new Date(), REPORT_CFG.TIMEZONE, 'yyyy-MM-dd');
+  const monthStart = today.slice(0,7) + '-01';
+  Logger.log('🧪 Test report · query="' + agentNameQuery + '" → ' + toEmail);
+
+  const records = loadDataRecords_();
+  Logger.log('  · 데이터 레코드: ' + records.length + '건 로드');
+
+  // 부분일치로 에이전트 이름 찾기
+  const q = String(agentNameQuery||'').toLowerCase().trim();
+  const allAgents = Array.from(new Set(records.map(r => r.agent).filter(Boolean)));
+  const matched = allAgents.filter(a => String(a).toLowerCase().indexOf(q) >= 0);
+
+  if(matched.length === 0){
+    Logger.log('❌ 에이전트 매칭 실패 — 전체 에이전트 목록:');
+    allAgents.sort().forEach(a => Logger.log('   · ' + a));
+    return {ok: false, error: 'agent not found', allAgents};
+  }
+  const agentName = matched[0];
+  if(matched.length > 1){
+    Logger.log('⚠️ 후보 ' + matched.length + '명 — 첫 번째 사용: ' + agentName);
+    Logger.log('   다른 후보: ' + matched.slice(1).join(', '));
+  } else {
+    Logger.log('✓ 매칭된 에이전트: ' + agentName);
+  }
+
+  const stats = calcAgentStats_(records, agentName, monthStart, today);
+  Logger.log('  · stats: ' + JSON.stringify(stats));
+  const html = buildReportHTML_({name: agentName, stats, today, monthStart});
+  const subject = '[TEST · 일일 보고 · Laporan Harian] ' + agentName + ' · ' + today;
+  GmailApp.sendEmail(toEmail, subject, '', {
+    htmlBody: html,
+    name: REPORT_CFG.FROM_NAME
+  });
+  Logger.log('✅ 테스트 메일 발송 완료 → ' + toEmail);
+  return {ok: true, agent: agentName, to: toEmail, today, stats};
+}
