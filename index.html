@@ -1726,8 +1726,85 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .dlg-item[onclick*="OFF"] .dlg-dot{background:var(--c-navy)!important}
 .dlg-item[onclick*="MKT"] .dlg-dot{background:var(--c-yellow)!important}
 .dlg-unfit .dlg-dot{background:var(--c-red)!important}
+/* 🔒 접근 권한 모달 (초대된 사용자만) */
+#auth-modal{position:fixed;inset:0;z-index:99999;display:none}
+#auth-modal.show{display:block}
+.auth-overlay{position:absolute;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(10px)}
+.auth-card{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);color:#fff;padding:42px 36px 32px;border-radius:16px;border:2px solid #fbbf24;box-shadow:0 0 80px rgba(251,191,36,.35),0 20px 60px rgba(0,0,0,.5);min-width:340px;max-width:90vw;text-align:center}
+.auth-icon{font-size:52px;margin-bottom:14px;filter:drop-shadow(0 0 18px rgba(251,191,36,.5))}
+.auth-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.6px;line-height:1.2}
+.auth-sub{font-size:12.5px;color:#94a3b8;margin:8px 0 24px;font-weight:700;letter-spacing:.1px}
+.auth-pin{width:100%;padding:14px 16px;font-size:22px;font-weight:900;text-align:center;border:2px solid #334155;background:#0f172a;color:#fbbf24;border-radius:10px;letter-spacing:8px;outline:none;transition:border-color .15s;font-family:'SF Mono',Consolas,monospace;box-sizing:border-box}
+.auth-pin:focus{border-color:#fbbf24;box-shadow:0 0 0 4px rgba(251,191,36,.15)}
+.auth-btn{width:100%;margin-top:14px;padding:14px;font-size:15px;font-weight:900;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0f172a;border:none;border-radius:10px;cursor:pointer;letter-spacing:.2px;transition:transform .12s,box-shadow .15s}
+.auth-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(251,191,36,.4)}
+.auth-err{margin-top:12px;color:#fca5a5;font-size:13px;font-weight:800;min-height:18px}
+.auth-card.shake{animation:authShake .4s}
+@keyframes authShake{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(-53%,-50%)}75%{transform:translate(-47%,-50%)}}
+.auth-foot{margin-top:18px;font-size:10.5px;color:#64748b;font-weight:600;letter-spacing:.3px}
 </style></head>
 <body>
+
+<!-- 🔒 접근 권한 모달 — 초대된 사용자만 -->
+<div id="auth-modal">
+  <div class="auth-overlay"></div>
+  <div class="auth-card">
+    <div class="auth-icon">🔒</div>
+    <div class="auth-title">접근 권한 확인</div>
+    <div class="auth-sub">초대된 사용자만 이용 가능합니다 · Akses Terbatas</div>
+    <input type="password" class="auth-pin" id="auth-pin-input" placeholder="PIN" maxlength="20" autocomplete="off" />
+    <button class="auth-btn" id="auth-pin-btn">확인 / Konfirmasi</button>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-foot">SALES TEAM DASHBOARD · INVITE-ONLY</div>
+  </div>
+</div>
+<script>
+/* ⚠️ 접근 PIN — 원하는 PIN 으로 바꾸세요 (예: '2026', 'kaia', 'sales' 등)
+   변경 후 초대한 사람들한테만 알려주시면 됩니다.
+   PIN 입력 성공 시 30일간 localStorage 에 저장되어 재입력 안 함. */
+(function(){
+  const ACCESS_PIN = '2026';                       // ← 본인이 정한 PIN 으로 변경
+  const STORAGE_KEY = 'dashboard_auth_v1';
+  const EXPIRE_MS = 30 * 24 * 60 * 60 * 1000;
+  const modal = document.getElementById('auth-modal');
+  function isAuthed(){
+    try{
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
+      if(!d || d.p !== ACCESS_PIN) return false;
+      if(Date.now() - d.t > EXPIRE_MS) return false;
+      return true;
+    }catch(e){ return false; }
+  }
+  function gate(){
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    const input = document.getElementById('auth-pin-input');
+    const btn = document.getElementById('auth-pin-btn');
+    const err = document.getElementById('auth-err');
+    const card = modal.querySelector('.auth-card');
+    setTimeout(()=>input.focus(), 100);
+    function tryAuth(){
+      const pin = (input.value||'').trim();
+      if(!pin){ input.focus(); return; }
+      if(pin === ACCESS_PIN){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({p: ACCESS_PIN, t: Date.now()}));
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+        err.textContent = '';
+      } else {
+        err.textContent = '⚠️ 잘못된 PIN · PIN salah';
+        card.classList.add('shake');
+        input.value = '';
+        input.focus();
+        setTimeout(()=>card.classList.remove('shake'), 400);
+      }
+    }
+    btn.onclick = tryAuth;
+    input.onkeydown = function(e){ if(e.key==='Enter') tryAuth(); };
+  }
+  if(!isAuthed()) gate();
+})();
+</script>
 
 <div id="page-main">
 
