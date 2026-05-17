@@ -1684,7 +1684,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <div class="cal-controls">
     <div class="cal-month-nav">
       <button class="cal-nav-btn" onclick="calPrevMonth()" title="이전 월" data-t-title="prev_month">◀</button>
-      <span class="cal-month-label" id="cal-month-label">5월</span>
+      <span class="cal-month-label" id="cal-month-label">May</span>
       <button class="cal-nav-btn" onclick="calNextMonth()" title="다음 월" data-t-title="next_month">▶</button>
     </div>
     <div class="cal-team-tabs" id="cal-team-tabs"></div>
@@ -1704,7 +1704,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
           <span class="cleg-item"><span class="ldot" style="background:#16a34a"></span>TINA</span>
           <span class="cleg-item"><span class="ldot" style="background:#ea4335"></span>LIDIA</span>
           <span class="cleg-divider"></span>
-          <span class="cleg-item"><span class="strike-red">완료된 방문</span>은 취소선으로 표시</span>
+          <span class="cleg-item"><span class="strike-red" data-t="cal_legend_done">완료된 방문</span><span data-t="cal_legend_strike">은 취소선으로 표시</span></span>
         </div>
       </div>
       <div class="cal-grid" id="cal-s-grid"></div>
@@ -1879,8 +1879,9 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 <script src="data.js"></script>
 <script>
 // 월 라벨·요일을 영어로 통일 (한국어/인니어 공통). data.js 가 한국어 값으로 들어와도 즉시 변환.
+// data.js 는 'let D = ...' 로 선언되어 window.D 가 아닌 모듈 스코프에 있음 → typeof D 로 확인
 (function(){
-  if(!window.D) return;
+  if(typeof D === 'undefined' || !D) return;
   const _MN_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   if(D.mlabels){
     Object.keys(D.mlabels).forEach(k=>{
@@ -2099,6 +2100,20 @@ const LANG = {
     st_h_book_rate_t:'배정→예약 목표 25%', st_h_visit_rate_t:'예약→방문 목표 75%',
     st_h_close_rate_t:'방문→클로징 목표 65%', st_h_db_close_t:'DB→클로징 목표 12% (최종 KPI)',
     st_basis_alloc:'배정일 기준',
+    // 캘린더 상단 stat 카드
+    cs_prev_diff:'전월 대비', cs_thisweek:'이번주', cs_daily_avg:'일평균',
+    cs_count_open_mem:'클릭 → 회원 목록',
+    cs_unit_count:'건',  // 빈 문자열로 둘 수도 있지만 한글은 자연스러움 위해 유지
+    // 캘린더 범례
+    cal_legend_done:'완료된 방문', cal_legend_strike:'은 취소선으로 표시',
+    // KPI 테이블 팀 펼치기/접기
+    tbl_expand:'▶ 펼치기', tbl_collapse:'▼ 접기',
+    tbl_expand_short:'펼치기', tbl_collapse_short:'접기',
+    tbl_persons:'명',
+    // 확인필요 타이틀
+    overdue_tag_title:'방문일 지났는데 미완료 - 클릭시 명단',
+    // 회원 목록 카운트
+    mem_total_count:'총 {n}건',
   },
   id: {
     title:'Dashboard Penjualan Terpadu', subtitle:'Status Penjualan Kunjungan Real-time',
@@ -2289,11 +2304,31 @@ const LANG = {
     st_h_book_rate_t:'Alokasi→Jadwal target 25%', st_h_visit_rate_t:'Jadwal→Visit target 75%',
     st_h_close_rate_t:'Visit→Close target 65%', st_h_db_close_t:'DB→Close target 12% (KPI Akhir)',
     st_basis_alloc:'Berdasarkan Tgl Alokasi',
+    // Kartu stat header kalender
+    cs_prev_diff:'vs Bln Lalu', cs_thisweek:'Minggu Ini', cs_daily_avg:'Rata-rata',
+    cs_count_open_mem:'Klik → Daftar Member',
+    cs_unit_count:'',  // Bahasa: tidak pakai unit
+    // Legend kalender
+    cal_legend_done:'Visit selesai', cal_legend_strike:' ditampilkan dengan strikethrough',
+    // Buka/Tutup pada tabel KPI per tim
+    tbl_expand:'▶ Buka', tbl_collapse:'▼ Tutup',
+    tbl_expand_short:'Buka', tbl_collapse_short:'Tutup',
+    tbl_persons:'org',
+    // Title untuk tag konfirmasi
+    overdue_tag_title:'Sudah lewat tgl visit tapi belum selesai - klik untuk daftar',
+    // Total daftar member
+    mem_total_count:'Total {n}',
   }
 };
 
 let curLang = localStorage.getItem('dash_lang') || 'ko';
-function T(key){ return LANG[curLang]?.[key] || LANG.ko[key] || key; }
+// 빈 문자열도 유효한 값으로 인정 (||는 ''를 falsy 로 처리하므로 in 연산자 사용)
+function T(key){
+  const cur = LANG[curLang];
+  if(cur && key in cur) return cur[key];
+  if(LANG.ko && key in LANG.ko) return LANG.ko[key];
+  return key;
+}
 // 플레이스홀더 치환: T_('r_climb_to', {n:2}) → "⬆️ 2위까지"
 function T_(key, vars){
   let s = T(key);
@@ -2873,7 +2908,7 @@ function openMemTeam(team, stypeStr, labelOverride){
       <div class="mem-count">${recs.length}</div>
       <div style="font-size:11px;color:#aaa">건</div></div>`;
   document.getElementById('mem-search').value='';
-  document.getElementById('mem-count-lbl').textContent = `총 ${recs.length}건`;
+  document.getElementById('mem-count-lbl').textContent = T_('mem_total_count',{n:recs.length});
   renderMemTable(recs);
   document.getElementById('page-main').style.display='none';
   document.getElementById('page-member').style.display='block';
@@ -2924,7 +2959,7 @@ function renderGaps(){
     if(window.__gapAgentsCollapsed[team] === undefined) window.__gapAgentsCollapsed[team] = true;
     const isCollapsedNow = !!window.__gapAgentsCollapsed[team];
     const agentToggleHtml = activeAgents.length
-      ? `<button class="team-chevron-btn gap-agent-toggle" data-team="${team}" data-count="${activeAgents.length}" onclick="event.stopPropagation();toggleGapAgents('${team}')" title="${isCollapsedNow?'펼치기':'접기'}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 10px;font-size:14px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s">${isCollapsedNow?'▶ 펼치기':'▼ 접기'} · ${activeAgents.length}명</button>`
+      ? `<button class="team-chevron-btn gap-agent-toggle" data-team="${team}" data-count="${activeAgents.length}" onclick="event.stopPropagation();toggleGapAgents('${team}')" title="${isCollapsedNow?T('tbl_expand_short'):T('tbl_collapse_short')}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 10px;font-size:14px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s">${isCollapsedNow?T('tbl_expand'):T('tbl_collapse')} · ${activeAgents.length}${T('tbl_persons')}</button>`
       : '';
     if(team === 'TIM_LIDIA'){
       // LIDIA: 비디오콜 전담팀
@@ -3004,8 +3039,8 @@ function toggleGapAgents(team){
   const btn = document.querySelector(`.gap-agent-toggle[data-team="${team}"]`);
   if(btn){
     const count = btn.dataset.count || '0';
-    btn.textContent = `${isCollapsed?'▶ 펼치기':'▼ 접기'} · ${count}명`;
-    btn.title = isCollapsed ? '펼치기' : '접기';
+    btn.textContent = `${isCollapsed?T('tbl_expand'):T('tbl_collapse')} · ${count}${T('tbl_persons')}`;
+    btn.title = isCollapsed ? T('tbl_expand_short') : T('tbl_collapse_short');
   }
 }
 
@@ -3499,8 +3534,8 @@ function toggleTeamRows(team){
   const btn = document.querySelector(`tr[data-team-row="${team}"] .team-chevron-btn`);
   if(btn){
     const count = btn.dataset.count || '';
-    btn.textContent = `${isCollapsed?'▶ 펼치기':'▼ 접기'}${count?' · '+count+'명':''}`;
-    btn.title = isCollapsed ? '펼치기' : '접기';
+    btn.textContent = `${isCollapsed?T('tbl_expand'):T('tbl_collapse')}${count?' · '+count+T('tbl_persons'):''}`;
+    btn.title = isCollapsed ? T('tbl_expand_short') : T('tbl_collapse_short');
   }
 }
 
@@ -3519,7 +3554,7 @@ function kpiTblRow(label, emo, color, st, isAll, dataTeam){
       ? `<span class="num-val" style="color:#2563eb" onclick="kpiTblClick(event,'s_f','${dataTeam}')">${f(sf)}</span>`
       : `<span class="num-val zero">-</span>`;
     if(so > 0){
-      html += `<div style="margin-top:3px"><span class="overdue-tag" onclick="kpiTblClickOverdue(event,'${dataTeam}')" title="방문일 지났는데 미완료 - 클릭시 명단">⚠️ ${T('cal_check')} ${f(so)}</span></div>`;
+      html += `<div style="margin-top:3px"><span class="overdue-tag" onclick="kpiTblClickOverdue(event,'${dataTeam}')" title="${T('overdue_tag_title')}">⚠️ ${T('cal_check')} ${f(so)}</span></div>`;
     }
     return html;
   };
@@ -3530,7 +3565,7 @@ function kpiTblRow(label, emo, color, st, isAll, dataTeam){
   const isCollapsed = window.__teamCollapsed[dataTeam];
   const teamAgentCount = isTeamRow ? ((D.team_members[dataTeam]||[]).length) : 0;
   const chevron = isTeamRow
-    ? `<button class="team-chevron-btn" data-count="${teamAgentCount}" onclick="event.stopPropagation();toggleTeamRows('${dataTeam}')" title="${isCollapsed?'펼치기':'접기'}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 11px;font-size:13px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s;white-space:nowrap;letter-spacing:-.2px">${isCollapsed?'▶ 펼치기':'▼ 접기'} · ${teamAgentCount}명</button>`
+    ? `<button class="team-chevron-btn" data-count="${teamAgentCount}" onclick="event.stopPropagation();toggleTeamRows('${dataTeam}')" title="${isCollapsed?T('tbl_expand_short'):T('tbl_collapse_short')}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 11px;font-size:13px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s;white-space:nowrap;letter-spacing:-.2px">${isCollapsed?T('tbl_expand'):T('tbl_collapse')} · ${teamAgentCount}${T('tbl_persons')}</button>`
     : '';
   const rowAttr = isTeamRow ? `data-team-row="${dataTeam}"` : '';
   return `<tr class="${isAll?'row-all':''}" data-team="${dataTeam}" ${rowAttr}>
@@ -3706,20 +3741,21 @@ function renderCal(){
     ].map(([k,icon,lbl,n,pn,wn,top])=>{
       const avg = (n/daysIn).toFixed(1);
       const share = n>0 && top ? Math.round(top.count/n*100) : 0;
+      const u = T('cs_unit_count');
       const topHtml = top
-        ? `<span class="cs-top-name">${top.name}</span><span class="cs-top-cnt">${top.count}건${share?` · ${share}%`:''}</span>`
+        ? `<span class="cs-top-name">${top.name}</span><span class="cs-top-cnt">${top.count}${u}${share?` · ${share}%`:''}</span>`
         : `<span class="cs-m-val same">-</span>`;
       const numClickable = n>0 ? ` clickable" onclick="openMonthType('${k}','${month}')` : '';
-      const numTitle = n>0 ? `title="${lbl} ${n}건 — 클릭 → 회원 목록"` : '';
+      const numTitle = n>0 ? `title="${lbl} ${n}${u} — ${T('cs_count_open_mem')}"` : '';
       return `<div class="cstat cs-${k}">
         <div class="cs-top-row">
           <div class="cs-lbl">${icon} ${lbl}</div>
           <div class="cs-num${numClickable}" ${numTitle}>${n}</div>
         </div>
         <div class="cs-metrics">
-          <div class="cs-m"><span class="cs-m-lbl">전월 대비</span>${deltaFmt(n,pn)}</div>
-          <div class="cs-m"><span class="cs-m-lbl">이번주</span><span class="cs-m-val">${wn}건</span></div>
-          <div class="cs-m"><span class="cs-m-lbl">일평균</span><span class="cs-m-val">${avg}</span></div>
+          <div class="cs-m"><span class="cs-m-lbl">${T('cs_prev_diff')}</span>${deltaFmt(n,pn)}</div>
+          <div class="cs-m"><span class="cs-m-lbl">${T('cs_thisweek')}</span><span class="cs-m-val">${wn}${u}</span></div>
+          <div class="cs-m"><span class="cs-m-lbl">${T('cs_daily_avg')}</span><span class="cs-m-val">${avg}</span></div>
           <div class="cs-m cs-m-toprow"><span class="cs-m-lbl">🏆 TOP</span><span class="cs-m-val cs-m-top">${topHtml}</span></div>
         </div>
       </div>`;
@@ -4505,7 +4541,7 @@ function openUrgentByType(kind, agentOverride){
       <div class="mem-count">${recs.length}</div>
       <div style="font-size:11px;color:#aaa">건</div></div>`;
   document.getElementById('mem-search').value='';
-  document.getElementById('mem-count-lbl').textContent = `총 ${recs.length}건`;
+  document.getElementById('mem-count-lbl').textContent = T_('mem_total_count',{n:recs.length});
   renderMemTable(recs);
   document.getElementById('page-main').style.display='none';
   document.getElementById('page-member').style.display='block';
@@ -5829,7 +5865,7 @@ function openRecent7DAgent(agent, fromStr){
       <div class="mem-count">${recs.length}</div>
       <div style="font-size:11px;color:#aaa">건</div></div>`;
   document.getElementById('mem-search').value='';
-  document.getElementById('mem-count-lbl').textContent = `총 ${recs.length}건`;
+  document.getElementById('mem-count-lbl').textContent = T_('mem_total_count',{n:recs.length});
   if(typeof buildMemFilters==='function'){
     ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
       const el=document.getElementById(id); if(el)el.value='';
@@ -5869,7 +5905,7 @@ function openRecent7DTeam(team, fromStr){
       <div class="mem-count">${recs.length}</div>
       <div style="font-size:11px;color:#aaa">건</div></div>`;
   document.getElementById('mem-search').value='';
-  document.getElementById('mem-count-lbl').textContent = `총 ${recs.length}건`;
+  document.getElementById('mem-count-lbl').textContent = T_('mem_total_count',{n:recs.length});
   if(typeof buildMemFilters==='function'){
     ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
       const el=document.getElementById(id); if(el)el.value='';
@@ -5904,7 +5940,7 @@ function openRecent7DMember(tr){
       <div class="mem-count">${recs.length}</div>
       <div style="font-size:11px;color:#aaa">건</div></div>`;
   const sb = document.getElementById('mem-search'); if(sb) sb.value='';
-  const cl = document.getElementById('mem-count-lbl'); if(cl) cl.textContent = `총 ${recs.length}건`;
+  const cl = document.getElementById('mem-count-lbl'); if(cl) cl.textContent = T_('mem_total_count',{n:recs.length});
   if(typeof buildMemFilters==='function'){
     ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.value='';
@@ -6384,7 +6420,7 @@ function showMem(recs, agent, stype, month, date, labelOverride){
       <div class="mem-count">${recs.length}</div>
       <div style="font-size:11px;color:#aaa">건</div></div>`;
   document.getElementById('mem-search').value='';
-  document.getElementById('mem-count-lbl').textContent = `총 ${recs.length}건`;
+  document.getElementById('mem-count-lbl').textContent = T_('mem_total_count',{n:recs.length});
   // 필터 드롭다운 옵션 자동 생성 + 초기화
   if(typeof buildMemFilters==='function'){
     ['mem-f-team','mem-f-agent','mem-f-prov','mem-f-ch','mem-f-dk','mem-f-st','mem-f-cl'].forEach(id=>{
