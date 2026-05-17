@@ -1581,8 +1581,23 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .insight-card.insight-eff .insight-value{color:#15803d}
 .insight-card.insight-last .insight-value{color:#b91c1c}
 .insight-desc{font-size:11.5px;color:#475569;font-weight:600;line-height:1.4}
-.insight-msg{padding:11px 14px;background:rgba(255,255,255,.65);border-radius:8px;font-size:13px;font-weight:600;color:#78350f;line-height:1.5;border:1px solid rgba(245,158,11,.4)}
-.insight-msg b{color:#92400e;font-weight:900}
+/* 📖 매트릭스 범례 박스 */
+.cohort-legend-box{margin:0 18px 18px;padding:14px 18px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px}
+.legend-title{font-size:14px;font-weight:900;color:#0f172a;letter-spacing:-.3px;margin-bottom:10px}
+.legend-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.legend-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid #e2e8f0}
+.legend-swatch{width:24px;height:24px;border-radius:5px;flex-shrink:0;margin-top:2px}
+.swatch-diag{background:rgba(34,197,94,.55);box-shadow:inset 0 0 0 2px #16a34a}
+.swatch-prev{background:rgba(168,85,247,.45)}
+.swatch-unmatch{background:rgba(251,191,36,.50);border:1px dashed #f59e0b}
+.swatch-db{background:#fffbeb;border:1px solid #f59e0b;border-right:3px solid #f59e0b}
+.legend-text{font-size:11.5px;line-height:1.4;color:#475569}
+.legend-text b{font-size:12.5px;color:#0f172a;font-weight:900}
+.legend-text small{font-size:11px;color:#64748b}
+
+/* 표 헤더 요약 줄 */
+.cohort-summary{font-size:12.5px;color:#475569;margin-top:2px;line-height:1.4}
+.cohort-summary b{font-size:13.5px}
 
 /* 📈 월별 추이 / 💳 결제 종류 / ⏱ lag — 공통 wrapper */
 .extra-section{margin:0 18px 22px;padding:16px 18px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
@@ -1943,7 +1958,7 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <!-- 📐 통계 — DB 코호트 매트릭스 (배정월 × 클로징 발생월) -->
   <div id="content-analytics" style="display:none">
     <div class="sec-hd">
-      <div><div class="sec-title" data-t="sec_analytics">📐 DB 코호트 분석 (재경 보고용 · 2025~현재)</div>
+      <div><div class="sec-title" data-t="sec_analytics">📐 DB 코호트 분석</div>
       <div class="sec-sub" data-t="sec_analytics_sub">배정월 × 클로징 발생월 매트릭스 — 과거 DB 가 매월 매출에 기여하는 비율 시각화</div></div>
     </div>
     <div id="analytics-wrap" style="padding:14px 18px;overflow-x:auto"></div>
@@ -2135,7 +2150,7 @@ const LANG = {
     // 추가 — Bahasa 전환 시 누락 항목
     tab_agent_insight:'에이전트별 토탈관리',
     tab_analytics:'📊 통계',
-    sec_analytics:'📐 DB 코호트 분석 (재경 보고용 · 2025~현재)',
+    sec_analytics:'📐 DB 코호트 분석',
     sec_analytics_sub:'배정월 × 클로징 발생월 매트릭스 — "이전 달 DB 가 매월 매출의 몇 %를 만드는지" 시각화',
     cohort_no_data:'2025년 이후 데이터 없음',
     alyt_off_label:'OFF DB',
@@ -2157,6 +2172,18 @@ const LANG = {
     cohort_section_title:'DB 코호트 매트릭스 — 배정월 × 통장입금 결제월',
     cohort_section_sub:'결제일 = 통장입금일 (Buku Setoran Bank · CSV) · 배정월 = 시트 DB · 매칭 안 된 결제는 \"cohort 미상\" 행에 분리',
     cohort_unmatched:'cohort 미상 (DB 매칭 X)',
+    cohort_h_assign_sub:'(DB 배정월)',
+    cohort_h_db_sub:'(배정된 DB 수)',
+    cohort_summary:'배정 DB {db}건 → 누적 클로징 {cl}건 (효율 {eff}%)',
+    legend_title:'매트릭스 읽는 법',
+    legend_diag:'🟢 대각선 (즉시 전환)',
+    legend_diag_desc:'같은 달에 배정·결제 — 빠른 클로징',
+    legend_prev:'🟣 비대각선 (이전 달 DB)',
+    legend_prev_desc:'배정 후 시간이 지나 결제 — 우리 비즈니스의 본질',
+    legend_unmatch:'🟡 cohort 미상',
+    legend_unmatch_desc:'DB 시트와 매칭 실패 — 외부/누락 회원',
+    legend_db:'🟠 배정 DB',
+    legend_db_desc:'그 달에 새로 배정된 총 DB 수',
     insight_box_title:'핵심 인사이트 — 재경 보고용 자동 요약',
     insight_label_prev:'이전월 DB 기여율',
     insight_label_lag:'배정 → 결제 평균 lag',
@@ -2398,7 +2425,7 @@ const LANG = {
     // Tambahan — item yang tertinggal saat ganti bahasa
     tab_agent_insight:'Manajemen Total per Agen',
     tab_analytics:'📊 Statistik',
-    sec_analytics:'📐 Analisis Kohor DB (Laporan Keuangan · 2025~Sekarang)',
+    sec_analytics:'📐 Analisis Kohor DB',
     sec_analytics_sub:'Matriks Bulan Alokasi × Bulan Closing — Visualisasi "berapa % omzet bulan ini berasal dari DB bulan-bulan lalu"',
     cohort_no_data:'Tidak ada data sejak 2025',
     alyt_off_label:'OFF DB',
@@ -2420,6 +2447,18 @@ const LANG = {
     cohort_section_title:'Matriks Kohor DB — Bulan Alokasi × Bulan Setoran Bank',
     cohort_section_sub:'Tanggal Closing = Tgl Setoran Bank (Buku Setoran · CSV) · Bulan Alokasi = DB Sheet · Closing tanpa match DB → baris \"Kohor Tidak Match\"',
     cohort_unmatched:'Kohor Tidak Match (DB tidak ditemukan)',
+    cohort_h_assign_sub:'(Bln Alokasi DB)',
+    cohort_h_db_sub:'(Jml DB dialokasikan)',
+    cohort_summary:'Alokasi {db} DB → Total Closing {cl} (Efisiensi {eff}%)',
+    legend_title:'Cara Baca Matriks',
+    legend_diag:'🟢 Diagonal (Konversi Instan)',
+    legend_diag_desc:'Alokasi & closing di bulan yg sama',
+    legend_prev:'🟣 Non-Diagonal (DB Bulan Lalu)',
+    legend_prev_desc:'Closing setelah jeda — Karakter bisnis kita',
+    legend_unmatch:'🟡 Kohor Tidak Match',
+    legend_unmatch_desc:'Tidak ada di sheet DB — eksternal/missing',
+    legend_db:'🟠 Alokasi DB',
+    legend_db_desc:'Total DB yg dialokasikan bulan tsb',
     insight_box_title:'Insight Utama — Ringkasan Otomatis Laporan Keuangan',
     insight_label_prev:'Kontribusi DB Bulan Lalu',
     insight_label_lag:'Rata-rata Lag Alokasi → Closing',
@@ -4665,16 +4704,66 @@ function renderAnalytics(){
     kinds.forEach(kk=>{ dbCount[m][kk]++; });
   });
 
-  // 2) D.records 매칭 인덱스 (이름+부모, 이름만)
+  // 2) D.records 매칭 인덱스 (3단계 fallback)
+  //    1단계: childName + 부모 full name (정확)
+  //    2단계: childName + 부모 first name (예: 'Hendra' vs 'Hendra Kurniawan')
+  //    3단계: childName 만 (multi 인 경우 ad 가 closeDate 와 가장 가까운 record 선택)
   const norm = (s)=>(s||'').toLowerCase().replace(/[^a-z가-힣0-9]/g,'');
-  const recPairIdx = {};
-  const recChildIdx = {};
-  (D.records||[]).forEach(r=>{
-    const kp = norm(r.nm)+'|'+norm(r.pa);
-    const kc = norm(r.nm);
-    if(!recPairIdx[kp]) recPairIdx[kp] = r;
-    if(!recChildIdx[kc]) recChildIdx[kc] = r;
+  const firstTok = (s)=>{ const t=(s||'').split(/[\s\/,]+/).filter(Boolean); return t[0]||''; };
+  const pairIdx = {};      // child + full parent → [recordIndex]
+  const pairFirstIdx = {}; // child + parent first name
+  const childIdx = {};     // child only
+  (D.records||[]).forEach((r, i)=>{
+    if(!r.ad) return;
+    const cn = norm(r.nm);
+    if(!cn) return;
+    if(!childIdx[cn]) childIdx[cn]=[];
+    childIdx[cn].push(i);
+    const pn = norm(r.pa);
+    if(pn){
+      const k1 = cn+'|'+pn;
+      if(!pairIdx[k1]) pairIdx[k1]=[];
+      pairIdx[k1].push(i);
+    }
+    const pnFirst = norm(firstTok(r.pa));
+    if(pnFirst && pnFirst !== pn){
+      const k2 = cn+'|'+pnFirst;
+      if(!pairFirstIdx[k2]) pairFirstIdx[k2]=[];
+      pairFirstIdx[k2].push(i);
+    }
   });
+
+  // 최적 D.record 매칭 — 단계별 fallback + ad ≤ closeDate 인 후보 우선
+  const matchRecord = (closeDate, childName, parentName)=>{
+    const cn = norm(childName);
+    if(!cn) return null;
+    const pn = norm(parentName);
+    const pnFirst = norm(firstTok(parentName));
+    const pickBest = (cands)=>{
+      if(cands.length === 0) return null;
+      // ad ≤ closeDate 인 후보 우선 — 그 중에서 close 와 가장 가까운 것
+      const pre = cands.filter(r => r.ad && r.ad <= closeDate);
+      if(pre.length > 0){
+        pre.sort((a,b)=> (closeDate.localeCompare(b.ad)) - (closeDate.localeCompare(a.ad)));
+        return pre[0];
+      }
+      // ad > closeDate 인 후보뿐 — 매칭 인정하되 (multi 면 가장 가까운 것)
+      // 나중 매트릭스 build 시 cohM > closeM 이면 unmatched 로 떨어짐
+      const sorted = cands.slice().sort((a,b)=> a.ad.localeCompare(b.ad));
+      return sorted[0];
+    };
+    // 1) strict
+    let r = pickBest((pairIdx[cn+'|'+pn]||[]).map(i=>D.records[i]));
+    if(r) return r;
+    // 2) child + parent first name
+    if(pnFirst && pnFirst !== pn){
+      r = pickBest((pairFirstIdx[cn+'|'+pnFirst]||[]).map(i=>D.records[i]));
+      if(r) return r;
+    }
+    // 3) child only — multi 면 가장 가까운 것
+    r = pickBest((childIdx[cn]||[]).map(i=>D.records[i]));
+    return r;
+  };
 
   // 3) CSV CLOSING 을 매트릭스에 배치
   //    cohort[kindKey][cohortMonth][closeMonth] = count
@@ -4691,14 +4780,10 @@ function renderAnalytics(){
     // c = [date 'YYYY-MM-DD', childId, childName, parentId, parentName, paymentType]
     const closeM = c[0].slice(0,7);
     if(closeM < yearStart || closeM > todayM) return;
-    const cn = c[2], pn = c[4];
-    const kp = norm(cn)+'|'+norm(pn);
-    const kc = norm(cn);
-    const r = recPairIdx[kp] || recChildIdx[kc];
+    const r = matchRecord(c[0], c[2], c[4]);
     if(r){
       const cohM = (r.ad||'').slice(0,7);
-      // 매칭 record 의 배정월이 cohort 범위 안에 있고 + 결제일이 배정일 이후일 때만 유효
-      // (cohM > closeM 이면 다른 사람을 잘못 매칭한 거 — 결제가 배정보다 먼저 일 수 없음)
+      // 매칭 record 의 배정월이 cohort 범위에 있고 결제일이 배정일 이후일 때만 정상
       if(monthsList.includes(cohM) && cohM <= closeM){
         const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
         const kinds = k ? [k, 'TOTAL'] : ['TOTAL'];
@@ -4740,15 +4825,25 @@ function renderAnalytics(){
       monthsList.forEach(closeM => { colTotals[closeM] += (coh[cohM] && coh[cohM][closeM]) || 0; });
     });
 
+    // 표 헤더용 한 줄 요약: 총 DB N건, 누적 클로징 M건, 효율 X%
+    let sumDb = 0, sumCl = 0;
+    monthsList.forEach(m=>{
+      sumDb += dbCount[m][kindKey] || 0;
+      monthsList.forEach(cm => { sumCl += (coh[m] && coh[m][cm]) || 0; });
+    });
+    if(isTotal){ monthsList.forEach(m => sumCl += (unmatched[m]||0)); }
+    const sumEff = sumDb ? (sumCl/sumDb*100).toFixed(1) : '0.0';
+    const summary = T('cohort_summary').replace('{db}', f(sumDb)).replace('{cl}', f(sumCl)).replace('{eff}', sumEff);
+
     let h = `<div class="cohort-section">
       <div class="cohort-hd" style="border-left:5px solid ${color};background:${bgColor}">
         <div class="cohort-title" style="color:${color}">📐 ${kindLabel}</div>
-        <div class="cohort-sub">${T('cohort_sub')}</div>
+        <div class="cohort-summary"><b style="color:${color}">${summary}</b></div>
       </div>
       <div class="cohort-wrap"><table class="cohort-tbl">
         <thead><tr>
-          <th class="L">${T('cohort_h_assign')}</th>
-          <th class="R">${T('cohort_h_db')}</th>`;
+          <th class="L">${T('cohort_h_assign')}<br><small style="font-weight:700;color:#94a3b8">${T('cohort_h_assign_sub')}</small></th>
+          <th class="R">${T('cohort_h_db')}<br><small style="font-weight:700;color:#fde68a">${T('cohort_h_db_sub')}</small></th>`;
     monthsList.forEach(m => {
       h += `<th class="R">${mLbl(m)}<br><small>${T('cohort_h_close')}</small></th>`;
     });
@@ -4865,7 +4960,7 @@ function renderAnalytics(){
   csvClosings.forEach(c=>{
     const closeM = c[0].slice(0,7);
     if(closeM < yearStart || closeM > todayM) return;
-    const r = recPairIdx[norm(c[2])+'|'+norm(c[4])] || recChildIdx[norm(c[2])];
+    const r = matchRecord(c[0], c[2], c[4]);
     if(!r || !r.ad) return;
     const closeDate = new Date(c[0]);
     const adDate = new Date(r.ad);
@@ -4935,14 +5030,29 @@ function renderAnalytics(){
         <div class="insight-desc">${T('insight_desc_last').replace('{diag}', String(lastDiag)).replace('{prev}', String(lastPrev))}</div>
       </div>
     </div>
-    <div class="insight-msg">
-      💡 <b>${T('insight_msg_title')}</b>: ${T('insight_msg_body').replace('{p}', String(prevContribPct))}
-    </div>
   </div>
 
-  <div class="cohort-section-hd">
-    <div class="cohort-section-title">📐 ${T('cohort_section_title')}</div>
-    <div class="cohort-section-sub">${T('cohort_section_sub')}</div>
+  <!-- 📐 매트릭스 읽는 법 -->
+  <div class="cohort-legend-box">
+    <div class="legend-title">📖 ${T('legend_title')}</div>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-swatch swatch-diag"></span>
+        <div class="legend-text"><b>${T('legend_diag')}</b><br><small>${T('legend_diag_desc')}</small></div>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch swatch-prev"></span>
+        <div class="legend-text"><b>${T('legend_prev')}</b><br><small>${T('legend_prev_desc')}</small></div>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch swatch-unmatch"></span>
+        <div class="legend-text"><b>${T('legend_unmatch')}</b><br><small>${T('legend_unmatch_desc')}</small></div>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch swatch-db"></span>
+        <div class="legend-text"><b>${T('legend_db')}</b><br><small>${T('legend_db_desc')}</small></div>
+      </div>
+    </div>
   </div>`;
   h += buildCohortTable('OFF',   T('alyt_off_label'),   '#a855f7', '#faf5ff');
   h += buildCohortTable('MKT',   T('alyt_mkt_label'),   '#0891b2', '#ecfeff');
