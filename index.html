@@ -1489,6 +1489,27 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .tab.on::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #fcd34d;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
 .tab-content{border:2.5px solid #fcd34d;border-top:none;box-shadow:0 6px 22px rgba(30,58,138,.12)}
 /* 빠른 이동 버튼 — line 1418 의 강렬한 남색 배경 스타일에 위임 (이 블록은 의도적으로 비움) */
+/* 📊 통계 탭 표 */
+.alyt-tbl{min-width:1100px}
+.alyt-tbl thead th{background:#1e3a8a;color:#fff;font-weight:900;font-size:12.5px;padding:11px 8px;letter-spacing:-.3px;border-bottom:none;text-align:center}
+.alyt-tbl thead th.L{text-align:left}
+.alyt-tbl thead th.R{text-align:right}
+.alyt-tbl tbody tr.alyt-row td{padding:11px 10px;border-bottom:1px solid #e5e7eb;font-size:13.5px;vertical-align:middle}
+.alyt-tbl tbody tr.alyt-row:hover td{background:rgba(252,211,77,.18)!important}
+.alyt-tbl td.alyt-kind{vertical-align:middle;writing-mode:horizontal-tb;border-right:3px solid rgba(255,255,255,.4);padding:0 6px;min-width:130px}
+.alyt-month{font-size:13px;line-height:1.3;min-width:130px}
+.alyt-month b{font-size:14px;color:#0f172a}
+.alyt-period{font-size:11px;color:#64748b;font-weight:600}
+.alyt-num{font-weight:800;font-size:14.5px;letter-spacing:-.3px;text-align:right}
+.apct{font-weight:800;font-size:13.5px;padding:2px 7px;border-radius:6px;display:inline-block;min-width:46px;text-align:center}
+.apct-strong{font-size:14.5px;font-weight:900;padding:3px 9px}
+.apct.apc-good{color:#15803d;background:#dcfce7;border:1px solid #86efac}
+.apct.apc-mid{color:#a16207;background:#fef3c7;border:1px solid #fde68a}
+.apct.apc-low{color:#b91c1c;background:#fee2e2;border:1px solid #fecaca}
+.apct.apc-zero{color:#94a3b8;background:#f1f5f9;border:1px solid #e2e8f0}
+.alyt-note{margin:14px 18px 0;padding:11px 14px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;font-size:11.5px;color:#854d0e;line-height:1.7}
+.alyt-note b{display:block;color:#713f12;margin-bottom:4px;font-size:12.5px}
+.alyt-note span{display:block;padding-left:6px}
 /* 프리셋 버튼 (오늘 / 최근 N일 등) */
 .preset-btn{background:#fff;color:var(--c-navy);border:1.5px solid #cbd5e1;font-weight:700}
 .preset-btn:hover{background:var(--c-yellow-bg);border-color:var(--c-yellow)}
@@ -1825,15 +1846,13 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
     </div>
     <div class="cal-wrap" id="ai-cal-wrap"></div>
   </div>
-  <!-- 📊 통계 (별도 분석 영역 — 사용자가 채워 넣을 예정) -->
+  <!-- 📊 통계 (월별 보고용 표 — OFF / 마케팅 / 토탈) -->
   <div id="content-analytics" style="display:none">
     <div class="sec-hd">
-      <div><div class="sec-title" data-t="sec_analytics">📊 통계</div>
-      <div class="sec-sub" data-t="sec_analytics_sub">상세 분석 영역</div></div>
+      <div><div class="sec-title" data-t="sec_analytics">📊 월별 통계 (업무 보고용)</div>
+      <div class="sec-sub" data-t="sec_analytics_sub">OFF · 마케팅 · 토탈 — 월별 배정 / 예약 / 방문 / 결제 추이</div></div>
     </div>
-    <div id="analytics-wrap" style="padding:40px 24px;text-align:center;color:#94a3b8;font-size:14px;font-weight:700">
-      <span data-t="analytics_placeholder">준비 중 — 통계 항목은 곧 추가됩니다</span>
-    </div>
+    <div id="analytics-wrap" style="padding:14px 18px;overflow-x:auto"></div>
   </div>
 </div>
 </div><!-- /page-main -->
@@ -2021,8 +2040,21 @@ const LANG = {
     // 추가 — Bahasa 전환 시 누락 항목
     tab_agent_insight:'에이전트별 토탈관리',
     tab_analytics:'📊 통계',
-    sec_analytics:'📊 통계', sec_analytics_sub:'상세 분석 영역',
-    analytics_placeholder:'준비 중 — 통계 항목은 곧 추가됩니다',
+    sec_analytics:'📊 월별 통계 (업무 보고용)',
+    sec_analytics_sub:'OFF · 마케팅 · 토탈 — 월별 배정 / 예약 / 방문 / 결제 추이 · 발생주의 (배정일 기준)',
+    alyt_off_label:'OFF DB (콜렉터+Sales)',
+    alyt_mkt_label:'마케팅 DB',
+    alyt_total_label:'토탈',
+    alyt_h_kind:'구분', alyt_h_period:'월 (기간)',
+    alyt_h_db:'배정 DB', alyt_h_booking:'예약', alyt_h_db_to_book:'DB 대비 예약율',
+    alyt_h_book_visit:'예약 방문완료', alyt_h_book_to_visit:'예약대비 방문율',
+    alyt_h_langsung:'예약없이 방문완료', alyt_h_langsung_sub:'(포함 →)',
+    alyt_h_closing:'결제', alyt_h_visit_to_close:'방문 대비 전환율',
+    alyt_h_db_to_close:'DB 대비 전환율',
+    alyt_note_title:'📌 집계 기준',
+    alyt_note_basis:'· 발생주의 — 모든 지표는 DB 배정일(ad) 의 월에 귀속 (3월 배정 DB 가 4월 결제돼도 3월 행에 잡힘)',
+    alyt_note_booking:'· 예약 = 상담예약 sched (status s/d/vc/ls 또는 cl=1 — 랑숭 walk-in 포함)',
+    alyt_note_close_rate:'· 방문 대비 전환율 = 결제 ÷ (예약 방문완료) · 분모에 랑숭 미포함',
     quick_nav:'📂 빠른 이동:',
     all_agents_btn:'👥 전체 에이전트',
     sec_db_agent_sub:'선택한 에이전트의 DB 종류 · 활동 상태 분포',
@@ -2228,8 +2260,21 @@ const LANG = {
     // Tambahan — item yang tertinggal saat ganti bahasa
     tab_agent_insight:'Manajemen Total per Agen',
     tab_analytics:'📊 Statistik',
-    sec_analytics:'📊 Statistik', sec_analytics_sub:'Area analisis detail',
-    analytics_placeholder:'Sedang disiapkan — item statistik akan ditambahkan',
+    sec_analytics:'📊 Statistik Bulanan (Laporan)',
+    sec_analytics_sub:'OFF · Marketing · Total — Alokasi / Jadwal / Visit / Closing per bulan · Basis Akrual (Tgl Alokasi)',
+    alyt_off_label:'OFF DB (Collector+Sales)',
+    alyt_mkt_label:'Marketing DB',
+    alyt_total_label:'Total',
+    alyt_h_kind:'Tipe', alyt_h_period:'Bulan (Periode)',
+    alyt_h_db:'Alokasi DB', alyt_h_booking:'Jadwal', alyt_h_db_to_book:'Tk. Jadwal vs DB',
+    alyt_h_book_visit:'Visit dari Jadwal', alyt_h_book_to_visit:'Tk. Visit vs Jadwal',
+    alyt_h_langsung:'Visit Langsung', alyt_h_langsung_sub:'(termasuk →)',
+    alyt_h_closing:'Closing', alyt_h_visit_to_close:'Tk. Konversi vs Visit',
+    alyt_h_db_to_close:'Tk. Konversi vs DB',
+    alyt_note_title:'📌 Dasar Perhitungan',
+    alyt_note_basis:'· Basis Akrual — Semua indikator dibukukan pada bulan Tgl Alokasi DB (DB Maret di-closing April tetap masuk baris Maret)',
+    alyt_note_booking:'· Jadwal = jadwal konsultasi sched (status s/d/vc/ls atau cl=1 — termasuk walk-in Langsung)',
+    alyt_note_close_rate:'· Tingkat Konversi vs Visit = Closing ÷ (Visit dari Jadwal) · Langsung tidak masuk penyebut',
     quick_nav:'📂 Navigasi Cepat:',
     all_agents_btn:'👥 Semua Agen',
     sec_db_agent_sub:'Distribusi Jenis DB & Status Aktivitas Agen Terpilih',
@@ -4393,8 +4438,120 @@ function renderTab(){
   else if(curTab==='rank') renderRank();
   else if(curTab==='team_insight') renderTeamInsightOnly();
   else if(curTab==='agent_insight') renderAgentInsightOnly();
-  else if(curTab==='analytics'){ /* 사용자가 채워 넣을 예정 — 추후 renderAnalytics() 추가 */ }
+  else if(curTab==='analytics') renderAnalytics();
   else if(curTab==='insight') renderTeamInsightOnly(); // legacy fallback
+}
+
+// ── 📊 월별 통계 (업무 보고용 · 발생주의 / 배정일 기준) ──────
+// 구분(OFF / MKT / 토탈) × 월별로 배정→예약→방문→결제 funnel 집계
+// 모든 지표는 배정일(ad) 의 월을 기준으로 묶음 (예: 3월 배정된 DB 가
+// 4월에 결제되었어도 3월 행의 '결제' 칸에 잡힘)
+function renderAnalytics(){
+  const wrap = document.getElementById('analytics-wrap');
+  if(!wrap) return;
+  const monthsList = (D.months || []).slice().sort();
+  const today = D.today || '';
+  const init = ()=>({db:0, sched:0, d:0, vc:0, ls:0, cl:0});
+  const data = {};
+  monthsList.forEach(m=>{ data[m] = {OFF:init(), MKT:init(), TOTAL:init()}; });
+
+  (D.records||[]).forEach(r=>{
+    if(!r.ad) return;
+    const m = r.ad.slice(0,7);          // 배정일 → 월 (발생주의)
+    if(!data[m]) return;
+    const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
+    const targets = k ? [data[m][k], data[m].TOTAL] : [data[m].TOTAL];
+    targets.forEach(t => t.db++);
+    if(r.st==='s' || r.st==='d' || r.st==='vc' || r.st==='ls' || r.cl===1){
+      targets.forEach(t => t.sched++);
+    }
+    if(r.st==='d')  targets.forEach(t => t.d++);
+    if(r.st==='vc') targets.forEach(t => t.vc++);
+    if(r.st==='ls') targets.forEach(t => t.ls++);
+    if(r.cl===1)    targets.forEach(t => t.cl++);
+  });
+
+  // 월별 실제 집계 기간 (1일 ~ 말일, 단 진행 중인 월은 오늘까지)
+  const fmtMD = (s)=>{ const p=s.split('-'); return p.length===3 ? `${parseInt(p[1])}/${parseInt(p[2])}` : s; };
+  const monthRangeLbl = (m)=>{
+    const [y, mo] = m.split('-').map(Number);
+    const first = `${m}-01`;
+    const lastDay = new Date(y, mo, 0).getDate();
+    const natural = `${m}-${String(lastDay).padStart(2,'0')}`;
+    const last = (today && today.startsWith(m) && today < natural) ? today : natural;
+    return `${fmtMD(first)}~${fmtMD(last)}`;
+  };
+
+  const pct = (num, den, digits)=>{
+    if(!den) return 0;
+    const p = num/den*100;
+    return digits>0 ? Math.round(p*Math.pow(10,digits))/Math.pow(10,digits) : Math.round(p);
+  };
+  const pctCell = (val, strong)=>{
+    const cls = val>=20 ? 'apc-good' : val>=10 ? 'apc-mid' : val>0 ? 'apc-low' : 'apc-zero';
+    return `<span class="apct ${strong?'apct-strong':''} ${cls}">${val}%</span>`;
+  };
+
+  const kinds = [
+    {key:'OFF',   label:T('alyt_off_label'),   color:'#a855f7', bgRow:'#faf5ff'},
+    {key:'MKT',   label:T('alyt_mkt_label'),   color:'#0891b2', bgRow:'#ecfeff'},
+    {key:'TOTAL', label:T('alyt_total_label'), color:'#1e3a8a', bgRow:'#eff6ff'},
+  ];
+
+  let h = `<table class="month-tbl alyt-tbl">
+    <thead><tr>
+      <th class="L">${T('alyt_h_kind')}</th>
+      <th class="L">${T('alyt_h_period')}</th>
+      <th class="R">${T('alyt_h_db')}</th>
+      <th class="R">${T('alyt_h_booking')}</th>
+      <th class="R">${T('alyt_h_db_to_book')}</th>
+      <th class="R">${T('alyt_h_book_visit')}</th>
+      <th class="R">${T('alyt_h_book_to_visit')}</th>
+      <th class="R">${T('alyt_h_langsung')}<br><small style="font-weight:700;color:#94a3b8">${T('alyt_h_langsung_sub')}</small></th>
+      <th class="R">${T('alyt_h_closing')}</th>
+      <th class="R">${T('alyt_h_visit_to_close')}</th>
+      <th class="R">${T('alyt_h_db_to_close')}</th>
+    </tr></thead><tbody>`;
+
+  kinds.forEach(kind=>{
+    monthsList.forEach((m, i)=>{
+      const d = data[m][kind.key];
+      const bookVisit = d.d + d.vc;
+      const r_db_book  = pct(d.sched, d.db, 1);
+      const r_book_v   = pct(bookVisit, d.sched, 0);
+      const r_v_close  = pct(d.cl, bookVisit, 1);
+      const r_db_close = pct(d.cl, d.db, 1);
+      const mLbl = (D.mlabels && D.mlabels[m]) || m;
+      const periodLbl = monthRangeLbl(m);
+      const isFirst = i===0;
+      const isLast  = i===monthsList.length-1;
+      h += `<tr class="alyt-row ${kind.key.toLowerCase()}" style="background:${kind.bgRow};${isLast?'border-bottom:3px solid '+kind.color+';':''}">`;
+      if(isFirst){
+        h += `<td rowspan="${monthsList.length}" class="L alyt-kind" style="color:#fff;background:${kind.color};font-weight:900;font-size:13.5px;text-align:center;letter-spacing:-.3px">${kind.label}</td>`;
+      }
+      h += `<td class="L alyt-month"><b>${mLbl}</b><br><span class="alyt-period">${periodLbl}</span></td>`;
+      h += `<td class="R alyt-num" style="color:#0f172a">${f(d.db)}</td>`;
+      h += `<td class="R alyt-num" style="color:#1d4ed8">${f(d.sched)}</td>`;
+      h += `<td class="R">${pctCell(r_db_book, false)}</td>`;
+      h += `<td class="R alyt-num" style="color:#16a34a">${f(bookVisit)}</td>`;
+      h += `<td class="R">${pctCell(r_book_v, false)}</td>`;
+      h += `<td class="R alyt-num" style="color:#1e293b">${f(d.ls)}</td>`;
+      h += `<td class="R alyt-num" style="color:#dc2626;font-weight:900">${f(d.cl)}</td>`;
+      h += `<td class="R">${pctCell(r_v_close, true)}</td>`;
+      h += `<td class="R">${pctCell(r_db_close, true)}</td>`;
+      h += `</tr>`;
+    });
+  });
+
+  h += `</tbody></table>
+    <div class="alyt-note">
+      <b>${T('alyt_note_title')}</b>
+      <span>${T('alyt_note_basis')}</span>
+      <span>${T('alyt_note_booking')}</span>
+      <span>${T('alyt_note_close_rate')}</span>
+    </div>`;
+
+  wrap.innerHTML = h;
 }
 
 // ===== 팀·에이전트 인사이트 =====
