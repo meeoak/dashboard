@@ -203,7 +203,8 @@ function writeAgentReport(payload){
 
 const REPORT_CFG = {
   EMAIL_SHEET_ID: '1eTjA_f2nf5xmVLT3G_9la_GTQnJkv87Dp1jKeXdWjeg',
-  EMAIL_GID: 823310638,
+  EMAIL_GID: 1063851809,
+  EMAIL_SHEET_NAME: '이메일정보',  // GID 못 찾으면 이름으로 fallback
   DATA_SHEET_ID: '1TMtrsOIN9UylvYolwkyl5EZzUXd1DcDNg6raPPpBep0',
   DATA_GID: 0,
   TIMEZONE: 'Asia/Jakarta',  // WIB · 사용자 기본 인도네시아 에이전트들
@@ -288,7 +289,11 @@ function getAgentEmails_() {
   const ss = SpreadsheetApp.openById(REPORT_CFG.EMAIL_SHEET_ID);
   const sheets = ss.getSheets();
   let sheet = sheets.find(s => s.getSheetId() === REPORT_CFG.EMAIL_GID);
+  if(!sheet && REPORT_CFG.EMAIL_SHEET_NAME){
+    sheet = sheets.find(s => s.getName() === REPORT_CFG.EMAIL_SHEET_NAME);
+  }
   if(!sheet) sheet = sheets[0];  // fallback: 첫 번째 탭
+  Logger.log('  · 이메일 시트: ' + sheet.getName() + ' (gid=' + sheet.getSheetId() + ')');
   const data = sheet.getDataRange().getValues();
   if(data.length < 2) return [];
 
