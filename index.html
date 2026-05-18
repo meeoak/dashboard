@@ -2163,8 +2163,8 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
   <!-- 📐 통계 — DB 코호트 매트릭스 (배정월 × 클로징 발생월) -->
   <div id="content-analytics" style="display:none">
     <div class="sec-hd">
-      <div><div class="sec-title" data-t="sec_analytics">📐 DB 코호트 분석</div>
-      <div class="sec-sub" data-t="sec_analytics_sub">배정월 × 클로징 발생월 매트릭스 — 과거 DB 가 매월 매출에 기여하는 비율 시각화</div></div>
+      <div><div class="sec-title" data-t="sec_analytics">🏆 누적클로징</div>
+      <div class="sec-sub" data-t="sec_analytics_sub">배정월 × 클로징 발생월 매트릭스 — 과거 DB 의 누적 결제 기여 추이</div></div>
     </div>
     <div id="analytics-wrap" style="padding:14px 18px;overflow-x:auto"></div>
   </div>
@@ -2356,8 +2356,8 @@ const LANG = {
     // 추가 — Bahasa 전환 시 누락 항목
     tab_agent_insight:'에이전트별 토탈관리',
     tab_analytics:'📊 통계',
-    sec_analytics:'📐 DB 코호트 분석',
-    sec_analytics_sub:'배정월 × 클로징 발생월 매트릭스 — "이전 달 DB 가 매월 매출의 몇 %를 만드는지" 시각화',
+    sec_analytics:'🏆 누적클로징',
+    sec_analytics_sub:'배정월 × 클로징 발생월 매트릭스 — 과거 DB 의 누적 결제 기여 추이',
     cohort_no_data:'2025년 이후 데이터 없음',
     alyt_off_label:'OFF DB',
     alyt_mkt_label:'MKT DB',
@@ -2649,8 +2649,8 @@ const LANG = {
     // Tambahan — item yang tertinggal saat ganti bahasa
     tab_agent_insight:'Total per Agen',
     tab_analytics:'📊 Statistik',
-    sec_analytics:'📐 Analisis Kohor DB',
-    sec_analytics_sub:'Matriks Bulan Alokasi × Bulan Closing — Visualisasi "berapa % omzet bulan ini berasal dari DB bulan-bulan lalu"',
+    sec_analytics:'🏆 Closing Kumulatif',
+    sec_analytics_sub:'Matriks Bulan Alokasi × Bulan Closing — Tren kontribusi closing kumulatif dari DB bulan-bulan lalu',
     cohort_no_data:'Tidak ada data sejak 2025',
     alyt_off_label:'OFF DB',
     alyt_mkt_label:'MKT DB',
@@ -5410,67 +5410,7 @@ function renderAnalytics(){
   const unmatchPct = allClosingsCnt ? Math.round(unmatchCnt/allClosingsCnt*100) : 0;
   const matchPct = 100 - unmatchPct;
 
-  let h = `
-  <!-- 📌 자동 인사이트 박스 (재경 보고용) -->
-  <div class="insight-box">
-    <div class="insight-title">📌 ${T('insight_box_title')}</div>
-    <div class="insight-grid">
-      <div class="insight-card insight-prev">
-        <div class="insight-label">${T('insight_label_prev')}</div>
-        <div class="insight-value">${prevContribPct}%</div>
-        <div class="insight-desc">${T('insight_desc_prev').replace('{n}', String(totalActualSum - totalDiagSum)).replace('{t}', String(totalActualSum))}</div>
-      </div>
-      <div class="insight-card insight-lag">
-        <div class="insight-label">${T('insight_label_lag')}</div>
-        <div class="insight-value">${lagAvg}${T('insight_days')}</div>
-        <div class="insight-desc">${T('insight_desc_lag').replace('{med}', String(lagMed))}</div>
-      </div>
-      <div class="insight-card insight-eff">
-        <div class="insight-label">${T('insight_label_eff')}</div>
-        <div class="insight-value">${overallEff}%</div>
-        <div class="insight-desc">${T('insight_desc_eff').replace('{cl}', String(totalActualSum)).replace('{db}', f(totalDb))}</div>
-      </div>
-      <div class="insight-card insight-unmatch">
-        <div class="insight-label">⚠️ ${T('insight_label_unmatch')}</div>
-        <div class="insight-value">${unmatchPct}%</div>
-        <div class="insight-desc">${T('insight_desc_unmatch').replace('{n}', f(unmatchCnt)).replace('{t}', f(allClosingsCnt))}</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ⚠️ DB 미매칭 원인 안내 -->
-  <div class="unmatch-explain">
-    <div class="ue-title">⚠️ ${T('ue_title').replace('{n}', f(unmatchCnt)).replace('{p}', String(unmatchPct))}</div>
-    <div class="ue-causes">
-      <div class="ue-cause"><b>${T('ue_cause1')}</b><br><small>${T('ue_cause1_desc')}</small></div>
-      <div class="ue-cause"><b>${T('ue_cause2')}</b><br><small>${T('ue_cause2_desc')}</small></div>
-      <div class="ue-cause"><b>${T('ue_cause3')}</b><br><small>${T('ue_cause3_desc')}</small></div>
-    </div>
-    <div class="ue-fix">💡 <b>${T('ue_fix_title')}</b>: ${T('ue_fix_body')}</div>
-  </div>
-
-  <!-- 📐 매트릭스 읽는 법 -->
-  <div class="cohort-legend-box">
-    <div class="legend-title">📖 ${T('legend_title')}</div>
-    <div class="legend-items">
-      <div class="legend-item">
-        <span class="legend-swatch swatch-diag"></span>
-        <div class="legend-text"><b>${T('legend_diag')}</b><br><small>${T('legend_diag_desc')}</small></div>
-      </div>
-      <div class="legend-item">
-        <span class="legend-swatch swatch-prev"></span>
-        <div class="legend-text"><b>${T('legend_prev')}</b><br><small>${T('legend_prev_desc')}</small></div>
-      </div>
-      <div class="legend-item">
-        <span class="legend-swatch swatch-unmatch"></span>
-        <div class="legend-text"><b>${T('legend_unmatch')}</b><br><small>${T('legend_unmatch_desc')}</small></div>
-      </div>
-      <div class="legend-item">
-        <span class="legend-swatch swatch-db"></span>
-        <div class="legend-text"><b>${T('legend_db')}</b><br><small>${T('legend_db_desc')}</small></div>
-      </div>
-    </div>
-  </div>`;
+  let h = ``;
   h += buildCohortTable('TOTAL', T('alyt_total_label'), '#1e3a8a', '#eff6ff');
 
   // ⏱ 배정 → 결제 lag 분포
