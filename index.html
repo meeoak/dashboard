@@ -4875,10 +4875,16 @@ function renderTab(){
 
 // ── 📐 통계 탭 — DB 코호트 매트릭스 (재경 보고용) ──────────
 // 데이터 소스:
-//   - CSV CLOSING (closings.js · 통장입금 기준 진짜 결제일) → column total 의 진실
-//   - D.records (시트 데이터 · ad 배정월 · dk OFF/MKT) → cohort 행과 DB count
-// 매칭 키: childName + parentName (정규화) — 64% 엄격 매칭, 7% child만 매칭, 28% 미상.
-// 미상 closing 은 'cohort 미상' 행에 따로 모아서 column total 보존.
+//   - D.records (시트 cl=1) → 매트릭스 카운트의 진실 (영업 confirmed closing)
+//   - CSV CLOSING (closings.js · 통장입금) → 결제 월(column) 배치용 보조 정보
+//   - cohort 미상: 통장에 입금됐는데 매칭되는 DB record 가 시트에 없는 경우
+// 매칭 키: childName + parentName (정규화) — 3단계 fallback (full/first/child)
+// 룰:
+//   1) CSV 매칭 + 시트 cl=1 → 결제월 셀 (정상)
+//   2) CSV 매칭 + 시트 cl=0 → 카운트 안 함 (영업이 cl 처리 안 한 건)
+//   3) CSV 매칭 안 됨 → cohort 미상
+//   4) 시트 cl=1 인데 CSV 매칭 없음 → ad 월 대각선 (결제일 불명 fallback)
+// 결과: cohort 매트릭스 본문 총합 (미상 제외) = KPI 의 클로징 수
 
 // 코호트 매트릭스 셀 클릭 → 해당 records 로 회원 목록 모달 열기
 // renderAnalytics() 가 window.__cohortRecs[kindKey][cohM][closeM] = [records] 를 채워둠.
@@ -5058,6 +5064,12 @@ function renderAnalytics(){
   });
   let matchCnt = 0, unmatchCnt = 0;
 
+  // CSV 매칭 시 시트 cl=1 인 record 만 카운트 — 매트릭스 ↔ KPI 클로징 수 일치 유지
+  //  - CSV 매칭 + 시트 cl=1 → 결제월(closeM) 셀에 카운트 (정상 케이스)
+  //  - CSV 매칭 + 시트 cl=0 → 카운트 안 함 (영업이 cl 처리 안 한 건)
+  //  - CSV 매칭 안 됨 → cohort 미상 (기존 동작)
+  //  - 시트 cl=1 인데 CSV 매칭 안 됨 → 아래 fallback 루프에서 ad 월 대각선에 추가
+  const countedRecs = new Set();
   csvClosings.forEach(c=>{
     // c = [date 'YYYY-MM-DD', childId, childName, parentId, parentName, paymentType]
     const closeM = c[0].slice(0,7);
@@ -5065,8 +5077,8 @@ function renderAnalytics(){
     const r = matchRecord(c[0], c[2], c[4]);
     if(r){
       const cohM = (r.ad||'').slice(0,7);
-      // 매칭 record 의 배정월이 cohort 범위에 있고 결제일이 배정일 이후일 때만 정상
       if(monthsList.includes(cohM) && cohM <= closeM){
+        if(r.cl !== 1) return;  // 시트 cl=0 이면 카운트 X
         const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
         const kinds = k ? [k, 'TOTAL'] : ['TOTAL'];
         kinds.forEach(kk=>{
@@ -5074,12 +5086,30 @@ function renderAnalytics(){
           if(!cohortRecs[kk][cohM][closeM]) cohortRecs[kk][cohM][closeM] = [];
           cohortRecs[kk][cohM][closeM].push(r);
         });
+        countedRecs.add(r);
         matchCnt++;
         return;
       }
     }
     unmatched[closeM] = (unmatched[closeM]||0) + 1;
     unmatchCnt++;
+  });
+
+  // Fallback: 시트 cl=1 인데 CSV 매칭 안 된 record 를 ad 월 대각선에 추가
+  // (결제일 불명 — 영업이 cl 처리했으나 통장에서 못 찾은 케이스)
+  // 이로써 코호트 표 총합 = KPI 클로징 수 보장.
+  (D.records||[]).forEach(r=>{
+    if(r.cl !== 1) return;
+    if(countedRecs.has(r)) return;
+    const adM = (r.ad||'').slice(0,7);
+    if(!monthsList.includes(adM)) return;
+    const k = r.dk==='OFF' ? 'OFF' : (r.dk==='MKT' ? 'MKT' : null);
+    const kinds = k ? [k, 'TOTAL'] : ['TOTAL'];
+    kinds.forEach(kk=>{
+      cohort[kk][adM][adM] = (cohort[kk][adM][adM]||0) + 1;
+      if(!cohortRecs[kk][adM][adM]) cohortRecs[kk][adM][adM] = [];
+      cohortRecs[kk][adM][adM].push(r);
+    });
   });
 
   // 매트릭스 셀 onclick 핸들러용 — 전역으로 노출
@@ -7883,12 +7913,12 @@ function computeDerived(s){
   s.r_dc=s.db>0?Math.round((s.cl/s.db)*1000)/10:0;
 }
 
-// 통장입금 CSV (window.CSV_CLOSINGS) 를 cl 플래그의 진실 source 로 적용
-//   - 시트 cl=1 이라도 CSV 매칭 없으면 cl=0 (부풀림 방지)
-//   - 시트 cl=0 이라도 CSV 매칭되면 cl=1 + cl_date 부여 (시트 누락 보정)
-//   - 매칭 키: childName + parentName (정규화) — 3단계 fallback (full/first/child)
-//   - 한 record 가 여러 CSV 와 매칭되면 가장 빠른 결제일을 cl_date 로 사용
-// 결과: 통계 탭 코호트 대각선 = 4대 핵심 KPI 의 클로징 수 (단일 source of truth)
+// 통장입금 CSV (window.CSV_CLOSINGS) 매칭으로 각 record 에 cl_date 부여.
+// ⚠️ r.cl 자체는 시트 cl=1 (영업 진실) 유지 — 통장은 보조 정보로만 사용.
+//   - 시트 cl=1 + CSV 매칭 → r.cl_date = CSV 결제일 (코호트 매트릭스 column 배치용)
+//   - 시트 cl=1 + CSV 매칭 없음 → r.cl_date = '' (코호트 매트릭스에서 ad 월 대각선으로 fallback)
+//   - 시트 cl=0 → CSV 매칭이 있어도 cl 카운트는 안 함 (영업이 클로징으로 안 잡은 건)
+// 매칭 키: childName + parentName (정규화) · 3단계 fallback (full/first/child)
 function applyCsvClToRecords(records){
   if(typeof window==='undefined' || !window.CSV_CLOSINGS || !window.CSV_CLOSINGS.length) return;
   const norm=(s)=>(s||'').toLowerCase().replace(/[^a-z가-힣0-9]/g,'');
@@ -7913,7 +7943,7 @@ function applyCsvClToRecords(records){
     const sorted=idxs.slice().sort((a,b)=>(records[a].ad||'').localeCompare(records[b].ad||''));
     return sorted[0];
   };
-  const clDate={};  // recIdx → 가장 빠른 CSV 결제일
+  const clDate={};
   window.CSV_CLOSINGS.forEach(c=>{
     const closeDate=c[0], childName=c[2], parentName=c[4];
     const cn=norm(childName); if(!cn) return;
@@ -7926,21 +7956,14 @@ function applyCsvClToRecords(records){
       if(!clDate[i] || closeDate < clDate[i]) clDate[i]=closeDate;
     }
   });
-  // r.cl override + cl_date 부여. 시트의 원래 cl 은 cl_sheet 로 보존 (재호출 시 덮어쓰지 않음).
+  // cl_date 만 추가 — r.cl 은 시트 진실 유지
   records.forEach((r,i)=>{
-    if(r.cl_sheet === undefined) r.cl_sheet = r.cl;
-    if(clDate[i] !== undefined){
-      r.cl = 1;
-      r.cl_date = clDate[i];
-    } else {
-      r.cl = 0;
-      r.cl_date = '';
-    }
+    r.cl_date = (clDate[i] !== undefined) ? clDate[i] : '';
   });
 }
 
 function buildD(records,today){
-  // ▶ CSV 통장입금 매칭으로 r.cl 보정 (모든 aggregation 전에 1번만)
+  // ▶ CSV 통장입금 매칭으로 cl_date 부여 (r.cl 자체는 시트 진실 유지)
   applyCsvClToRecords(records);
   const D={today};
   const monthsSet=new Set();
@@ -8035,7 +8058,7 @@ function buildD(records,today){
     }
     D.cal_summary[month]={days,days_in:lastDay};
   }
-  D.records=records.map(r=>({a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_sheet:r.cl_sheet,cl_date:r.cl_date||'',cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''}));
+  D.records=records.map(r=>({a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_date:r.cl_date||'',cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''}));
   const chanMap={};
   for(const r of records){
     if(!r.ch)continue;
