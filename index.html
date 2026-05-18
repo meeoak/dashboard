@@ -1628,6 +1628,9 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
 .cohort-tbl td.impossible{font-size:11px;background:#f8fafc;color:#cbd5e1}
 .cohort-tbl td.coh-diag{position:relative}
 .cohort-tbl tbody tr:hover td:not(.cum):not(.impossible):not(.eff){background-color:rgba(252,211,77,.18)!important}
+/* 클릭 가능한 셀 hover — 회원 목록 열림 표시 */
+.cohort-tbl td[onclick]{transition:filter .12s, box-shadow .12s}
+.cohort-tbl td[onclick]:hover{filter:brightness(.92);box-shadow:inset 0 0 0 2px #2563eb}
 .cohort-tbl tr.pre-row td.L{color:#92400e}
 .cohort-tbl tfoot tr td{padding:10px 8px}
 .cohort-tbl tfoot tr.sum-actual td{background:#dbeafe;border-top:3px solid #2563eb;color:#1e3a8a;font-weight:900;font-size:14.5px}
@@ -4876,6 +4879,63 @@ function renderTab(){
 //   - D.records (시트 데이터 · ad 배정월 · dk OFF/MKT) → cohort 행과 DB count
 // 매칭 키: childName + parentName (정규화) — 64% 엄격 매칭, 7% child만 매칭, 28% 미상.
 // 미상 closing 은 'cohort 미상' 행에 따로 모아서 column total 보존.
+
+// 코호트 매트릭스 셀 클릭 → 해당 records 로 회원 목록 모달 열기
+// renderAnalytics() 가 window.__cohortRecs[kindKey][cohM][closeM] = [records] 를 채워둠.
+function _cohortKindLbl(k){ return k==='OFF'?'OFF DB':(k==='MKT'?'MKT DB':'TOTAL'); }
+function _cohortShowRecs(recs, label){
+  if(!recs || !recs.length){ alert('데이터 없음'); return; }
+  // 중복 record 제거 (한 D.record 가 여러 CSV closing 에 매칭됐을 수 있음)
+  const seen = new Set();
+  const uniq = recs.filter(r=>{ if(seen.has(r)) return false; seen.add(r); return true; });
+  showMem(uniq, null, 'cl', null, null, label);
+}
+function openCohortCell(kindKey, cohM, closeM){
+  const recs = (window.__cohortRecs && window.__cohortRecs[kindKey] && window.__cohortRecs[kindKey][cohM] && window.__cohortRecs[kindKey][cohM][closeM]) || [];
+  const lbl = `${_cohortKindLbl(kindKey)} · 배정 ${cohM} → 결제 ${closeM} (${recs.length}건)`;
+  _cohortShowRecs(recs, lbl);
+}
+function openCohortRow(kindKey, cohM){
+  // cohM 행 전체 (그 달 배정 DB 의 모든 누적 클로징)
+  const byMonth = (window.__cohortRecs && window.__cohortRecs[kindKey] && window.__cohortRecs[kindKey][cohM]) || {};
+  const recs = [];
+  Object.keys(byMonth).forEach(cm => byMonth[cm].forEach(r => recs.push(r)));
+  const lbl = `${_cohortKindLbl(kindKey)} · 배정 ${cohM} 누적 클로징 (${recs.length}건)`;
+  _cohortShowRecs(recs, lbl);
+}
+// 푸터 행 셀 클릭: mode = 'col'|'off-diag'|'off-prev'|'mkt-diag'|'mkt-prev'
+function openCohortFooter(kindKey, closeM, mode){
+  const all = window.__cohortRecs || {};
+  const pick = (kk, predicate) => {
+    const out = [];
+    const km = all[kk] || {};
+    Object.keys(km).forEach(cohM => {
+      if(!predicate(cohM)) return;
+      const arr = km[cohM][closeM] || [];
+      arr.forEach(r => out.push(r));
+    });
+    return out;
+  };
+  let recs = [], lbl = '';
+  if(mode === 'col'){
+    recs = pick(kindKey, _=>true);
+    lbl = `${_cohortKindLbl(kindKey)} · 결제 ${closeM} 컬럼 합계 (${recs.length}건)`;
+  } else if(mode === 'off-diag'){
+    recs = pick('OFF', cohM => cohM === closeM);
+    lbl = `OFF DB · 배정월=결제월 ${closeM} 당월 결제 (${recs.length}건)`;
+  } else if(mode === 'off-prev'){
+    recs = pick('OFF', cohM => cohM < closeM);
+    lbl = `OFF DB · 이전 배정 → ${closeM} 결제 (${recs.length}건)`;
+  } else if(mode === 'mkt-diag'){
+    recs = pick('MKT', cohM => cohM === closeM);
+    lbl = `MKT DB · 배정월=결제월 ${closeM} 당월 결제 (${recs.length}건)`;
+  } else if(mode === 'mkt-prev'){
+    recs = pick('MKT', cohM => cohM < closeM);
+    lbl = `MKT DB · 이전 배정 → ${closeM} 결제 (${recs.length}건)`;
+  }
+  _cohortShowRecs(recs, lbl);
+}
+
 function renderAnalytics(){
   const wrap = document.getElementById('analytics-wrap');
   if(!wrap) return;
@@ -4986,11 +5046,14 @@ function renderAnalytics(){
 
   // 3) CSV CLOSING 을 매트릭스에 배치
   //    cohort[kindKey][cohortMonth][closeMonth] = count
+  //    cohortRecs[kindKey][cohortMonth][closeMonth] = [D.records ...] (셀 클릭 → 회원 목록)
   //    unmatched[closeMonth] = count (D.records 에 매칭 안 됨 — TOTAL 표에 cohort 미상 행)
   const cohort    = { OFF:{}, MKT:{}, TOTAL:{} };
+  const cohortRecs = { OFF:{}, MKT:{}, TOTAL:{} };
   const unmatched = {};
   monthsList.forEach(m=>{
     cohort.OFF[m]={}; cohort.MKT[m]={}; cohort.TOTAL[m]={};
+    cohortRecs.OFF[m]={}; cohortRecs.MKT[m]={}; cohortRecs.TOTAL[m]={};
     unmatched[m] = 0;
   });
   let matchCnt = 0, unmatchCnt = 0;
@@ -5008,6 +5071,8 @@ function renderAnalytics(){
         const kinds = k ? [k, 'TOTAL'] : ['TOTAL'];
         kinds.forEach(kk=>{
           cohort[kk][cohM][closeM] = (cohort[kk][cohM][closeM]||0) + 1;
+          if(!cohortRecs[kk][cohM][closeM]) cohortRecs[kk][cohM][closeM] = [];
+          cohortRecs[kk][cohM][closeM].push(r);
         });
         matchCnt++;
         return;
@@ -5016,6 +5081,9 @@ function renderAnalytics(){
     unmatched[closeM] = (unmatched[closeM]||0) + 1;
     unmatchCnt++;
   });
+
+  // 매트릭스 셀 onclick 핸들러용 — 전역으로 노출
+  window.__cohortRecs = cohortRecs;
 
   const buildCohortTable = (kindKey, kindLabel, color, bgColor)=>{
     const coh = cohort[kindKey];
@@ -5096,10 +5164,16 @@ function renderAnalytics(){
           const isDiag = (mi === ci);
           const txtColor = v ? (isDiag ? '#14532d' : '#581c87') : '#cbd5e1';
           const border  = isDiag ? 'box-shadow:inset 0 0 0 2px #16a34a;' : '';
-          h += `<td class="R coh-cell${isDiag?' coh-diag':''}" style="background:${cellBg(v, isDiag)};${border}color:${txtColor};font-weight:${isDiag?'900':'800'}">${v||'—'}</td>`;
+          const clickAttr = v
+            ? ` onclick="openCohortCell('${kindKey}','${cohM}','${closeM}')" style="cursor:pointer;background:${cellBg(v, isDiag)};${border}color:${txtColor};font-weight:${isDiag?'900':'800'}"`
+            : ` style="background:${cellBg(v, isDiag)};${border}color:${txtColor};font-weight:${isDiag?'900':'800'}"`;
+          h += `<td class="R coh-cell${isDiag?' coh-diag':''}"${clickAttr}>${v||'—'}</td>`;
         }
       });
-      h += `<td class="R cum">${f(cohSum)}</td>`;
+      const cumClick = cohSum
+        ? ` onclick="openCohortRow('${kindKey}','${cohM}')" style="cursor:pointer"`
+        : '';
+      h += `<td class="R cum"${cumClick}>${f(cohSum)}</td>`;
       h += `<td class="R eff ${effCls}">${eff}%</td></tr>`;
     });
 
@@ -5165,9 +5239,15 @@ function renderAnalytics(){
     });
 
     // 1) 당월 실제 클로징 (컬럼 합계) — 2026부터
+    // 클릭 가능 셀 헬퍼: 값>0 일 때 cursor:pointer + onclick
+    const ftCell = (v, m, mode) => {
+      if(m < REPORT_START) return `<td class="R" style="color:#cbd5e1">—</td>`;
+      if(!v) return `<td class="R">${f(v)}</td>`;
+      return `<td class="R" style="cursor:pointer" onclick="openCohortFooter('${kindKey}','${m}','${mode}')">${f(v)}</td>`;
+    };
     h += `<tr class="sum-actual"><td class="L" colspan="2"><b>${T('cohort_actual')}</b><br><small>${T('cohort_actual_sub')}</small></td>`;
     monthsList.forEach(m => {
-      h += cellOr(m, `<td class="R">${f(colTotals[m])}</td>`);
+      h += ftCell(colTotals[m], m, 'col');
     });
     h += `<td class="R cum">${f(actual2026)}</td>`;
     const grandEff = grandDb ? Math.round(grandCohClosing/grandDb*1000)/10 : 0;
@@ -5175,27 +5255,25 @@ function renderAnalytics(){
 
     // 2-1) ㄴ OFF DB 당월 결제 (= OFF diagonal)
     h += `<tr class="sum-sub sub-off-diag"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_off_diag')}</b></td>`;
-    monthsList.forEach(m => { h += cellOr(m, `<td class="R">${f(offDiag[m])}</td>`); });
+    monthsList.forEach(m => { h += ftCell(offDiag[m], m, 'off-diag'); });
     h += `<td class="R cum">${f(offDiag2026)}</td><td class="R eff">—</td></tr>`;
 
     // 2-2) ㄴ OFF DB 이전 결제 (= OFF column total - diagonal)
     h += `<tr class="sum-sub sub-off-prev"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_off_prev')}</b></td>`;
     monthsList.forEach(m => {
-      const v = offColTot[m] - offDiag[m];
-      h += cellOr(m, `<td class="R">${f(v)}</td>`);
+      h += ftCell(offColTot[m] - offDiag[m], m, 'off-prev');
     });
     h += `<td class="R cum">${f(offPrev2026)}</td><td class="R eff">—</td></tr>`;
 
     // 2-3) ㄴ MKT DB 당월 결제 (= MKT diagonal)
     h += `<tr class="sum-sub sub-mkt-diag"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_mkt_diag')}</b></td>`;
-    monthsList.forEach(m => { h += cellOr(m, `<td class="R">${f(mktDiag[m])}</td>`); });
+    monthsList.forEach(m => { h += ftCell(mktDiag[m], m, 'mkt-diag'); });
     h += `<td class="R cum">${f(mktDiag2026)}</td><td class="R eff">—</td></tr>`;
 
     // 2-4) ㄴ MKT DB 이전 결제
     h += `<tr class="sum-sub sub-mkt-prev"><td class="L" colspan="2"><span class="sub-bullet">ㄴ</span><b>${T('cohort_sub_mkt_prev')}</b></td>`;
     monthsList.forEach(m => {
-      const v = mktColTot[m] - mktDiag[m];
-      h += cellOr(m, `<td class="R">${f(v)}</td>`);
+      h += ftCell(mktColTot[m] - mktDiag[m], m, 'mkt-prev');
     });
     h += `<td class="R cum">${f(mktPrev2026)}</td><td class="R eff">—</td></tr>`;
 
