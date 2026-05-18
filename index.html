@@ -711,7 +711,7 @@ body.focus-mode #detail-section-hd{display:none!important}
 .today-mark{width:6px;height:6px;border-radius:50%;background:#1e3a8a;display:inline-block}
 .cal-badges{display:flex;flex-direction:column;gap:3px}
 .cal-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:4px;padding:2px 6px;width:100%}
-.cb-d{background:#dcfce7;color:#16a34a}.cb-s{background:#dbeafe;color:#1d4ed8}
+.cb-d{background:#dcfce7;color:#16a34a}.cb-s{background:#dbeafe;color:#1d4ed8}.cb-rs{background:#fee2e2;color:#b91c1c}
 .cb-vc{background:#ede9fe;color:#6d28d9}.cb-ls{background:#ffedd5;color:#1e293b}
 .cb-w{background:#fef3c7;color:#92400e}
 .cal-agents{margin-top:4px;display:flex;flex-wrap:wrap;gap:2px}
@@ -737,7 +737,8 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cal-report-title-row{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .cal-report-title{font-size:20px;font-weight:900;color:#1a1a1a;margin:0;line-height:1.2}
 .cal-report-total{font-size:12px;color:#666;font-weight:700}
-.cal-stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.cal-stat-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+.cal-stat-cards .cstat:last-child:nth-child(odd){grid-column:span 2}
 .cstat{position:relative;border:none;border-radius:14px;padding:14px 16px 14px 22px;display:flex;flex-direction:column;gap:3px;overflow:hidden;box-shadow:0 2px 10px #0001;transition:all .18s}
 .cstat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px}
 .cstat::after{content:'';position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;opacity:.1;pointer-events:none}
@@ -783,13 +784,19 @@ body.focus-mode #detail-section-hd{display:none!important}
 .cstat.cs-ls::after{background:#ea580c}
 .cstat.cs-ls .cs-num{background-image:linear-gradient(135deg,#fb923c,#9a3412);color:#9a3412}
 .cstat.cs-ls .cs-bar-fill{background:linear-gradient(90deg,#fb923c,#c2410c)}
+.cstat.cs-rs{background:linear-gradient(135deg,#fef2f2 0%,#fee2e2 100%)}
+.cstat.cs-rs::before{background:linear-gradient(180deg,#f87171,#b91c1c)}
+.cstat.cs-rs::after{background:#dc2626}
+.cstat.cs-rs .cs-num{background-image:linear-gradient(135deg,#f87171,#991b1b);color:#991b1b}
+.cstat.cs-rs .cs-bar-fill{background:linear-gradient(90deg,#f87171,#b91c1c)}
 .cal-report-legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11.5px;font-weight:700;color:#555;padding-top:2px}
 .cleg-item{display:inline-flex;align-items:center;gap:5px}
 .cleg-item .ldot{width:11px;height:11px;border-radius:3px;display:inline-block}
 .cleg-divider{width:1px;height:14px;background:#ddd}
 .strike-red{text-decoration:line-through;text-decoration-color:#dc2626;text-decoration-thickness:2px;color:#6b7280;font-weight:800}
 @media(max-width:900px){
-  .cal-stat-cards{grid-template-columns:repeat(3,1fr)}
+  .cal-stat-cards{grid-template-columns:repeat(1,1fr)}
+  .cal-stat-cards .cstat:last-child:nth-child(odd){grid-column:span 1}
 }
 @media(max-width:640px){
   .cal-report-header{padding:10px 12px 12px}
@@ -1960,8 +1967,9 @@ body.focus-mode .tab-content{margin-top:0;border-top:none;border-radius:0}
         <div><span class="def-num">②</span> <b data-t="def_book_2">비디오콜예약/완료</b> <span class="def-sub">(status=vc)</span></div>
         <div><span class="def-num">③</span> <b data-t="def_book_3">방문완료</b> <span class="def-sub" data-t="def_book_3_sub">(status=d, 이미 예약 잡혔던 것)</span></div>
         <div><span class="def-num">④</span> <b data-t="def_book_4_ls">비짓랑숭</b> <span class="def-sub" data-t="def_book_4_ls_sub">(status=ls, 즉시 방문도 상담예약으로)</span></div>
-        <div><span class="def-num">⑤</span> <b data-t="def_book_5_trial">체험중·체험완료</b> <span class="def-sub" data-t="def_book_5_trial_sub">(Uji Coba, 자동 포함)</span></div>
-        <div><span class="def-num">⑥</span> <b data-t="def_book_6_cl">클로징</b> <span class="def-sub" data-t="def_book_6_cl_sub">(cl=1, 자동 포함)</span></div>
+        <div><span class="def-num">⑤</span> <b data-t="def_book_5_rs">🔄 리스케줄</b> <span class="def-sub" data-t="def_book_5_rs_sub">(status=rs, Rescheduling Visit Batal — 방문취소 재예약)</span></div>
+        <div><span class="def-num">⑥</span> <b data-t="def_book_6_trial">체험중·체험완료</b> <span class="def-sub" data-t="def_book_6_trial_sub">(Uji Coba, 자동 포함)</span></div>
+        <div><span class="def-num">⑦</span> <b data-t="def_book_7_cl">클로징</b> <span class="def-sub" data-t="def_book_7_cl_sub">(cl=1, 자동 포함)</span></div>
       </div>
     </div>
     <div class="def-card def-green">
@@ -2272,8 +2280,9 @@ const LANG = {
     def_book_1:'방문예약', def_book_2:'비디오콜예약/완료', def_book_3:'방문완료',
     def_book_3_sub:'(status=d, 이미 예약 잡혔던 것)',
     def_book_4_ls:'비짓랑숭', def_book_4_ls_sub:'(status=ls, 즉시 방문도 상담예약으로)',
-    def_book_5_trial:'체험중·체험완료', def_book_5_trial_sub:'(Uji Coba, 자동 포함)',
-    def_book_6_cl:'클로징', def_book_6_cl_sub:'(cl=1, 자동 포함)',
+    def_book_5_rs:'🔄 리스케줄', def_book_5_rs_sub:'(status=rs, Rescheduling Visit Batal — 방문취소 재예약)',
+    def_book_6_trial:'체험중·체험완료', def_book_6_trial_sub:'(Uji Coba, 자동 포함)',
+    def_book_7_cl:'클로징', def_book_7_cl_sub:'(cl=1, 자동 포함)',
     def_book_4:'체험중·체험완료', def_book_4_sub:'(Uji Coba, 자동 포함)',
     def_book_5:'클로징', def_book_5_sub:'(cl=1, 자동 포함)',
     def_done_title:'✅ 상담완료 (visit)',
@@ -2324,7 +2333,7 @@ const LANG = {
     cal_title_all:'📅 방문 캘린더',
     cal_total:'총', cal_unit:'건',
     cal_label_done:'완료', cal_label_video:'비디오', cal_label_langsung:'랑숭',
-    cal_label_book:'예약', cal_label_wait:'대기',
+    cal_label_book:'예약', cal_label_wait:'대기', cal_label_reschedule:'리스케줄',
     dow_mon:'Mon', dow_tue:'Tue', dow_wed:'Wed', dow_thu:'Thu', dow_fri:'Fri', dow_sat:'Sat', dow_sun:'Sun',
     // Other
     final_kpi:'⭐ 최종', main_kpi_label:'최종 KPI',
@@ -2431,7 +2440,7 @@ const LANG = {
     report_btn_kr_title:'한국어 인쇄/PDF', report_btn_id_title:'Bahasa 인쇄/PDF',
     report_btn_print_title:'현재 언어 그대로 인쇄',
     report_activity_lbl:'🏆 활동지수', report_db_unit:'건',
-    mgmt_active:'진행됨', mgmt_no_memo:'상담기록없음', mgmt_no_resp:'응답없음', mgmt_cancel:'부적합',
+    mgmt_active:'관리진행됨', mgmt_no_memo:'상담기록없음', mgmt_no_resp:'고객 무응답', mgmt_cancel:'DB 부적합',
     prev_month:'이전 월', next_month:'다음 월',
     nav_home:'🏠 전체 대시보드', nav_giar:'GIAR 대시보드', nav_tina:'TINA 대시보드', nav_lidia:'LIDIA 대시보드',
     nav_home_title:'전체 대시보드로 돌아가기',
@@ -2479,7 +2488,7 @@ const LANG = {
     urg_b_no_target_sub:'배정 후 2주 이내 회원 중 즉시 액션 필요한 건 없습니다',
     urg_b_title:'긴급 관리 필요 {n}건', urg_b_scope_all:'전체',
     urg_b_subtitle:'배정 후 2주 이내 · 이관 임박 · 매일 자동 업데이트 (오늘 {today})',
-    urg_b_no_memo:'📝 상담기록없음', urg_b_overdue:'⚠️ 방문일 지남', urg_b_no_resp:'🚨 응답없음',
+    urg_b_no_memo:'📝 상담기록없음', urg_b_overdue:'⚠️ 방문일 지남', urg_b_no_resp:'🚨 고객 무응답',
     urg_b_wait:'⏳ 일정대기 누적', urg_b_soon:'📅 방문 임박',
     urg_b_no_memo_t:'상담기록도 없고 옵션도 선택 안된 회원 목록',
     urg_b_overdue_t:'방문일 지남 회원 목록',
@@ -2493,12 +2502,12 @@ const LANG = {
     r3d_rank_1:'🚨 긴급 1위', r3d_rank_2:'🔥 긴급 2위', r3d_rank_3:'⚠️ 긴급 3위',
     r3d_action_immediate:'🔥 즉시 조치', r3d_action_priority:'⚠️ 우선 관리',
     r3d_urg_count:'🚨 긴급 {n}건',
-    r3d_no_memo:'상담기록없음', r3d_overdue:'방문일 지남', r3d_no_resp:'응답없음',
+    r3d_no_memo:'상담기록없음', r3d_overdue:'방문일 지남', r3d_no_resp:'고객 무응답',
     r3d_wait:'일정대기', r3d_soon:'방문 임박',
     r3d_expand:'▼ 펼치기', r3d_collapse:'▲ 접기',
     r3d_no_memo_chip_t:'상담기록없음 — 클릭 → 회원 목록',
     r3d_overdue_chip_t:'방문일 지남 — 클릭 → 회원 목록',
-    r3d_no_resp_chip_t:'응답없음 — 클릭 → 회원 목록',
+    r3d_no_resp_chip_t:'고객 무응답 — 클릭 → 회원 목록',
     r3d_wait_chip_t:'일정대기 — 클릭 → 회원 목록',
     r3d_soon_chip_t:'방문 임박 — 클릭 → 회원 목록',
     // 팀 인사이트
@@ -2562,8 +2571,9 @@ const LANG = {
     def_book_1:'Visit Booking', def_book_2:'Video Call', def_book_3:'Visit Selesai',
     def_book_3_sub:'(status=d, sudah pernah dijadwal)',
     def_book_4_ls:'Visit Langsung', def_book_4_ls_sub:'(status=ls, walk-in juga termasuk)',
-    def_book_5_trial:'Sedang/Selesai Uji Coba', def_book_5_trial_sub:'(Uji Coba, otomatis termasuk)',
-    def_book_6_cl:'Closing', def_book_6_cl_sub:'(cl=1, otomatis termasuk)',
+    def_book_5_rs:'🔄 Rescheduling', def_book_5_rs_sub:'(status=rs, Rescheduling Visit Batal)',
+    def_book_6_trial:'Sedang/Selesai Uji Coba', def_book_6_trial_sub:'(Uji Coba, otomatis termasuk)',
+    def_book_7_cl:'Closing', def_book_7_cl_sub:'(cl=1, otomatis termasuk)',
     def_book_4:'Sedang/Selesai Uji Coba', def_book_4_sub:'(Uji Coba, otomatis termasuk)',
     def_book_5:'Closing', def_book_5_sub:'(cl=1, otomatis termasuk)',
     def_done_title:'✅ Konsultasi Selesai (visit)',
@@ -2616,7 +2626,7 @@ const LANG = {
     cal_title_all:'📅 Kalender Kunjungan',
     cal_total:'Total', cal_unit:'',
     cal_label_done:'Selesai', cal_label_video:'Video', cal_label_langsung:'Langsung',
-    cal_label_book:'Jadwal', cal_label_wait:'Menunggu',
+    cal_label_book:'Jadwal', cal_label_wait:'Menunggu', cal_label_reschedule:'Reschedule',
     dow_mon:'Mon', dow_tue:'Tue', dow_wed:'Wed', dow_thu:'Thu', dow_fri:'Fri', dow_sat:'Sat', dow_sun:'Sun',
     // Other
     final_kpi:'⭐ Akhir', main_kpi_label:'KPI Akhir',
@@ -2723,7 +2733,7 @@ const LANG = {
     report_btn_kr_title:'Cetak/PDF Bahasa Korea', report_btn_id_title:'Cetak/PDF Bahasa Indonesia',
     report_btn_print_title:'Cetak dengan bahasa saat ini',
     report_activity_lbl:'🏆 Indeks Aktivitas', report_db_unit:'',
-    mgmt_active:'Diproses', mgmt_no_memo:'Tanpa Catatan', mgmt_no_resp:'Tidak Respons', mgmt_cancel:'Tidak Sesuai',
+    mgmt_active:'Sedang Dikelola', mgmt_no_memo:'Tanpa Catatan', mgmt_no_resp:'Pelanggan Tidak Respons', mgmt_cancel:'DB Tidak Sesuai',
     prev_month:'Bulan Sebelumnya', next_month:'Bulan Berikutnya',
     nav_home:'🏠 Dashboard Utama', nav_giar:'Dashboard GIAR', nav_tina:'Dashboard TINA', nav_lidia:'Dashboard LIDIA',
     nav_home_title:'Kembali ke Dashboard Utama',
@@ -2949,7 +2959,7 @@ function targetStatus(actual, target){
   const ico = actual>=target ? '✅' : actual>=target*0.7 ? '⚠️' : '🔻';
   return {pct, cls, ico, ach: actual>=target};
 }
-window.STLBL = {d:'방문완료',ls:'랑숭비짓',vc:'비디오콜',s:'방문예약',s_f:'방문예약',s_o:'⚠️ 확인필요',w:'일정대기',cl:'클로징',db:'📋 DB 배정 전체',none:'미진행',x:'취소/거절'};
+window.STLBL = {d:'방문완료',ls:'랑숭비짓',vc:'비디오콜',s:'방문예약',s_f:'방문예약',s_o:'⚠️ 확인필요',w:'일정대기',rs:'🔄 리스케줄',cl:'클로징',db:'📋 DB 배정 전체',none:'미진행',x:'취소/거절'};
 const STLBL = window.STLBL;
 const STCOL = {d:'#16a34a',ls:'#1e293b',vc:'#6d28d9',s:'#1d4ed8',s_f:'#1d4ed8',s_o:'#dc2626',w:'#92400e',cl:'#1e3a8a',db:'#555',none:'#888',x:'#999'};
 const STBG  = {d:'#dcfce7',ls:'#ffedd5',vc:'#ede9fe',s:'#dbeafe',s_f:'#dbeafe',s_o:'#fee2e2',w:'#fef3c7',cl:'#fefce8',db:'#f5f5f5',none:'#fafafa',x:'#f5f5f5'};
@@ -3299,8 +3309,8 @@ function statsRange(from, to, team, agent){
       if(r.od){ if(inRange) s.s_o++; }
       else s.s_f++;
     }
-    // 상담예약(sched) = s/d/vc/ls/cl=1, 기간 내
-    if(inRange && (r.st==='s' || r.st==='d' || r.st==='vc' || r.st==='ls' || r.cl===1)){
+    // 상담예약(sched) = s/d/vc/ls/rs/cl=1, 기간 내 (리스케줄 포함)
+    if(inRange && (r.st==='s' || r.st==='d' || r.st==='vc' || r.st==='ls' || r.st==='rs' || r.cl===1)){
       schedNew++;
     }
   }
@@ -3620,15 +3630,16 @@ function renderDBSummary(){
     document.getElementById('db-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#aaa;padding:30px">데이터 없음</div>';
     return;
   }
-  // 활동 상태 — 부적합 DB(Keterangan DB 입력)는 다른 카테고리에서 제외
-  const isUnfit = (r) => (r.kt && String(r.kt).trim()) || (r.st==='x' && r.cl!==1);
-  // OFF vs MKT vs 부적합 (상호 배타 — 합 = total)
+  // DB 부적합 = Keterangan DB(영업 판단) 만. status x(취소/거절)는 관리진행됨에 포함.
+  const isUnfit = (r) => (r.kt && String(r.kt).trim());
+  // OFF vs MKT vs DB 부적합 (상호 배타 — 합 = total)
   const offCnt = records.filter(r=>r.dk==='OFF' && !isUnfit(r)).length;
   const mktCnt = records.filter(r=>r.dk==='MKT' && !isUnfit(r)).length;
   const cancelled = records.filter(isUnfit).length;
   const offPct = total ? Math.round(offCnt/total*100) : 0;
   const mktPct = total ? Math.round(mktCnt/total*100) : 0;
-  const active = records.filter(r=> !isUnfit(r) && (['s','d','vc','ls','w'].includes(r.st) || r.cl===1)).length;
+  // 관리진행됨 = 방문여부 옵션 선택된 모든 status (s/d/vc/ls/rs/w/x) 또는 클로징됨
+  const active = records.filter(r=> !isUnfit(r) && (['s','d','vc','ls','rs','w','x'].includes(r.st) || r.cl===1)).length;
   const idleRecs = records.filter(r=> !isUnfit(r) && r.st==='none' && r.cl!==1);
   const idle = idleRecs.length;
   // 미진행 내 세부: 메모없음 vs 응답없음 (메모 있음)
@@ -3665,11 +3676,11 @@ function renderDBSummary(){
         <div class="mtl-bar" style="width:${Math.min(pct(active),100)}%"></div>
         <div class="mtl-target" style="left:${TARGETS.db_mgmt}%" title="${T('tg_target')} ${TARGETS.db_mgmt}%"></div>
       </div>
-      <div class="mgmt-stack-bar" title="진행됨 / 상담기록없음 / 응답없음 / 부적합">
-        ${active>0?`<div class="ms-seg ms-active" style="width:${pct(active)}%" onclick="openMemStatus('active')" title="진행됨 ${active}건">${pct(active)>=8?'✅ '+pct(active)+'%':pct(active)+'%'}</div>`:''}
+      <div class="mgmt-stack-bar" title="관리진행됨 / 상담기록없음 / 고객 무응답 / DB 부적합">
+        ${active>0?`<div class="ms-seg ms-active" style="width:${pct(active)}%" onclick="openMemStatus('active')" title="관리진행됨 ${active}건">${pct(active)>=8?'✅ '+pct(active)+'%':pct(active)+'%'}</div>`:''}
         ${idleNoMemo>0?`<div class="ms-seg ms-no-memo" style="width:${pct(idleNoMemo)}%" onclick="openMemStatus('idle_noMemo')" title="상담기록없음 ${idleNoMemo}건 (긴급)">${pct(idleNoMemo)>=8?'🚨 '+pct(idleNoMemo)+'%':pct(idleNoMemo)+'%'}</div>`:''}
-        ${idleNoResp>0?`<div class="ms-seg ms-no-resp" style="width:${pct(idleNoResp)}%" onclick="openMemStatus('idle_noResp')" title="응답없음 ${idleNoResp}건 (위험)">${pct(idleNoResp)>=8?'⚠️ '+pct(idleNoResp)+'%':pct(idleNoResp)+'%'}</div>`:''}
-        ${cancelled>0?`<div class="ms-seg ms-cancel" style="width:${pct(cancelled)}%" onclick="openMemStatus('cancel')" title="부적합 ${cancelled}건">${pct(cancelled)>=8?'⛔ '+pct(cancelled)+'%':pct(cancelled)+'%'}</div>`:''}
+        ${idleNoResp>0?`<div class="ms-seg ms-no-resp" style="width:${pct(idleNoResp)}%" onclick="openMemStatus('idle_noResp')" title="고객 무응답 ${idleNoResp}건 (위험)">${pct(idleNoResp)>=8?'⚠️ '+pct(idleNoResp)+'%':pct(idleNoResp)+'%'}</div>`:''}
+        ${cancelled>0?`<div class="ms-seg ms-cancel" style="width:${pct(cancelled)}%" onclick="openMemStatus('cancel')" title="DB 부적합 ${cancelled}건">${pct(cancelled)>=8?'⛔ '+pct(cancelled)+'%':pct(cancelled)+'%'}</div>`:''}
       </div>
       <div class="mgmt-detail">
         <div class="mgmt-detail-row mgmt-row-active" onclick="openMemStatus('active')" title="${T('mgmt_active')}">
@@ -3717,10 +3728,10 @@ function renderDBSummary(){
               <div class="dlg-val"><b>${f(mktCnt)}</b><span>${mktPct}%</span></div>
             </div>
           </div>
-          <div class="dlg-item dlg-unfit" onclick="openMemStatus('cancel')" style="cursor:pointer" title="취소·거절된 부적합 DB">
+          <div class="dlg-item dlg-unfit" onclick="openMemStatus('cancel')" style="cursor:pointer" title="Keterangan DB 입력된 DB 부적합">
             <span class="dlg-dot" style="background:#dc2626"></span>
             <div class="dlg-info">
-              <div class="dlg-lbl">⛔ 부적합 DB</div>
+              <div class="dlg-lbl">⛔ DB 부적합</div>
               <div class="dlg-val"><b>${f(cancelled)}</b><span>${pct(cancelled)}%</span></div>
             </div>
           </div>
@@ -3774,9 +3785,9 @@ function openMemStatus(kind){
     if(curAgent!=='ALL' && r.a!==curAgent) return false;
     if(r.ad < curFrom || r.ad > curTo) return false;
     if((curDbKind==='OFF' || curDbKind==='MKT') && r.dk!==curDbKind) return false;
-    const isUnfit = (r.kt && String(r.kt).trim()) || (r.st==='x' && r.cl!==1);
+    const isUnfit = (r.kt && String(r.kt).trim());
     if(kind==='active'){
-      return !isUnfit && (['s','d','vc','ls','w'].includes(r.st) || r.cl===1);
+      return !isUnfit && (['s','d','vc','ls','rs','w','x'].includes(r.st) || r.cl===1);
     } else if(kind==='idle'){
       return !isUnfit && r.st==='none' && r.cl!==1;
     } else if(kind==='idle_noMemo'){
@@ -3789,11 +3800,11 @@ function openMemStatus(kind){
     return false;
   });
   const labels = {
-    active: '✅ 진행됨 (예약·방문·클로)',
+    active: '✅ 관리진행됨 (옵션 선택된 모든 status)',
     idle: '⏳ 미진행 (상태 미입력)',
-    idle_noMemo: '📝 미진행 — 메모없음',
-    idle_noResp: '🚨 미진행 — 응답없음 (메모 있음)',
-    cancel: '⛔ 부적합 DB (취소·거절)'
+    idle_noMemo: '📝 상담기록없음',
+    idle_noResp: '🚨 고객 무응답 (상담기록 있음)',
+    cancel: '⛔ DB 부적합 (Keterangan DB)'
   };
   showMem(recs, null, kind, labels[kind]||kind);
 }
@@ -4173,7 +4184,7 @@ function renderCal(){
   const month = curFrom ? curFrom.slice(0,7) : (curMonth==='ALL' ? D.months[D.months.length-1] : curMonth);
   const calData = D.cal_summary[month];
   if(!calData) return;
-  const types = ['s','w','d','ls','vc'];
+  const types = ['s','w','d','ls','vc','rs'];
 
   const recs = D.cal_recs.filter(r=>{
     if(!r.vd.startsWith(month)) return false;
@@ -4186,7 +4197,7 @@ function renderCal(){
 
   const byDate = {};
   recs.forEach(r=>{
-    if(!byDate[r.vd]) byDate[r.vd]={d:[],ls:[],vc:[],s:[],w:[]};
+    if(!byDate[r.vd]) byDate[r.vd]={d:[],ls:[],vc:[],s:[],w:[],rs:[]};
     byDate[r.vd][r.st]?.push(r);
   });
 
@@ -4194,14 +4205,14 @@ function renderCal(){
   const firstDay = new Date(yr,mo-1,1).getDay();
   const firstDow = (firstDay+6)%7;
 
-  let totals = {d:0,ls:0,vc:0,s:0,w:0};
+  let totals = {d:0,ls:0,vc:0,s:0,w:0,rs:0};
   recs.forEach(r=>{ if(totals[r.st]!==undefined) totals[r.st]++; });
 
   const monthLbl = (D.mlabels && D.mlabels[month]) || month;
   document.getElementById('cal-s-title').textContent = monthLbl + ' ' + T('cal_title_all');
   const u = T('cal_unit');
   const doneN = totals.d + totals.ls + totals.vc;
-  const pendN = totals.s + totals.w;
+  const pendN = totals.s + totals.w + totals.rs;
   document.getElementById('cal-s-sub').textContent =
     `${T('cal_total')} ${pendN+doneN}${u}`;
   // 보고서 헤더의 카운트 카드 (상태별 큰 숫자 + 4가지 메트릭)
@@ -4221,7 +4232,7 @@ function renderCal(){
       if((curDbKind==='OFF' || curDbKind==='MKT') && r.dk!==curDbKind) return false;
       return true;
     });
-    const prevTotals = {d:0,ls:0,vc:0,s:0,w:0};
+    const prevTotals = {d:0,ls:0,vc:0,s:0,w:0,rs:0};
     prevRecs.forEach(r=>{ if(prevTotals[r.st]!==undefined) prevTotals[r.st]++; });
     // 이번주 범위 (오늘 기준 월~일)
     const tDate = new Date((D.today||'').replace(/-/g,'/'));
@@ -4233,10 +4244,10 @@ function renderCal(){
       const fmt = d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       wsStr = fmt(ws); weStr = fmt(we);
     }
-    const weekTotals = {d:0,ls:0,vc:0,s:0,w:0};
+    const weekTotals = {d:0,ls:0,vc:0,s:0,w:0,rs:0};
     if(wsStr) recs.forEach(r=>{ if(r.vd>=wsStr && r.vd<=weStr && weekTotals[r.st]!==undefined) weekTotals[r.st]++; });
     // TOP 에이전트
-    const topByStatus = {s:null,w:null,d:null,vc:null,ls:null};
+    const topByStatus = {s:null,w:null,d:null,vc:null,ls:null,rs:null};
     types.forEach(st=>{
       const cnt = {};
       recs.forEach(r=>{ if(r.st===st) cnt[r.a]=(cnt[r.a]||0)+1; });
@@ -4257,8 +4268,8 @@ function renderCal(){
       ['d','✅', T('cal_label_done'),     totals.d,  prevTotals.d,  weekTotals.d,  topByStatus.d],
       ['ls','⬜',T('cal_label_langsung'), totals.ls, prevTotals.ls, weekTotals.ls, topByStatus.ls],
       ['vc','📹',T('cal_label_video'),    totals.vc, prevTotals.vc, weekTotals.vc, topByStatus.vc],
+      ['rs','🔄',T('cal_label_reschedule'),totals.rs, prevTotals.rs, weekTotals.rs, topByStatus.rs],
     ].map(([k,icon,lbl,n,pn,wn,top])=>{
-      const avg = (n/daysIn).toFixed(1);
       const share = n>0 && top ? Math.round(top.count/n*100) : 0;
       const u = T('cs_unit_count');
       const topHtml = top
@@ -4274,7 +4285,6 @@ function renderCal(){
         <div class="cs-metrics">
           <div class="cs-m"><span class="cs-m-lbl">${T('cs_prev_diff')}</span>${deltaFmt(n,pn)}</div>
           <div class="cs-m"><span class="cs-m-lbl">${T('cs_thisweek')}</span><span class="cs-m-val">${wn}${u}</span></div>
-          <div class="cs-m"><span class="cs-m-lbl">${T('cs_daily_avg')}</span><span class="cs-m-val">${avg}</span></div>
           <div class="cs-m cs-m-toprow"><span class="cs-m-lbl">🏆 TOP</span><span class="cs-m-val cs-m-top">${topHtml}</span></div>
         </div>
       </div>`;
@@ -4291,12 +4301,13 @@ function renderCal(){
     const ds = day.date;
     const isToday = ds===D.today;
     const dow = day.dow_i;
-    const info = byDate[ds]||{d:[],ls:[],vc:[],s:[],w:[]};
+    const info = byDate[ds]||{d:[],ls:[],vc:[],s:[],w:[],rs:[]};
     const total = types.reduce((acc,t)=>acc+info[t].length,0);
 
     let badges='';
     if(info.s.length)  badges+=`<div class="cal-badge cb-s" onclick="event.stopPropagation();openDayType('${ds}','s')">📅 ${T('cal_label_book')} ${info.s.length}</div>`;
     if(info.w.length)  badges+=`<div class="cal-badge cb-w" onclick="event.stopPropagation();openDayType('${ds}','w')">⏳ ${T('cal_label_wait')} ${info.w.length}</div>`;
+    if(info.rs.length) badges+=`<div class="cal-badge cb-rs" onclick="event.stopPropagation();openDayType('${ds}','rs')">🔄 ${T('cal_label_reschedule')} ${info.rs.length}</div>`;
     const doneDay = info.d.length + info.ls.length + info.vc.length;
     if(doneDay) badges+=`<div class="cal-badge cb-d" onclick="event.stopPropagation();openDayDone('${ds}')">✅ ${T('cal_label_done')} ${doneDay}</div>`;
 
@@ -4305,7 +4316,7 @@ function renderCal(){
     types.forEach(t=>info[t].forEach(r=>{
       recList.push({a:r.a, st:r.st});
     }));
-    const stOrder = {s:1, w:2, d:3, vc:4, ls:5};
+    const stOrder = {s:1, w:2, rs:3, d:4, vc:5, ls:6};
     recList.sort((a,b)=>{
       const oa = stOrder[a.st]||9, ob = stOrder[b.st]||9;
       if(oa !== ob) return oa - ob;
@@ -5750,7 +5761,7 @@ function _reportT(lang){
     urgent_main_title: '🚨 긴급 관리 일일 보고서',
     urgent_subtitle: (team, today, total)=>`${team} · ${today} 기준 · 배정 후 2주 이내 이관 임박 회원 ${total}건`,
     urgent_overdue: '⚠️ 방문일 지남',
-    urgent_idle: '🚨 응답없음',
+    urgent_idle: '🚨 고객 무응답',
     urgent_wait: '⏳ 일정대기 누적',
     urgent_soon: '📅 방문 임박',
     urgent_empty_title: '긴급 관리 대상 없음',
@@ -5776,7 +5787,7 @@ function _reportT(lang){
     sub_overdue_hint: '방문일 지남',
     db_status_title: '📋 내 DB 현황',
     db_status_total: '전체 DB',
-    db_status_active: '진행됨',
+    db_status_active: '관리진행됨',
     db_status_idle: '미진행',
     db_status_cancel: '취소·거절',
     rate_ds: '예약율',
@@ -5811,7 +5822,7 @@ function _reportT(lang){
     col_channel: '채널',
     col_memo: '📝 상담기록',
     type_overdue: '방문일 지남',
-    type_idle: '응답없음',
+    type_idle: '고객 무응답',
     type_wait: '일정대기 누적',
     type_soon: '방문 임박',
     bulk_doc_title: (team)=>`${team} 에이전트 일일 보고서`,
@@ -7900,7 +7911,8 @@ function rowToRecord(row,today){
   else if(statusB==='Scheduling Selesai (예약완료)')st='s';
   else if(statusB==='Menunggu Jadwal (일정대기)')st='w';
   else if(statusA==='Telepon (전화)'&&(statusB==='Video Call (비디오콜상담)'||statusB==='Visit Selesai (방문완료)'))st='vc';
-  else if(statusB.includes('Pembatalan')||statusB.includes('Rescheduling')||statusB.includes('Penolakan')||statusB.includes('Telepon salah')||statusB.includes('전화번호'))st='x';
+  else if(statusB.includes('Rescheduling'))st='rs';  // 방문취소 재예약 — 상담예약(sched) 포함
+  else if(statusB.includes('Pembatalan')||statusB.includes('Penolakan')||statusB.includes('Telepon salah')||statusB.includes('전화번호'))st='x';
   // 미래 날짜로 완료/랑숭/비디오 처리된 건은 실제로는 방문예약(s)로 재분류 (논리적 오류 방지)
   if((st==='d'||st==='ls'||st==='vc')&&visitDate&&visitDate>today)st='s';
   let s_f=0,s_o=0;
@@ -7917,12 +7929,13 @@ function rowToRecord(row,today){
   return{a:agent,t:team,m:ad.slice(0,7),st,cl,cl_type:clType,nm:childName,pa:parentName,ph:phone,pv:province,ch:channel,vd:visitDate,ad,od:0,dk,cancel:'',memo,kt,_sf:s_f,_so:s_o};
 }
 
-function emptyStat(){return{db:0,d:0,ls:0,vc:0,s:0,s_f:0,s_o:0,w:0,x:0,none:0,cl:0,visit:0,sched:0,active:0,score:0,r_ds:0,r_sv:0,r_vc:0,r_dc:0};}
+function emptyStat(){return{db:0,d:0,ls:0,vc:0,s:0,rs:0,s_f:0,s_o:0,w:0,x:0,none:0,cl:0,visit:0,sched:0,active:0,score:0,r_ds:0,r_sv:0,r_vc:0,r_dc:0};}
 
 function computeDerived(s){
   s.visit=(s.d||0)+(s.ls||0)+(s.vc||0);
-  s.sched=s.visit+(s.s||0);
-  s.active=s.visit+(s.s||0)+(s.w||0);
+  s.sched=s.visit+(s.s||0)+(s.rs||0);  // 상담예약 = 방문완료+랑숭+비콜+예약대기+리스케줄
+  // 관리진행됨 = 옵션 선택된 모든 status (응답있음 w · 부적합성 x 포함, Keterangan DB 만 제외)
+  s.active=s.visit+(s.s||0)+(s.rs||0)+(s.w||0)+(s.x||0);
   s.score=s.visit*1+s.cl*5;
   s.r_ds=s.db>0?Math.round((s.sched/s.db)*1000)/10:0;
   s.r_sv=s.sched>0?Math.round((s.visit/s.sched)*1000)/10:0;
@@ -8053,11 +8066,11 @@ function buildD(records,today){
   computeDerived(D.overall);
   D.cal_recs=[];
   for(const r of records){
-    if(!['d','ls','vc','s','w'].includes(r.st))continue;
-    // vd 없으면 vc/ls 같은 비디오콜·랑숭은 ad(배정일)을 fallback으로 사용
+    if(!['d','ls','vc','s','w','rs'].includes(r.st))continue;
+    // vd 없으면 vc/ls/rs 같은 비디오콜·랑숭·리스케줄은 ad(배정일)을 fallback으로 사용
     let vd=r.vd;
     if(!vd){
-      if(r.st==='vc'||r.st==='ls')vd=r.ad;
+      if(r.st==='vc'||r.st==='ls'||r.st==='rs')vd=r.ad;
       else continue; // s/d/w 는 방문일 없으면 캘린더 제외
     }
     const c={a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_date:r.cl_date||'',cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''};
