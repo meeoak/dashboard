@@ -7845,17 +7845,24 @@ function detectKetColumn(headerRow){
   KET_COL_DETECTED=true;
 }
 
+// 에이전트명 정규화: "Yuyun yuniati" / "Yuyun Yuniati" 같은 case 변형을 동일인으로 합침
+// — Title Case (각 단어 첫글자만 대문자, 나머지는 소문자) 로 표준화
+function normalizeAgentName(s){
+  return (s||'').trim().split(/\s+/).map(w=>w?w.charAt(0).toUpperCase()+w.slice(1).toLowerCase():'').join(' ');
+}
+
 // 정적 데이터에서 에이전트→팀 매핑 추출 (라이브 파싱 fallback용)
 const STATIC_AGENT_TEAM={};
-for(const r of (D.records||[])) if(r.a&&r.t) STATIC_AGENT_TEAM[r.a]=r.t;
+for(const r of (D.records||[])) if(r.a&&r.t) STATIC_AGENT_TEAM[normalizeAgentName(r.a)]=r.t;
 console.log(`📋 정적 에이전트→팀 매핑 ${Object.keys(STATIC_AGENT_TEAM).length}건`);
 
 function rowToRecord(row,today){
   if(!row||row.length<13)return null;
   const ad=parseSheetDate(row[1]);
   if(!ad)return null;
-  const agent=(row[12]||'').trim();
-  if(!agent||agent==='#N/A'||agent.startsWith('유료회원'))return null;
+  const agentRaw=(row[12]||'').trim();
+  if(!agentRaw||agentRaw==='#N/A'||agentRaw.startsWith('유료회원'))return null;
+  const agent=normalizeAgentName(agentRaw);
   const channel=(row[2]||'').trim();
   const childName=(row[3]||'').trim();
   const parentName=(row[4]||'').trim();
@@ -7963,6 +7970,8 @@ function applyCsvClToRecords(records){
 }
 
 function buildD(records,today){
+  // ▶ 에이전트명 정규화 — case 변형 (예: 'Yuyun yuniati' / 'Yuyun Yuniati') 을 동일인으로 합침
+  records.forEach(r=>{ if(r.a) r.a=normalizeAgentName(r.a); });
   // ▶ CSV 통장입금 매칭으로 cl_date 부여 (r.cl 자체는 시트 진실 유지)
   applyCsvClToRecords(records);
   const D={today};
