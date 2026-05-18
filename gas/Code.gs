@@ -405,7 +405,8 @@ function calcAgentStats_(records, agentName, monthStart, today) {
     // visit / cl 판단 (status 코드)
     const sB = r.statusB;
     const visited = sB.indexOf('Visit Selesai') >= 0 || sB.indexOf('Langsung') >= 0 || sB.indexOf('Video Call') >= 0;
-    const isCl = r.clType && !/^tidak\b/i.test(r.clType);
+    const isCl = !!(r.clType && !/^tidak\b/i.test(r.clType) &&
+      /(cicilan|full payment|closing|elite|program|월납|분납|일시납|완납|선수금|보증금|할인)/i.test(r.clType));
 
     if(visited && inMonth){
       visit++;
@@ -459,7 +460,8 @@ function getUrgentMembers_(records, agentName, today) {
     const sB = (r.statusB||'').toLowerCase();
     const sA = (r.statusA||'').toLowerCase();
     const visited = sB.indexOf('visit selesai') >= 0 || sB.indexOf('langsung') >= 0 || sB.indexOf('video call') >= 0;
-    const isCl    = r.clType && !/^tidak\b/i.test(r.clType);
+    const isCl    = !!(r.clType && !/^tidak\b/i.test(r.clType) &&
+      /(cicilan|full payment|closing|elite|program|월납|분납|일시납|완납|선수금|보증금|할인)/i.test(r.clType));
     const isDaftar = sA.indexOf('daftar') >= 0;
     const daysAd = r.ad ? Math.floor((td - new Date(r.ad))/86400000) : 0;
     const daysVd = r.vd ? Math.floor((td - new Date(r.vd))/86400000) : 0;
