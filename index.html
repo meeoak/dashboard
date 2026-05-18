@@ -7883,7 +7883,65 @@ function computeDerived(s){
   s.r_dc=s.db>0?Math.round((s.cl/s.db)*1000)/10:0;
 }
 
+// 통장입금 CSV (window.CSV_CLOSINGS) 를 cl 플래그의 진실 source 로 적용
+//   - 시트 cl=1 이라도 CSV 매칭 없으면 cl=0 (부풀림 방지)
+//   - 시트 cl=0 이라도 CSV 매칭되면 cl=1 + cl_date 부여 (시트 누락 보정)
+//   - 매칭 키: childName + parentName (정규화) — 3단계 fallback (full/first/child)
+//   - 한 record 가 여러 CSV 와 매칭되면 가장 빠른 결제일을 cl_date 로 사용
+// 결과: 통계 탭 코호트 대각선 = 4대 핵심 KPI 의 클로징 수 (단일 source of truth)
+function applyCsvClToRecords(records){
+  if(typeof window==='undefined' || !window.CSV_CLOSINGS || !window.CSV_CLOSINGS.length) return;
+  const norm=(s)=>(s||'').toLowerCase().replace(/[^a-z가-힣0-9]/g,'');
+  const firstTok=(s)=>{const t=(s||'').split(/[\s\/,]+/).filter(Boolean);return t[0]||'';};
+  const pairIdx={}, pairFirstIdx={}, childIdx={};
+  records.forEach((r,i)=>{
+    if(!r.ad) return;
+    const cn=norm(r.nm); if(!cn) return;
+    (childIdx[cn]=childIdx[cn]||[]).push(i);
+    const pn=norm(r.pa);
+    if(pn) (pairIdx[cn+'|'+pn]=pairIdx[cn+'|'+pn]||[]).push(i);
+    const pf=norm(firstTok(r.pa));
+    if(pf && pf!==pn) (pairFirstIdx[cn+'|'+pf]=pairFirstIdx[cn+'|'+pf]||[]).push(i);
+  });
+  const pickBest=(idxs, closeDate)=>{
+    if(!idxs || !idxs.length) return -1;
+    const pre=idxs.filter(i=>records[i].ad && records[i].ad<=closeDate);
+    if(pre.length){
+      pre.sort((a,b)=>(closeDate.localeCompare(records[b].ad))-(closeDate.localeCompare(records[a].ad)));
+      return pre[0];
+    }
+    const sorted=idxs.slice().sort((a,b)=>(records[a].ad||'').localeCompare(records[b].ad||''));
+    return sorted[0];
+  };
+  const clDate={};  // recIdx → 가장 빠른 CSV 결제일
+  window.CSV_CLOSINGS.forEach(c=>{
+    const closeDate=c[0], childName=c[2], parentName=c[4];
+    const cn=norm(childName); if(!cn) return;
+    const pn=norm(parentName);
+    const pf=norm(firstTok(parentName));
+    let i=pickBest(pairIdx[cn+'|'+pn], closeDate);
+    if(i<0 && pf && pf!==pn) i=pickBest(pairFirstIdx[cn+'|'+pf], closeDate);
+    if(i<0) i=pickBest(childIdx[cn], closeDate);
+    if(i>=0){
+      if(!clDate[i] || closeDate < clDate[i]) clDate[i]=closeDate;
+    }
+  });
+  // r.cl override + cl_date 부여. 시트의 원래 cl 은 cl_sheet 로 보존 (재호출 시 덮어쓰지 않음).
+  records.forEach((r,i)=>{
+    if(r.cl_sheet === undefined) r.cl_sheet = r.cl;
+    if(clDate[i] !== undefined){
+      r.cl = 1;
+      r.cl_date = clDate[i];
+    } else {
+      r.cl = 0;
+      r.cl_date = '';
+    }
+  });
+}
+
 function buildD(records,today){
+  // ▶ CSV 통장입금 매칭으로 r.cl 보정 (모든 aggregation 전에 1번만)
+  applyCsvClToRecords(records);
   const D={today};
   const monthsSet=new Set();
   for(const r of records)if(r.ad)monthsSet.add(r.ad.slice(0,7));
@@ -7960,7 +8018,7 @@ function buildD(records,today){
       if(r.st==='vc'||r.st==='ls')vd=r.ad;
       else continue; // s/d/w 는 방문일 없으면 캘린더 제외
     }
-    const c={a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''};
+    const c={a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_date:r.cl_date||'',cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''};
     D.cal_recs.push(c);
   }
   D.cal_summary={};const calMonths=new Set(D.months);
@@ -7977,7 +8035,7 @@ function buildD(records,today){
     }
     D.cal_summary[month]={days,days_in:lastDay};
   }
-  D.records=records.map(r=>({a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''}));
+  D.records=records.map(r=>({a:r.a,t:r.t,m:r.m,st:r.st,cl:r.cl,cl_sheet:r.cl_sheet,cl_date:r.cl_date||'',cl_type:r.cl_type,nm:r.nm,pa:r.pa,ph:r.ph,pv:r.pv,ch:r.ch,vd:r.vd,ad:r.ad,od:r.od,dk:r.dk,cancel:r.cancel,memo:r.memo||''}));
   const chanMap={};
   for(const r of records){
     if(!r.ch)continue;
@@ -8172,6 +8230,17 @@ async function diagnoseSheetUrl(){
   } else {
     alert(lines.join('\n'));
   }
+}
+
+// data.js 의 pre-built D 에도 CSV 통장입금 매칭 적용 — 첫 렌더부터 KPI/코호트 수치 일치
+// (이후 applySheetRecords 가 호출돼도 idempotent — 같은 결과)
+if(typeof D !== 'undefined' && D && D.records && D.records.length && window.CSV_CLOSINGS && window.CSV_CLOSINGS.length){
+  try{
+    const _rebuilt = buildD(D.records.slice(), D.today);
+    _rebuilt.mlabels = Object.assign({}, D.mlabels||{}, _rebuilt.mlabels);
+    Object.keys(D).forEach(k=>delete D[k]);
+    Object.assign(D, _rebuilt);
+  }catch(e){ console.warn('CSV 매칭 초기화 실패:', e); }
 }
 
 // 정적 D의 백업 (페이지 로드 시 한 번만 저장 - 머지 시 과거 월 데이터 보존용)
