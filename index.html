@@ -4066,7 +4066,10 @@ function kpiTblRow(label, emo, color, st, isAll, dataTeam){
   // 팀 행에만 chevron 추가 (전체 통합 / 개별 에이전트 행 제외)
   const isTeamRow = !isAll && dataTeam.startsWith('TIM_');
   const isCollapsed = window.__teamCollapsed[dataTeam];
-  const teamAgentCount = isTeamRow ? ((D.team_members[dataTeam]||[]).length) : 0;
+  // 펼치기 버튼 카운트: 현재 기간(curFrom~curTo)에 DB 배정 있는 에이전트만 (실제 표에 펼쳐지는 행 수와 일치)
+  const teamAgentCount = isTeamRow
+    ? (D.team_members[dataTeam]||[]).filter(a=>(statsRange(curFrom, curTo, dataTeam, a).db||0) > 0).length
+    : 0;
   const chevron = isTeamRow
     ? `<button class="team-chevron-btn" data-count="${teamAgentCount}" onclick="event.stopPropagation();toggleTeamRows('${dataTeam}')" title="${isCollapsed?T('tbl_expand_short'):T('tbl_collapse_short')}" style="background:${color};color:white;border:none;border-radius:6px;padding:5px 11px;font-size:13px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:all .15s;white-space:nowrap;letter-spacing:-.2px">${isCollapsed?T('tbl_expand'):T('tbl_collapse')} · ${teamAgentCount}${T('tbl_persons')}</button>`
     : '';
@@ -7779,8 +7782,13 @@ function rowToRecord(row,today){
   if(st==='s'){if(visitDate&&visitDate>=today)s_f=1;else s_o=1;}
   // OFF/MKT 분류 (3-4월 기준): "Homepage" 들어가면 MKT, 나머지는 모두 OFF
   const dk = channel.toLowerCase().includes('homepage') ? 'MKT' : 'OFF';
-  // 'Tidak Closing' / 'Tidak Closng' 등은 클로징이 아님 — cl=0 처리
-  const cl = (clType && !/^tidak\b/i.test(clType)) ? 1 : 0;
+  // 클로징 여부: 결제 유형 키워드가 있어야 cl=1
+  // - 'Tidak Closing' / 'Tidak Closng' → tidak 접두 → cl=0
+  // - 'check' / '확인' 같은 placeholder 메모 → 화이트리스트 미스 → cl=0
+  // 화이트리스트: 실제 결제 유형에서 관측된 키워드 (Cicilan/Full Payment/Closing 상품/Elite/Program/완납/일시납/월납/분납/선수금/보증금/할인)
+  const cl = (clType && !/^tidak\b/i.test(clType) &&
+    /(cicilan|full payment|closing|elite|program|월납|분납|일시납|완납|선수금|보증금|할인)/i.test(clType))
+    ? 1 : 0;
   return{a:agent,t:team,m:ad.slice(0,7),st,cl,cl_type:clType,nm:childName,pa:parentName,ph:phone,pv:province,ch:channel,vd:visitDate,ad,od:0,dk,cancel:'',memo,kt,_sf:s_f,_so:s_o};
 }
 
