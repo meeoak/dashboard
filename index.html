@@ -7962,6 +7962,13 @@ function buildD(records,today){
   D.mlabels={};
   const _MONTH_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   for(const m of D.months){const mo=parseInt(m.split('-')[1]);D.mlabels[m]=_MONTH_EN[mo-1]||m;}
+  // 향후 2개월 라벨 추가 (드롭다운 표시용)
+  const _tMl=new Date(today);
+  for(let i=0;i<=2;i++){
+    const _mDt=new Date(_tMl.getFullYear(),_tMl.getMonth()+i,1);
+    const _mStr=`${_mDt.getFullYear()}-${String(_mDt.getMonth()+1).padStart(2,'0')}`;
+    if(!D.mlabels[_mStr])D.mlabels[_mStr]=_MONTH_EN[_mDt.getMonth()]||_mStr;
+  }
   D.teams=['TIM_GIAR','TIM_TINA','TIM_LIDIA'];
   D.team_members={TIM_GIAR:[],TIM_TINA:[],TIM_LIDIA:[]};
   D.a2t={};D.agent_meta={};
@@ -8036,6 +8043,12 @@ function buildD(records,today){
   }
   D.cal_summary={};const calMonths=new Set(D.months);
   for(const r of D.cal_recs)if(r.vd)calMonths.add(r.vd.slice(0,7));
+  // 향후 2개월 옵션 추가 (6월 등 미래 월 드롭다운에서 선택 가능하도록)
+  const _tDate=new Date(today);
+  for(let i=0;i<=2;i++){
+    const _m=new Date(_tDate.getFullYear(),_tDate.getMonth()+i,1);
+    calMonths.add(`${_m.getFullYear()}-${String(_m.getMonth()+1).padStart(2,'0')}`);
+  }
   D.cal_months=[...calMonths].sort();
   const dows=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   for(const month of D.cal_months){
