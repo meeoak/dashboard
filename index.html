@@ -3012,8 +3012,11 @@ function monthRange(m){
 
 function initFilters(){
   // 월 드롭다운: 데이터 월 + 미래 월(예정) 포함
+  // "예정" 태그는 오늘 월보다 미래인 경우만 (현재 월은 데이터 없어도 예정 아님)
+  const _today = D.today || new Date().toISOString().slice(0,10);
+  const _curMonthYM = _today.slice(0,7);
   const monthOpts = D.cal_months.map(m=>{
-    const isFuture = !D.months.includes(m);
+    const isFuture = m > _curMonthYM;
     const monthNum = m.slice(5).replace(/^0/,'');
     const monthLbl = (D.mlabels && D.mlabels[m]) || m;
     const futTag = isFuture ? (curLang==='ko' ? ' (예정)' : ' (depan)') : '';
