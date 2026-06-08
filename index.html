@@ -886,22 +886,24 @@ body.focus-mode #detail-section-hd{display:none!important}
 .rk-prev.below{background:#fef2f2;color:#b91c1c;border:1.5px solid #fecaca}
 .rbar{height:100%;border-radius:10px;transition:width .5s}
 .rstat-rate{background:#fef9c3;border:1px solid #fcd34d;border-radius:6px}
-.rstats{display:flex;gap:4px;flex-shrink:0;align-items:center}
-.rstat{text-align:center;width:54px;flex:0 0 54px;padding:3px 4px;border-radius:6px;transition:background .12s}
+/* 가로 정렬: 당월/전월/라벨 3행을 자식 셀들이 공유 (subgrid로 완벽 평행) */
+.rstats{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(54px,max-content);grid-template-rows:auto auto auto;gap:4px;flex-shrink:0;align-items:stretch}
+.rstat{display:grid;grid-template-rows:subgrid;grid-row:span 3;text-align:center;padding:3px 4px;border-radius:6px;transition:background .12s;width:auto}
 .rstat:hover{background:#f1f5f9}
-.rstat-v{font-size:14px;font-weight:900;letter-spacing:-.3px;line-height:1.1}
-.rstat-v-prev{font-size:11px;color:#94a3b8;font-weight:800;letter-spacing:-.3px;line-height:1.1;margin-top:2px;border-top:1px dashed #e2e8f0;padding-top:2px;cursor:pointer}
+.rstat-v{font-size:14px;font-weight:900;letter-spacing:-.3px;line-height:1.1;min-height:18px;display:flex;align-items:center;justify-content:center}
+.rstat-v-prev{font-size:11px;color:#94a3b8;font-weight:800;letter-spacing:-.3px;line-height:1.1;min-height:18px;display:flex;align-items:center;justify-content:center;border-top:1px dashed #e2e8f0;cursor:pointer}
 .rstat-v-prev:hover{color:#475569}
 .rstat-rate .rstat-v-prev{color:#a16207;border-top-color:#fde68a}
 .rstat-rate .rstat-v-prev:hover{color:#854d0e}
-.rstat-l{font-size:9.5px;color:#94a3b8;font-weight:800;letter-spacing:-.2px;margin-top:2px}
+.rstat-l{font-size:9.5px;color:#94a3b8;font-weight:800;letter-spacing:-.2px;min-height:14px;display:flex;align-items:center;justify-content:center}
 /* 점수 배지 (당월/전월 묶음) */
-.score-block{display:flex;flex-direction:column;gap:3px;align-items:stretch;flex-shrink:0;min-width:72px}
-.score-badge{background:linear-gradient(135deg,#fef3c7,#fefce8);color:#1e3a8a;font-size:18px;font-weight:900;border-radius:9px;padding:6px 12px;min-width:64px;text-align:center;border:1.5px solid #fbbf24;letter-spacing:-.4px;line-height:1}
+/* score-block 도 같은 3행 grid 공유 (당월=row1, 전월=row2~3 stretch) */
+.score-block{display:grid;grid-template-rows:subgrid;grid-row:span 3;align-items:stretch;flex-shrink:0;min-width:72px;gap:3px}
+.score-badge{background:linear-gradient(135deg,#fef3c7,#fefce8);color:#1e3a8a;font-size:18px;font-weight:900;border-radius:9px;padding:6px 12px;min-width:64px;text-align:center;border:1.5px solid #fbbf24;letter-spacing:-.4px;line-height:1;display:flex;align-items:center;justify-content:center;grid-row:1}
 .score-badge small{font-size:10px;font-weight:800;color:#92400e;letter-spacing:-.2px;margin-left:1px}
 .score-badge.act-idx{background:linear-gradient(135deg,#dbeafe,#eff6ff);color:#1e3a8a;border-color:#3b82f6}
 .score-badge.act-idx small{color:#3b82f6}
-.score-badge-prev{font-size:11px;font-weight:800;color:#64748b;background:#f1f5f9;padding:3px 8px;border-radius:6px;border:1px solid #e2e8f0;letter-spacing:-.2px;text-align:center;line-height:1.2}
+.score-badge-prev{font-size:11px;font-weight:800;color:#64748b;background:#f1f5f9;padding:3px 8px;border-radius:6px;border:1px solid #e2e8f0;letter-spacing:-.2px;text-align:center;line-height:1.2;display:flex;align-items:center;justify-content:center;grid-row:2 / span 2}
 .score-badge-prev b{color:#0f172a;font-weight:900;font-size:12.5px}
 .score-badge-prev small{font-size:9.5px;color:#94a3b8;font-weight:700}
 .top3-row .score-badge{background:linear-gradient(135deg,#fde68a,#fef3c7);border-color:#f59e0b;font-size:19px;padding:7px 14px}
