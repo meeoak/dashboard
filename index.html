@@ -2980,7 +2980,11 @@ const STLBL = window.STLBL;
 const STCOL = {d:'#16a34a',ls:'#1e293b',vc:'#6d28d9',s:'#1d4ed8',s_f:'#1d4ed8',s_o:'#dc2626',w:'#92400e',cl:'#1e3a8a',db:'#555',none:'#888',x:'#999'};
 const STBG  = {d:'#dcfce7',ls:'#ffedd5',vc:'#ede9fe',s:'#dbeafe',s_f:'#dbeafe',s_o:'#fee2e2',w:'#fef3c7',cl:'#fefce8',db:'#f5f5f5',none:'#fafafa',x:'#f5f5f5'};
 
-let curMonth = D.months[D.months.length-1];
+// 실제 오늘(로컬 기준) — data.js의 하드코딩된 today 대신 사용
+const _rtD = new Date();
+const REAL_TODAY = _rtD.getFullYear()+'-'+String(_rtD.getMonth()+1).padStart(2,'0')+'-'+String(_rtD.getDate()).padStart(2,'0');
+try { if(typeof D!=='undefined' && D) D.today = REAL_TODAY; } catch(e){}
+let curMonth = REAL_TODAY.slice(0,7);   // 기본 선택 월 = 현재 월 (데이터 유무 무관)
 let curTeam  = 'ALL';
 let curAgent = 'ALL';
 let curTab   = 'cal';
@@ -3013,9 +3017,15 @@ function monthRange(m){
 function initFilters(){
   // 월 드롭다운: 데이터 월 + 미래 월(예정) 포함
   // "예정" 태그는 오늘 월보다 미래인 경우만 (현재 월은 데이터 없어도 예정 아님)
-  const _today = D.today || new Date().toISOString().slice(0,10);
+  const _today = D.today || REAL_TODAY;
   const _curMonthYM = _today.slice(0,7);
-  const monthOpts = D.cal_months.map(m=>{
+  // 옵션 목록: cal_months + 현재 월 (데이터 없어도 현재 월 선택 가능)
+  let _months = (D.cal_months || D.months || []).slice();
+  if(!_months.includes(_curMonthYM)) _months.push(_curMonthYM);
+  _months = [...new Set(_months)].sort();
+  // curMonth이 옵션에 없으면 현재 월로 보정
+  if(curMonth!=='ALL' && !_months.includes(curMonth)) curMonth = _curMonthYM;
+  const monthOpts = _months.map(m=>{
     const isFuture = m > _curMonthYM;
     const monthNum = m.slice(5).replace(/^0/,'');
     const monthLbl = (D.mlabels && D.mlabels[m]) || m;
@@ -3023,9 +3033,10 @@ function initFilters(){
     return `<option value="${m}" ${m===curMonth?'selected':''}>${monthLbl}${futTag}</option>`;
   }).join('');
   document.getElementById('fsel-month').innerHTML = `<option value="ALL">${T('all_period')}</option>` + monthOpts;
-  // 기본 날짜 범위 = 최신 월
+  // 기본 날짜 범위 = 선택 월 (현재 월이면 오늘까지만 표시)
   const [s,e] = monthRange(curMonth);
-  curFrom = s; curTo = e;
+  curFrom = s;
+  curTo = (curMonth===_curMonthYM && e > _today) ? _today : e;
   document.getElementById('date-from').value = curFrom;
   document.getElementById('date-from').min = D.date_min;
   document.getElementById('date-from').max = D.date_max_ext;
@@ -8298,7 +8309,7 @@ function saveSheetCache(records){
 }
 function applySheetRecords(liveRecords){
   const merged = mergeRecords(window.__STATIC_RECORDS, liveRecords);
-  const today = new Date().toISOString().slice(0,10);
+  const today = REAL_TODAY;  // 로컬 기준 오늘로 통일 (헤더·기본 월 일치)
   const mergedD = buildD(merged, today);
   mergedD.mlabels = Object.assign({}, window.__STATIC_MLABELS, mergedD.mlabels);
   Object.keys(D).forEach(k=>delete D[k]);
